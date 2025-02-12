@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luffarschack med Minimax-algoritmen</title>
+    <!-- Favicon och Typsnitt -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
+    <style>
+        :root {
+            --bg: #f4f4f4;
+            --white: #ffffff;
+            --primary: #40534C;
+            --dark: #1A3636;
+            --text: #644117;
+            --subtle: #D6BD98;
+            --effect: #677D6A;
+            --placeholder: #B9AFA1;
+            --textarea: #FCF8F4;
+            --extra_effect: #D98E04; /* border summary*/
+            --extra_primary: #E0A030; /*bg summary*/
+            --extra_primary_dark: #705018;
+            --extra_red: #A44434;
+            --extra_red_dark: #52221A;
+            --status_graygreen: #8E9775; /* bg dator */
+            --status_olivegreen: #5B7052; /* border dator */
+            --status_ochreyellow: #D4A76A; /* bg player */
+            --status_goldenbrown: #C2955C; /* border player*/
+            --status_sienna: #A0522D; /* bg pruning */
+            --status_burntumber: #8A3324; /* border pruning */
+            --status_sandbrown: #C4A484; /* bg */
+            --status_terracotta: #A66A4C; /* border */
+            --status_bronze: #CD7F32; /* bg */
+            --status_cinnamon: #D2691E; /* border */
+        }
+
+        /* ====== Grundinställningar ====== */
+        body {
+            font-family: 'Source Serif Pro', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+        }
+
+        .container {
+            max-width: 700px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            font-size: 24px;
+            color: var(--white);
+            background-color: var(--primary);
+            border-radius: 8px 8px 0 0;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inforuta {
+            margin-top: 0px;
+            font-size: 15px;
+            color: var(--text);
+            background-color: var(--subtle);
+            border-radius: 0 0 8px 8px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+        }
+
+        /* ====== Layout: spelplan och visualisering sida vid sida ====== */
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ====== Spelplanen (vänster) ====== */
+        #game-container {
+            font-family: 'Lucida Console', monospace;
+            flex: 0 0 40%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        #game {
+            width: 100%;
+            aspect-ratio: 1/1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 5px;
+            box-sizing: border-box;
+        }
+
+        .cell {
+            background-color: var(--primary);
+            border-radius: 8px;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            cursor: pointer;
+            transition: background-color 0.3s, border 0.3s;
+            outline: none;
+        }
+
+        /* När cellen inte går att klicka visas en "not-allowed" muspekare */
+        .cell.disabled {
+            cursor: not-allowed;
+        }
+
+        /* ====== Beräkningsrutan (höger) ====== */
+        #visualization-container {
+            flex: 1 1 auto;
+            box-sizing: border-box;
+            scrollbar-color: var(--effect) var(--primary);
+        }
+
+        #visualization {
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--primary);
+            border-radius: 8px;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        /* ====== Färgade steg-containrar ====== */
+        .step-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1em;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .step-container.computer {
+            background-color: var(--status_graygreen);
+            border-left: 5px solid var(--status_olivegreen);
+            color: var(--white);
+        }
+
+        .step-container.player {
+            background-color: var(--status_ochreyellow);
+            border-left: 5px solid var(--status_goldenbrown);
+            color: var(--white);
+        }
+
+        .step-container.prune {
+            background-color: var(--status_sienna);
+            border-left: 5px solid var(--status_burntumber);
+            color: var(--white);
+        }
+
+        #separator {
+            border-top: 1px dashed var(--dark);
+            margin: 20px 0;
+        }
+
+        /* ====== Sammanställningsruta (gul) ====== */
+        .summary {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--extra_primary);
+            border-left: 5px solid var(--extra_effect);
+            border-radius: 8px;
+            color: var(--white);
+            font-family: monospace;
+            max-width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ====== Startknapp & Status ====== */
+        #startBtn {
+            cursor: pointer;
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px 0;
+        }
+
+        #startBtn:hover {
+            background-color: var(--effect);
+        }
+
+        #status {
+            background-color: var(--extra_primary);
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--white);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 0;
+        }
+
+        /* Klass för emoji-skugga */
+        .emoji-shadow {
+            text-shadow: 0px 0px 7px var(--extra_red);
+        }
+
+        #status_outside {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--extra_effect);
+            border: 1px solid var(--extra_red);
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        /* ====== Markering av nuvarande drag i simulerad spelplan ====== */
+        .current-move {
+            font-weight: bold;
+            color: var(--white);
+            text-shadow: 0px 0px 5px var(--effect);
+        }
+
+        /* ====== Responsiv layout för mobiler ====== */
+        @media (max-width: 600px) {
+            .flex-row {
+                flex-direction: column;
+            }
+
+            #game-container,
+            #visualization-container {
+                flex: 1 1 100%;
+            }
+
+            #visualization {
+                max-height: 300px;
+            }
+        }
+
+        /* ====== Ny container med ljusgrön bakgrund ====== */
+        .outer-game-container {
+            background-color: var(--effect);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            <span>Luffarschack med Minimax-algoritmen</span>
+            <span id="turnIndicator" style="font-size: 1;">🙋</span>
+        </h1>
+        <p class="inforuta">
+            Algoritmen undersöker alla möjliga drag utifrån det nuvarande läget och tilldelar varje drag poäng utifrån vad det draget kommer att leda till, under förutsättning att båda deltagarna spelar optimalt. <strong>1p</strong>
+            innebär vinst för spelaren, <strong>0p</strong> innebär oavgjort och <strong>-1p</strong> innebär vinst för datorn.
+        </p>
+        <!-- Container med ljusgrön bakgrund -->
+        <div class="outer-game-container">
+            <div class="flex-row">
+                <!-- Spelplanen (vänster) -->
+                <div id="game-container">
+                    <div id="game" role="grid" aria-label="Tic-Tac-Toe spelplan">
+                        <div class="cell" role="gridcell" data-index="0" tabindex="0" aria-label="Rutan 1"></div>
+                        <div class="cell" role="gridcell" data-index="1" tabindex="0" aria-label="Rutan 2"></div>
+                        <div class="cell" role="gridcell" data-index="2" tabindex="0" aria-label="Rutan 3"></div>
+                        <div class="cell" role="gridcell" data-index="3" tabindex="0" aria-label="Rutan 4"></div>
+                        <div class="cell" role="gridcell" data-index="4" tabindex="0" aria-label="Rutan 5"></div>
+                        <div class="cell" role="gridcell" data-index="5" tabindex="0" aria-label="Rutan 6"></div>
+                        <div class="cell" role="gridcell" data-index="6" tabindex="0" aria-label="Rutan 7"></div>
+                        <div class="cell" role="gridcell" data-index="7" tabindex="0" aria-label="Rutan 8"></div>
+                        <div class="cell" role="gridcell" data-index="8" tabindex="0" aria-label="Rutan 9"></div>
+                    </div>
+                </div>
+                <!-- Beräkningsrutan (höger) -->
+                <div id="visualization-container">
+                    <div id="visualization" aria-label="AI Beslutsprocess">
+                        <!-- Här renderas draglogiken -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Knapp som styr start, avbrott och återställning av omgång -->
+        <button id="startBtn">Starta en omgång</button>
+        <hr id="separator" />
+        <!-- Uppdaterad statistikruta med emoji-skugga -->
+        <div id="status_outside">
+            <div id="status">
+                <span class="emoji-shadow">🙋</span> 0
+                <span class="emoji-shadow">🤖</span> 0
+                <span class="emoji-shadow">🤝</span> 0
+            </div>
+        </div>
+    </div>
+    <!-- JAVASCRIPT-KOD -->
+    <script>
+        /***** Globala DOM-element och variabler *****/
+    const cells = document.querySelectorAll('.cell');
+    const startBtn = document.getElementById('startBtn');
+    const visualization = document.getElementById('visualization');
+    const statusDiv = document.getElementById('status');
+    const game = document.getElementById('game');
+
+    let winCount = 0;
+    let lossCount = 0;
+    let drawCount = 0;
+
+    const INF = Number.POSITIVE_INFINITY;
+
+    const PLAYER = 'X';
+    const COMPUTER = 'O';
+
+    const alphaBetaEnabled = false;
+
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = PLAYER;
+    let gameOver = false;
+    let disableUserInput = false;
+    // Variabel som håller koll på om en omgång pågår
+    let gameRunning = false;
+
+    /***** Uppdatera knapptexten utifrån spelets status *****/
+    function updateButtonText() {
+      if (gameRunning) {
+        startBtn.textContent = "Avbryt omgång";
+      } else {
+        // Om spelplanen är tom visas "Starta en omgång", annars "Starta en ny omgång"
+        if (board.some(cell => cell !== '')) {
+          startBtn.textContent = "Starta en ny omgång";
+        } else {
+          startBtn.textContent = "Starta en omgång";
+        }
+      }
+    }
+
+    /***** Uppdatera cellernas muspekare *****/
+    function updateCellsDisabledState() {
+      cells.forEach(cell => {
+        // Om vi inte har startat en match eller om användarinput är avstängd så sätts muspekaren till not-allowed
+        if (disableUserInput || !gameRunning) {
+          cell.classList.add('disabled');
+        } else {
+          cell.classList.remove('disabled');
+        }
+      });
+    }
+
+    const preCount = 2000;
+    const postCount = 2000;
+
+    function matchHeights() {
+      const gameHeight = game.offsetHeight;
+      visualization.style.height = gameHeight + 'px';
+      adjustVisualizationPadding();
+    }
+
+    function adjustVisualizationPadding() {
+      visualization.style.paddingRight = '5px';
+    }
+
+    function displayNum(num) {
+      if (num === Infinity) return "∞";
+      if (num === -Infinity) return "-∞";
+      return num;
+    }
+
+    function updateTurnIndicator() {
+      const turnIndicator = document.getElementById('turnIndicator');
+      if (currentPlayer === PLAYER) {
+        turnIndicator.textContent = '🙋';
+      } else if (currentPlayer === COMPUTER) {
+        turnIndicator.textContent = '🤖';
+      }
+    }
+
+    // Uppdatera poängrutan med emoji-skugga
+    function updateStats() {
+      statusDiv.innerHTML = `<span class="emoji-shadow">🙋</span> ${winCount} 
+                             <span class="emoji-shadow">🤖</span> ${lossCount} 
+                             <span class="emoji-shadow">🤝</span> ${drawCount}`;
+    }
+
+    /***** Starta spelet *****/
+    function init() {
+      gameRunning = true;
+      updateButtonText();
+
+      board = ['', '', '', '', '', '', '', '', ''];
+      visualization.innerHTML = '';
+      gameOver = false;
+      disableUserInput = false;
+      updateCellsDisabledState();
+
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.style.color = 'var(--white)';
+        cell.style.backgroundColor = 'var(--primary)';
+        cell.setAttribute('aria-label', `Rutan ${parseInt(cell.getAttribute('data-index')) + 1}`);
+      });
+
+      if (Math.random() < 0.5) {
+        currentPlayer = COMPUTER;
+        updateTurnIndicator();
+        disableUserInput = true;
+        updateCellsDisabledState();
+        setTimeout(computerMove, 500);
+      } else {
+        currentPlayer = PLAYER;
+        updateTurnIndicator();
+        const firstAvailable = document.querySelector('.cell[data-index="0"]');
+        if (firstAvailable) firstAvailable.focus();
+      }
+      matchHeights();
+      updateStats();
+    }
+
+    /***** Avbryt en pågående omgång och rensa spelplanen *****/
+    function cancelGame() {
+      gameOver = true;
+      gameRunning = false;
+      // Rensa spelplanen: nollställ board-arrayen och ta bort text samt återställ bakgrundsfärgen i cellerna
+      board = ['', '', '', '', '', '', '', '', ''];
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.style.backgroundColor = 'var(--primary)';
+      });
+      updateButtonText();
+      updateCellsDisabledState();
+    }
+
+    /***** Händelsehantering för spelarens drag *****
+     * Lägg även till kontroll av att en match är startad
+     *****/
+    function handleCellAction(index) {
+      if (!gameRunning || gameOver || currentPlayer !== PLAYER || disableUserInput) return;
+      makeMove(index, PLAYER);
+    }
+
+    function handleCellClick(e) {
+      const index = e.target.getAttribute('data-index');
+      handleCellAction(index);
+    }
+
+    function handleCellKeydown(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const index = e.target.getAttribute('data-index');
+        handleCellAction(index);
+      }
+    }
+
+    game.addEventListener('click', function(e) {
+      if (e.target.classList.contains('cell')) {
+        handleCellClick(e);
+      }
+    });
+
+    game.addEventListener('keydown', function(e) {
+      if (e.target.classList.contains('cell')) {
+        handleCellKeydown(e);
+      }
+    });
+
+    function makeMove(index, player) {
+      if (board[index] !== '' || gameOver) return;
+      board[index] = player;
+      const cell = document.querySelector(`.cell[data-index='${index}']`);
+      cell.textContent = player;
+      cell.style.color = 'var(--white)';
+
+      const winner = checkWinner(board);
+      if (winner) {
+        gameOver = true;
+        gameRunning = false;
+        updateButtonText();
+        updateCellsDisabledState();
+        if (winner.winner === PLAYER) {
+          winCount++;
+        } else {
+          lossCount++;
+        }
+        updateStats();
+        highlightWinningCombination(winner.combination);
+        return;
+      } else if (isBoardFull(board)) {
+        gameOver = true;
+        gameRunning = false;
+        updateButtonText();
+        updateCellsDisabledState();
+        drawCount++;
+        updateStats();
+        return;
+      }
+
+      currentPlayer = (currentPlayer === PLAYER) ? COMPUTER : PLAYER;
+      updateTurnIndicator();
+      if (currentPlayer === COMPUTER) {
+        updateStats();
+        disableUserInput = true;
+        updateCellsDisabledState();
+        setTimeout(computerMove, 500);
+      } else {
+        updateStats();
+        const nextAvailable = getAvailableSpots(board)[0];
+        if (nextAvailable !== undefined) {
+          const nextCell = document.querySelector(`.cell[data-index='${nextAvailable}']`);
+          if (nextCell) nextCell.focus();
+        }
+      }
+    }
+
+    function computerMove() {
+      if (gameOver) return;
+
+      const steps = [];
+      const summary = {
+        totalNodesEvaluated: 0,
+        totalPrunes: 0,
+        computationTime: 0
+      };
+      const startTime = performance.now();
+      let best;
+      if (alphaBetaEnabled) {
+        best = alphaBeta([...board], COMPUTER, -INF, INF, steps, summary);
+      } else {
+        best = minimax([...board], COMPUTER, steps, summary);
+      }
+      const endTime = performance.now();
+      summary.computationTime = (endTime - startTime).toFixed(2);
+
+      makeMove(best.index, COMPUTER);
+      updateVisualization(steps, summary, best);
+    }
+
+    function alphaBeta(tempBoard, player, alpha, beta, steps, summary) {
+      const availSpots = getAvailableSpots(tempBoard);
+      const check = checkWinner(tempBoard);
+
+      if (check) {
+        summary.totalNodesEvaluated++;
+        if (check.winner === PLAYER) return { score: 1 };
+        if (check.winner === COMPUTER) return { score: -1 };
+      } else if (availSpots.length === 0) {
+        summary.totalNodesEvaluated++;
+        return { score: 0 };
+      }
+
+      if (player === COMPUTER) {
+        let bestScore = INF;
+        let bestMove = null;
+        for (let i = 0; i < availSpots.length; i++) {
+          const idx = availSpots[i];
+          tempBoard[idx] = COMPUTER;
+          const boardSnapshot = [...tempBoard];
+          const result = alphaBeta(tempBoard, PLAYER, alpha, beta, steps, summary);
+          tempBoard[idx] = '';
+          summary.totalNodesEvaluated++;
+
+          if (result.score < bestScore) {
+            bestScore = result.score;
+            bestMove = idx;
+          }
+          beta = Math.min(beta, bestScore);
+
+          steps.push({
+            type: 'computer',
+            route: idx + 1,
+            score: result.score,
+            board: boardSnapshot
+          });
+
+          if (beta <= alpha) {
+            const pruneSnapshot = [...tempBoard];
+            steps.push({
+              type: 'prune',
+              board: pruneSnapshot
+            });
+            summary.totalPrunes++;
+            break;
+          }
+        }
+        return { score: bestScore, index: bestMove };
+      } else {
+        let bestScore = -INF;
+        let bestMove = null;
+        for (let i = 0; i < availSpots.length; i++) {
+          const idx = availSpots[i];
+          tempBoard[idx] = PLAYER;
+          const boardSnapshot = [...tempBoard];
+          const result = alphaBeta(tempBoard, COMPUTER, alpha, beta, steps, summary);
+          tempBoard[idx] = '';
+          summary.totalNodesEvaluated++;
+
+          if (result.score > bestScore) {
+            bestScore = result.score;
+            bestMove = idx;
+          }
+          alpha = Math.max(alpha, bestScore);
+
+          steps.push({
+            type: 'player',
+            route: idx + 1,
+            score: result.score,
+            board: boardSnapshot
+          });
+
+          if (beta <= alpha) {
+            const pruneSnapshot = [...tempBoard];
+            steps.push({
+              type: 'prune',
+              board: pruneSnapshot
+            });
+            summary.totalPrunes++;
+            break;
+          }
+        }
+        return { score: bestScore, index: bestMove };
+      }
+    }
+
+    function minimax(tempBoard, player, steps, summary) {
+      const availSpots = getAvailableSpots(tempBoard);
+      const check = checkWinner(tempBoard);
+
+      if (check) {
+        summary.totalNodesEvaluated++;
+        if (check.winner === PLAYER) return { score: 1 };
+        if (check.winner === COMPUTER) return { score: -1 };
+      } else if (availSpots.length === 0) {
+        summary.totalNodesEvaluated++;
+        return { score: 0 };
+      }
+
+      if (player === COMPUTER) {
+        let bestScore = INF;
+        let bestMove = null;
+        for (let i = 0; i < availSpots.length; i++) {
+          const idx = availSpots[i];
+          tempBoard[idx] = COMPUTER;
+          const boardSnapshot = [...tempBoard];
+          const result = minimax(tempBoard, PLAYER, steps, summary);
+          tempBoard[idx] = '';
+          summary.totalNodesEvaluated++;
+
+          if (result.score < bestScore) {
+            bestScore = result.score;
+            bestMove = idx;
+          }
+          steps.push({
+            type: 'computer',
+            route: idx + 1,
+            score: result.score,
+            board: boardSnapshot
+          });
+        }
+        return { score: bestScore, index: bestMove };
+      } else {
+        let bestScore = -INF;
+        let bestMove = null;
+        for (let i = 0; i < availSpots.length; i++) {
+          const idx = availSpots[i];
+          tempBoard[idx] = PLAYER;
+          const boardSnapshot = [...tempBoard];
+          const result = minimax(tempBoard, COMPUTER, steps, summary);
+          tempBoard[idx] = '';
+          summary.totalNodesEvaluated++;
+
+          if (result.score > bestScore) {
+            bestScore = result.score;
+            bestMove = idx;
+          }
+          steps.push({
+            type: 'player',
+            route: idx + 1,
+            score: result.score,
+            board: boardSnapshot
+          });
+        }
+        return { score: bestScore, index: bestMove };
+      }
+    }
+
+    function getAvailableSpots(bd) {
+      return bd.reduce((acc, val, i) => {
+        if (val === '') acc.push(i);
+        return acc;
+      }, []);
+    }
+
+    function checkWinner(bd) {
+      const patterns = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+      ];
+      for (let combo of patterns) {
+        const [a, b, c] = combo;
+        if (bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) {
+          return { winner: bd[a], combination: combo };
+        }
+      }
+      return null;
+    }
+
+    function isBoardFull(bd) {
+      return bd.every(cell => cell !== '');
+    }
+
+    function renderBoardHTML(step) {
+      const currentMoveIndex = step.route ? step.route - 1 : -1;
+      const boardCells = step.board.map((cell, idx) => {
+        let content = cell === '' ? '·' : cell;
+        if (idx === currentMoveIndex) {
+          content = `<span class="current-move">${content}</span>`;
+        }
+        return content;
+      });
+      let rows = [];
+      for (let i = 0; i < boardCells.length; i += 3) {
+        rows.push(`<div style="white-space: nowrap;">${boardCells.slice(i, i + 3).join(' ')}</div>`);
+      }
+      return rows.join('');
+    }
+
+    function renderStep(step) {
+      let stepClass = "";
+      let emoji = "";
+      let infoText = "";
+      if (step.type === 'computer') {
+        stepClass = "computer";
+        emoji = "🤖";
+        infoText = `Datorn testar ruta ${step.route} <strong>→ ${step.score}p</strong>`;
+      } else if (step.type === 'player') {
+        stepClass = "player";
+        emoji = "🙋";
+        infoText = `Spelaren testar ruta ${step.route} <strong>→ ${step.score}p</strong>`;
+      } else if (step.type === 'prune') {
+        stepClass = "prune";
+        emoji = "✂️";
+        infoText = `&nbsp;<br>Vi kapar en gren i trädet<br>&nbsp;`;
+      } else if (step.type === 'random') {
+        stepClass = "computer";
+        emoji = "🎲";
+        if (step.score === 0) {
+          infoText = step.message;
+        } else {
+          infoText = `${step.message} <strong>→ ${step.score}p</strong>`;
+        }
+      }
+      const boardRows = renderBoardHTML(step);
+      return `<div class="step-container ${stepClass}" style="display:flex; flex-direction:row; align-items:center; gap:1em; margin-bottom:10px; padding:10px;">` +
+             `<div style="margin:0; font-family:monospace;">${boardRows}</div>` +
+             `<div style="margin:0; font-family:monospace;">${infoText}</div>` +
+             `<div style="margin-left:auto; display:flex; align-items:center; font-size:2em;">${emoji}</div>` +
+             `</div>`;
+    }
+
+    function updateVisualization(steps, summary, best) {
+      const totalSteps = steps.length;
+      let html = "";
+      if (totalSteps <= preCount + postCount) {
+        for (let i = totalSteps - 1; i >= 0; i--) {
+          html += renderStep(steps[i]);
+        }
+      } else {
+        for (let i = totalSteps - 1; i >= totalSteps - postCount; i--) {
+          html += renderStep(steps[i]);
+        }
+        const skippedCount = totalSteps - preCount - postCount;
+        html += `<div class="step-container skip" style="background-color:#dc3545; margin-bottom:10px; padding:10px; font-family:monospace; text-align:center; color:white;">` +
+                `<pre style="margin:0; color:white;">-- ${skippedCount} drag har dolts av prestandaskäl --</pre>` +
+                `</div>`;
+        for (let i = preCount - 1; i >= 0; i--) {
+          html += renderStep(steps[i]);
+        }
+      }
+
+      let statsText = `Utvärderade noder: ${summary.totalNodesEvaluated}<br>`;
+      if (alphaBetaEnabled) {
+        statsText += `Alpha-beta prunings: ${summary.totalPrunes}<br>`;
+      }
+      statsText += `Beräkningstid: ${summary.computationTime} ms<br>`;
+      statsText += `Bästa draget: Ruta ${best.index + 1} <strong>→ ${best.score}p</strong>`;
+
+      html += `<div class="summary" style="margin-top:10px; padding:10px; font-family:monospace; max-width: 100%;">` +
+              `<div style="flex: 1;">` +
+              `<strong>Sammanställning:</strong><br>${statsText}` +
+              `</div>` +
+              `<div style="margin-left:auto; display:flex; align-items:center; font-size:2em;">📊</div>` +
+              `</div>`;
+
+      visualization.innerHTML = html;
+      adjustVisualizationPadding();
+      autoScrollVisualization(() => {
+        disableUserInput = false;
+        updateCellsDisabledState();
+        if (!gameOver && currentPlayer === PLAYER) {
+          const nextAvailable = getAvailableSpots(board)[0];
+          if (nextAvailable !== undefined) {
+            const nextCell = document.querySelector(`.cell[data-index='${nextAvailable}']`);
+            if (nextCell) nextCell.focus();
+          }
+        }
+      });
+    }
+
+    function autoScrollVisualization(callback) {
+      visualization.scrollTop = 0;
+      const start = 0;
+      const end = visualization.scrollHeight - visualization.clientHeight;
+      const duration = 500;
+      let startTime = null;
+      function animateScroll(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = timestamp - startTime;
+        let fraction = progress / duration;
+        if (fraction > 1) fraction = 1;
+        visualization.scrollTop = start + fraction * (end - start);
+        if (fraction < 1) {
+          requestAnimationFrame(animateScroll);
+        } else {
+          if (callback) callback();
+        }
+      }
+      requestAnimationFrame(animateScroll);
+    }
+
+    function highlightWinningCombination(combo) {
+      combo.forEach(i => {
+        const cell = document.querySelector(`.cell[data-index='${i}']`);
+        cell.style.backgroundColor = 'var(--dark)';
+      });
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (!gameRunning) {
+        init();
+      } else {
+        cancelGame();
+      }
+    });
+
+    window.onload = () => {
+      updateStats();
+      matchHeights();
+      updateButtonText();
+      updateCellsDisabledState();
+    };
+
+    window.addEventListener('resize', matchHeights);
+    </script>
+</body>
+
+</html>

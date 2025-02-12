@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <title>Välj ett slumpmässigt namn</title>
+  <style>
+    :root {
+      --bg: #f4f4f4; /* ljusgrå */
+      --white: #ffffff; /* vit */
+      --primary: #40534C; /* dämpad grön/blå */
+      --dark: #1A3636; /* mörk teal */
+      --text: #644117; /* mörk brun */
+      --subtle: #D6BD98; /* ljus beige */
+      --effect: #677D6A; /* gråblå/grön */
+      --placeholder: #B9AFA1; /* grå/beige  */
+      --textarea: #FCF8F4; /* ljusbeige till rutor*/
+    }
+
+    ::placeholder {
+      color: var(--placeholder);
+      opacity: 1;
+    }
+
+    body {
+      font-family: 'Source Serif Pro', serif;
+      text-align: left;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 0;
+    }
+
+    p {
+      margin-top: 0px;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 0 0 8px 8px;
+      padding: 10px 20px;
+      margin-bottom: 12px;
+    }
+
+    .container {
+      max-width: 700px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+    }
+
+    label {
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--dark);
+      margin-top: 0px;
+    }
+
+    textarea {
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      font-size: 12px;
+      border-radius: 5px;
+      width: 100%;
+      height: 120px;
+      padding: 8px;
+      margin: 5px 0;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    textarea[readonly] {
+      background-color: var(--textarea);
+      height: 80px;
+      overflow-y: auto;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    button:hover {
+      background-color: var(--effect);
+    }
+
+    .name-display {
+      font-family: 'Poppins', sans-serif;
+      color: var(--white);
+      font-size: 32px;
+      padding: 10px;
+      background-color: var(--primary);
+      border-radius: 8px;
+      text-align: center;
+      transition: background-color 0.5s;
+      margin-bottom: 0px;
+    }
+
+    .name_outside {
+      border: 1px solid var(--primary);
+      padding: 15px;
+      border-radius: 8px;
+      background-color: var(--effect);
+    }
+
+    #separator {
+      border-top: 1px dashed var(--dark);
+      margin: 20px 0;
+    }
+
+    .flash-green {
+      animation: flashGreen 0.5s;
+    }
+
+    @keyframes flashGreen {
+      0% {
+        background-color: var(--primary);
+      }
+
+      50% {
+        background-color: var(--dark);
+      }
+
+      100% {
+        background-color: var(--primary);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Välj ett slumpmässigt namn</h1>
+    <p>Använd detta verktyg för att välja nästa elev som ska svara på en fråga, hålla sitt framförande eller andra
+      situationer där det är viktigt att eleverna blir slumpmässigt utvalda. Använd komma eller ny rad för
+      separering.</p>
+
+    <label for="studentNames">Ange elevernas namn:</label><br>
+    <textarea id="studentNames" placeholder="Anna, Bengt, Cecilia, David, Emma o.s.v."></textarea><br>
+
+    <label for="selectedNames">Redan valda elever:</label><br>
+    <textarea id="selectedNames" readonly placeholder=""></textarea><br>
+
+    <button id="chooseButton" onclick="chooseRandomName()">Välj ett slumpmässigt namn i listan</button>
+
+    <hr id="separator" />
+
+    <div class="name_outside">
+      <p class="name-display" id="nameDisplay">&#129300;</p>
+    </div>
+  </div>
+
+  <script>
+    // Funktion för att blanda en array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    let animationTimeout;
+    let animationInterval;
+
+    function chooseRandomName() {
+      const chooseButton = document.getElementById('chooseButton');
+      chooseButton.disabled = true;
+      chooseButton.style.cursor = 'not-allowed';
+      chooseButton.style.opacity = '0.6';
+
+      // Hämta och processa tillgängliga namn
+      let names = document.getElementById('studentNames').value
+        .trim()
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(name => name !== '');
+
+      // Hämta redan valda namn
+      let selectedNamesTextarea = document.getElementById('selectedNames');
+      let selectedNames = selectedNamesTextarea.value
+        .trim()
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(name => name !== '');
+
+      // Ta bort redan valda namn från listan
+      names = names.filter(name => !selectedNames.includes(name));
+
+      if (names.length === 0) {
+        alert('Alla namn har redan valts.');
+        chooseButton.disabled = false;
+        chooseButton.style.cursor = 'pointer';
+        chooseButton.style.opacity = '1';
+        return;
+      }
+
+      // Om endast ett namn finns kvar, välj det direkt
+      if (names.length === 1) {
+        const selectedName = names[0];
+        displaySelectedName(selectedName);
+        document.getElementById('nameDisplay').textContent = selectedName;
+        flashGreen();
+        chooseButton.disabled = false;
+        chooseButton.style.cursor = 'pointer';
+        chooseButton.style.opacity = '1';
+        return;
+      }
+
+      // Blanda namnen
+      const shuffledNames = shuffle([...names]);
+      const nameDisplay = document.getElementById('nameDisplay');
+
+      // Sätt en initial text – bakgrundsfärgen behålls enligt CSS (var(--primary))
+      nameDisplay.textContent = 'Carl XVI Gustaf';
+      // OBS: Ta bort eller kommentera ut raden nedan så att bakgrundsfärgen inte ändras under animationen:
+      // nameDisplay.style.backgroundColor = 'var(--effect)';
+
+      // Inställningar för den progressiva animationen
+      let currentIndex = 0;
+      let intervalTime = 200;
+      const minInterval = 50;
+      const intervalDecrease = 10;
+
+      function animateNames() {
+        nameDisplay.textContent = shuffledNames[currentIndex];
+        currentIndex = (currentIndex + 1) % shuffledNames.length;
+        if (intervalTime > minInterval) {
+          intervalTime -= intervalDecrease;
+          clearInterval(animationInterval);
+          animationInterval = setInterval(animateNames, intervalTime);
+        }
+      }
+
+      animationInterval = setInterval(animateNames, intervalTime);
+
+      // Stoppa animationen efter 3 sekunder och välj ett slumpmässigt namn
+      animationTimeout = setTimeout(() => {
+        clearInterval(animationInterval);
+        const randomIndex = Math.floor(Math.random() * shuffledNames.length);
+        const selectedName = shuffledNames[randomIndex];
+        nameDisplay.textContent = selectedName;
+        flashGreen();
+        displaySelectedName(selectedName);
+        chooseButton.disabled = false;
+        chooseButton.style.cursor = 'pointer';
+        chooseButton.style.opacity = '1';
+      }, 3000);
+    }
+
+    function displaySelectedName(selectedName) {
+      let selectedNamesTextarea = document.getElementById('selectedNames');
+      let selectedNames = selectedNamesTextarea.value
+        .trim()
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(name => name !== '');
+      selectedNames.push(selectedName);
+      selectedNamesTextarea.value = selectedNames.join(', ');
+
+      // Ta bort det valda namnet från listan med tillgängliga namn
+      let names = document.getElementById('studentNames').value
+        .trim()
+        .split(/[\n,]+/)
+        .map(name => name.trim())
+        .filter(name => name !== '');
+      names = names.filter(name => name !== selectedName);
+      document.getElementById('studentNames').value = names.join(', ');
+    }
+
+    function flashGreen() {
+      const nameDisplay = document.getElementById('nameDisplay');
+      nameDisplay.classList.add('flash-green');
+      setTimeout(() => {
+        nameDisplay.classList.remove('flash-green');
+      }, 500);
+    }
+  </script>
+</body>
+
+</html>

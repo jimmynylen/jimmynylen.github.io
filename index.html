@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jimmy Nylén [.se]</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <style>
+    :root {
+      --bg: #f4f4f4;       /* ljusgrå (#f4f4f4) */
+      --white: #ffffff;    /* vit (#ffffff) */
+      --primary: #40534C;  /* dämpad grön/blå (#40534C) */
+      --dark: #1A3636;     /* mörk teal (#1A3636) */
+      --text: #644117;     /* mörk brun (#644117) */
+      --subtle: #D6BD98;   /* ljus beige (#D6BD98) */
+      --hover: #677D6A;    /* gråblå/grön (#677D6A) */
+      --accent: #E5004B;   /* stark röd (#E5004B) */
+    }
+
+    body {
+      font-family: 'Source Serif Pro', serif;
+      text-align: left;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin-top: 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+      margin-bottom: 0;
+    }
+
+    p {
+      margin-top: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      padding: 10px 20px;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .button-container button {
+      flex: 1 1 calc(50% - 10px);
+      cursor: pointer;
+      background-color: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      padding: 10px 0;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 500px) {
+      .button-container button {
+        flex: 1 1 100%;
+      }
+    }
+
+    button:hover {
+      background-color: var(--hover);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Rubrikstil som efterliknar pre-taggens utseende */
+    h2.dashed-header {
+      font-family: monospace; /* Monospace (standard för pre-taggar) */
+      font-size: 14px;        /* Anpassad storlek för att matcha pre-taggen */
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      margin: 20px 0;
+      margin-bottom: 5px;
+      margin-top: 15px;
+      white-space: nowrap;    /* Behåller whitespace så att innehållet inte bryts */
+    }
+
+    h2.dashed-header .title {
+      margin-right: 5px;
+    }
+
+    h2.dashed-header::after {
+      content: "";
+      flex-grow: 1;
+      border-bottom: 1px dashed var(--dark);
+      margin-left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Skolverktyg skapade med AI</h1>
+
+    <p>Dessa verktyg är skapade som ett experiment för att se hur väl Artificiell Intelligens fungerar som ett stöd
+      vid programmering. Alla verktyg är skapade med ChatGPT (som inte alltid gör saker så enkla som man hade hoppats) och endast visuella justeringar är gjorda för hand.</p>
+
+    <!-- Rubrik som efterliknar pre -->
+    <h2 class="dashed-header"><span class="title">Klassrumsverktyg</span></h2>
+    <div class="button-container">
+      <button onclick="window.location.href='https://jimmynylen.se/klassrum/grupp'">Skapa slumpmässiga grupper</button>
+      <button onclick="window.location.href='https://jimmynylen.se/klassrum/namn'">Välj ett slumpmässigt namn</button>
+      <!--<button onclick="window.location.href='https://jimmynylen.se/klassrum/timer'">Provinformation och klassrumstimer</button>-->
+    </div>
+
+    <!-- Rubrik för Matematik -->
+    <h2 class="dashed-header"><span class="title">Matematik</span></h2>
+    <div class="button-container">
+      <button onclick="window.location.href='https://jimmynylen.se/matematik/statistik'">Beräkna lägesmått och spridningsmått</button>
+      <button onclick="window.location.href='https://jimmynylen.se/matematik/sannolikhet'">Tärningskast och sannolikhet</button>
+      <button onclick="window.location.href='https://jimmynylen.se/matematik/enhetsomvandlare'">Enhetsomvandlaren (ma/fy/ke/IT)</button>
+      <button onclick="window.location.href='https://jimmynylen.se/matematik/countdown'">Sifferspelet från Countdown</button>
+    </div>
+
+    <!-- Rubrik för Artificiell Intelligens 1 -->
+    <h2 class="dashed-header"><span class="title">Artificiell Intelligens 1</span></h2>
+    <div class="button-container">
+      <button onclick="window.location.href='https://jimmynylen.se/algoritm/search'">Visualisering av sökalgoritmer</button>
+      <button onclick="window.location.href='https://jimmynylen.se/algoritm/sortering'">Visualisering av sorteringsalgoritmer</button>
+      <button onclick="window.location.href='https://jimmynylen.se/algoritm/minimax'">Luffarschack med Minimax-algoritmen</button>
+    </div>
+  </div>
+</body>
+
+</html>

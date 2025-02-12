@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualisering av sorteringsalgoritmer</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
+    <style>
+        :root {
+            --bg: #f4f4f4;
+            --white: #ffffff;
+            --primary: #40534C;
+            --dark: #1A3636;
+            --text: #644117;
+            --subtle: #D6BD98;
+            --effect: #677D6A;
+            --placeholder: #B9AFA1;
+            --textarea: #FCF8F4;
+            --extra_effect: #D98E04;
+            --extra_primary: #E0A030;
+            --extra_primary_dark: #705018;
+            --extra_red: #A44434;
+            --extra_red_dark: #52221A;
+            --status_graygreen: #8E9775;
+            --status_olivegreen: #5B7052;
+            --status_ochreyellow: #D4A76A;
+            --status_goldenbrown: #C2955C;
+            --status_sienna: #A0522D;
+            --status_burntumber: #8A3324;
+            --status_sandbrown: #C4A484;
+            --status_terracotta: #A66A4C;
+            --status_bronze: #CD7F32;
+            --status_cinnamon: #D2691E;
+            --cell_mediumgreen: #3CB371;
+            --cell_amberyellow: #ffbf00;
+        }
+
+        body {
+            font-family: 'Source Serif Pro', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+        }
+
+        .container {
+            max-width: 700px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            font-size: 24px;
+            color: var(--white);
+            background-color: var(--primary);
+            border-radius: 8px 8px 0 0;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inforuta {
+            margin-top: 0;
+            font-size: 15px;
+            color: var(--text);
+            background-color: var(--subtle);
+            border-radius: 0 0 8px 8px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+        }
+
+        .controls-top {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .controls-top>* {
+            box-sizing: border-box;
+        }
+
+        #algorithmSelect {
+            width: 40%;
+            padding: 8px;
+            background-color: var(--textarea);
+            border: 1px solid var(--effect);
+            color: var(--dark);
+            border-radius: 5px;
+        }
+
+        #numBarsSelect {
+            width: 40%;
+            padding: 8px;
+            background-color: var(--textarea);
+            border: 1px solid var(--effect);
+            color: var(--dark);
+            border-radius: 5px;
+        }
+
+        #randomizeBtn {
+            width: 20%;
+            padding: 10px;
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #randomizeBtn:hover {
+            background-color: var(--effect);
+        }
+
+        .visualization-wrapper {
+            background-color: var(--effect);
+            padding: 15px;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        #array-container {
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            height: 250px;
+            border-radius: 8px;
+            background-color: var(--primary);
+            padding: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #array-grid {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+        }
+
+        .cell {
+            background-color: var(--status_graygreen);
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+            box-sizing: border-box;
+            flex: 1;
+            margin: 0 1px;
+            position: relative;
+            overflow: hidden;
+            min-height: 60px;
+            color: var(--white);
+        }
+
+        .cell span {
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+        .merge-label {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 25%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .merge-label.finished {
+            background-color: #86ED26;
+            color: var(--dark);
+        }
+
+        .merge-label.active {
+            background-color: #FEDD00;
+            color: var(--dark);
+        }
+
+        .controls-bottom {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #startSortBtn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #startSortBtn:hover {
+            background-color: var(--effect);
+        }
+
+        .explanation-box {
+            background-color: var(--status_graygreen);
+            color: var(--white);
+            border-left: 5px solid var(--status_olivegreen);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-family: monospace;
+            cursor: pointer;
+        }
+
+        .explanation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .explanation-description {
+            font-size: 14px;
+        }
+
+        .explanation-emoji {
+            font-size: 22px;
+        }
+
+        .pseudocode-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .pseudocode-content.expanded {
+            max-height: 1000px;
+        }
+
+        .pseudocode-content pre {
+            margin-bottom: 0;
+            padding-bottom: 5px;
+        }
+
+        #visualization-container {
+            box-sizing: border-box;
+            scrollbar-color: var(--effect) var(--primary);
+        }
+
+        #visualization {
+            font-size: 12px;
+            height: 215px;
+            overflow-y: auto;
+            background-color: var(--primary);
+            border-radius: 8px;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        .step-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: var(--textarea);
+            border-left: 5px solid;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .step-container.compare {
+            background-color: var(--status_graygreen);
+            color: var(--white);
+            border-left: 5px solid var(--status_olivegreen);
+        }
+
+        .step-container.swap,
+        .step-container.merge {
+            background-color: var(--status_ochreyellow);
+            color: var(--white);
+            border-left: 5px solid var(--status_goldenbrown);
+        }
+
+        .step-container.finished,
+        .step-container.insertion {
+            background-color: var(--status_sienna);
+            color: var(--white);
+            border-left: 5px solid var(--status_burntumber);
+        }
+
+        .step-container.mergeTemp {
+            background-color: var(--status_sandbrown);
+            color: var(--white);
+            border-left: 5px solid var(--status_terracotta);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding-right: 40px;
+        }
+
+        .step-emoji {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            font-size: 22px;
+        }
+
+        .step-description {
+            font-size: 14px;
+        }
+
+        .step-array {
+            font-size: 12px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--extra_primary);
+            color: var(--white);
+            border-left: 5px solid var(--extra_effect);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        .summary-text h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .summary-text p {
+            margin: 3px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .summary-emoji {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .fade-in.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .controls-top {
+                flex-direction: column;
+            }
+
+            #algorithmSelect,
+            #numBarsSelect,
+            #randomizeBtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Visualisering av sorteringsalgoritmer</h1>
+        <p class="inforuta">
+            Algoritmer för sortering är snarare ett generellt programmeringskoncept än ett AI-koncept, men i min mening
+            är det en bra introduktion till att jämföra hur en människa och en dator (eller en AI om man ska vara noga)
+            löser samma problem,
+            vilket är en del av kursen Artificiell Intelligens 1.
+        </p>
+        <div class="controls-top">
+            <select id="algorithmSelect">
+        <option value="bubble">Bubble Sort</option>
+        <option value="insertion">Insertion Sort</option>
+        <option value="selection">Selection Sort</option>
+        <option value="merge">Merge Sort</option>
+      </select>
+            <select id="numBarsSelect"></select>
+            <button id="randomizeBtn">Slumpa siffror</button>
+        </div>
+        <div class="visualization-wrapper">
+            <div id="array-container">
+                <div id="array-grid">
+                    <!-- Staplar genereras här -->
+                </div>
+            </div>
+            <div id="visualization-container">
+                <div id="visualization">
+                    <!-- Steg, förklaringsruta och pseudokod hamnar här -->
+                </div>
+            </div>
+        </div>
+        <div class="controls-bottom">
+            <button id="startSortBtn">Sortera siffror i storleksordning</button>
+        </div>
+    </div>
+    <script>
+        /*******************************************************
+     * Globala variabler och element
+     *******************************************************/
+    const algorithmSelect = document.getElementById('algorithmSelect');
+    const numBarsSelect = document.getElementById('numBarsSelect');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+    const startSortBtn = document.getElementById('startSortBtn');
+    const arrayGrid = document.getElementById('array-grid');
+    const visualization = document.getElementById('visualization');
+
+    let array = [];
+    let steps = [];
+    let currentStep = 0;
+    const animationDelay = 350; // ms mellan varje steg
+    let comparisonsCount = 0;
+    let movesCount = 0;
+    
+    // --- Nya globala variabler för att hantera pågående sortering ---
+    let sortInterval = null;
+    let isSorting = false;
+
+    /* Förvalda startvärden (antal siffror) per algoritm */
+    const defaultBars = {
+      bubble: 10,
+      insertion: 12,
+      selection: 12,
+      merge: 16
+    };
+
+    /* Förklaringar för varje algoritm */
+    const algorithmExplanations = {
+      bubble: "Bubble Sort jämför intilliggande element och byter plats om de är i fel ordning. Klicka på rutan för att se pseudokod.",
+      insertion: "Insertion Sort bygger den sorterade delen stegvis genom att infoga element på rätt plats. Klicka på rutan för att se pseudokod.",
+      selection: "Selection Sort letar upp det minsta elementet i den osorterade delen och byter plats. Klicka på rutan för att se pseudokod.",
+      merge: "Merge Sort delar arrayen i delar, sorterar och slår sedan ihop dem steg för steg. Klicka på rutan för att se pseudokod."
+    };
+
+    /* Pseudokod för varje algoritm */
+    const algorithmPseudocode = {
+      bubble: `<pre>
+function bubbleSort(array)
+  for i = 0 to array.length - 1
+    for j = 0 to array.length - i - 2
+      if array[j] > array[j+1]
+        swap(array[j], array[j+1])
+  return array
+</pre>`,
+      insertion: `<pre>
+function insertionSort(array)
+  for i = 1 to array.length - 1
+    key = array[i]
+    j = i - 1
+    while j >= 0 and array[j] > key
+      array[j+1] = array[j]
+      j = j - 1
+    array[j+1] = key
+  return array
+</pre>`,
+      selection: `<pre>
+function selectionSort(array)
+  for i = 0 to array.length - 1
+    minIndex = i
+    for j = i+1 to array.length - 1
+      if array[j] < array[minIndex]
+        minIndex = j
+    swap(array[i], array[minIndex])
+  return array
+</pre>`,
+      merge: `<pre>
+function mergeSort(array)
+  if array.length > 1
+    mid = floor(array.length / 2)
+    left = array[0..mid-1]
+    right = array[mid..end]
+    mergeSort(left)
+    mergeSort(right)
+    merge(left, right, array)
+  return array
+</pre>`
+    };
+
+    /*******************************************************
+     * Hjälpfunktion: Avbryt pågående sortering
+     *******************************************************/
+    function abortSort() {
+      if (sortInterval) {
+        clearInterval(sortInterval);
+        sortInterval = null;
+      }
+      isSorting = false;
+      startSortBtn.textContent = "Sortera siffror i storleksordning";
+      // Återställ varje stapels tillstånd
+      array.forEach(item => {
+        item.sorted = false;
+        item.mergeState = "";
+      });
+      renderArray(array); // Uppdatera visualiseringen med osorterade staplar
+    }
+
+    /*******************************************************
+     * 1. Bygg upp dropdown för antalet siffror (8–32)
+     *******************************************************/
+    function buildNumBarsOptions() {
+      numBarsSelect.innerHTML = "";
+      for (let i = 8; i <= 32; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i + " siffror";
+        numBarsSelect.appendChild(opt);
+      }
+    }
+    buildNumBarsOptions();
+
+    /***************************************************************
+     * 2. När man väljer algoritm -> sätt förval, visa pseudokod m.m.
+     * --- Avbryt pågående sortering om den är igång ---
+     ***************************************************************/
+    algorithmSelect.addEventListener('change', () => {
+      abortSort();
+      const selectedAlgo = algorithmSelect.value;
+      const defBars = defaultBars[selectedAlgo] || 10;
+      numBarsSelect.value = defBars.toString();
+      visualization.innerHTML = "";
+      createExplanationAndPseudocode(selectedAlgo);
+      randomizeArray();
+    });
+
+    /***************************************************************
+     * 3. När man väljer nytt antal siffror -> slumpa omedelbart
+     * --- Avbryt pågående sortering om den är igång ---
+     ***************************************************************/
+    numBarsSelect.addEventListener('change', () => {
+      abortSort();
+      randomizeArray();
+    });
+
+    /***************************************************************
+     * 4. Skapa sammanslagen förklarings- och pseudokodsruta
+     ***************************************************************/
+    function createExplanationAndPseudocode(algo) {
+      const combinedEl = document.createElement('div');
+      combinedEl.className = 'explanation-box fade-in';
+      combinedEl.innerHTML = `
+        <div class="explanation-header">
+          <div class="explanation-description">
+            ${algorithmExplanations[algo]}
+          </div>
+          <div class="explanation-emoji">ℹ️</div>
+        </div>
+        <div class="pseudocode-content">
+          <h3>Pseudokod</h3>
+          ${algorithmPseudocode[algo]}
+        </div>
+      `;
+      visualization.appendChild(combinedEl);
+      setTimeout(() => combinedEl.classList.add('show'), 10);
+      const header = combinedEl.querySelector('.explanation-header');
+      const codeContent = combinedEl.querySelector('.pseudocode-content');
+      header.addEventListener('click', () => {
+        codeContent.classList.toggle('expanded');
+      });
+    }
+
+    /***************************************************************
+     * 5. Slumpa array baserat på nuvarande dropdown-värde
+     * --- Avbryt pågående sortering om den är igång ---
+     ***************************************************************/
+    function randomizeArray() {
+      let count = parseInt(numBarsSelect.value, 10);
+      if (isNaN(count) || count < 8) count = 8;
+      if (count > 30) count = 30;
+      array = [];
+      for (let i = 0; i < count; i++) {
+        const num = Math.floor(Math.random() * 90) + 10;
+        array.push({ val: num, sorted: false });
+      }
+      comparisonsCount = 0;
+      movesCount = 0;
+      renderArray(array);
+    }
+
+    /***************************************************************
+     * 6. Rendera staplar i array-container
+     ***************************************************************/
+    function renderArray(arr) {
+      arrayGrid.innerHTML = "";
+      const containerHeight = arrayGrid.clientHeight;
+      const values = arr.map(e => e.val);
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      let cellMinHeight = 60;
+      const tempCell = document.createElement('div');
+      tempCell.className = 'cell';
+      document.body.appendChild(tempCell);
+      const computedStyle = getComputedStyle(tempCell);
+      cellMinHeight = parseFloat(computedStyle.minHeight) || cellMinHeight;
+      document.body.removeChild(tempCell);
+      const cellWidth = arrayGrid.clientWidth / arr.length;
+      const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
+      arr.forEach(item => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, cellMinHeight);
+        cell.style.height = finalHeight + "px";
+        let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
+        if (item.mergeState) {
+          innerContent += `<div class="merge-label ${item.mergeState === "M" ? "finished" : "active"}">${item.mergeState}</div>`;
+        }
+        cell.innerHTML = innerContent;
+        if (item.sorted) {
+          cell.style.backgroundColor = "var(--cell_mediumgreen)";
+        }
+        arrayGrid.appendChild(cell);
+      });
+    }
+
+    function calculateCellHeight(val, minValue, maxValue, containerHeight, cellMinHeight) {
+      if (maxValue === minValue) {
+        return containerHeight;
+      }
+      return cellMinHeight + ((val - minValue) / (maxValue - minValue)) * (containerHeight - cellMinHeight);
+    }
+
+    /***************************************************************
+     * 7. Olika sorteringsalgoritmer + inspelade steg
+     ***************************************************************/
+    function recordStep(description, type, arraySnapshot, indices) {
+      const snapshot = JSON.parse(JSON.stringify(arraySnapshot));
+      steps.push({ description, type, array: snapshot, indices });
+      if (type === "compare") {
+        comparisonsCount++;
+      } else if (type === "swap" || type === "merge") {
+        movesCount++;
+      }
+    }
+
+    function bubbleSort(arr) {
+      let localArr = arr.slice();
+      steps = [];
+      const n = localArr.length;
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+          recordStep(`Jämför: index ${j} vs ${j+1}`, "compare", localArr, [j, j+1]);
+          if (localArr[j].val > localArr[j+1].val) {
+            recordStep(`Byt: ${localArr[j].val} & ${localArr[j+1].val}`, "swap", localArr, [j, j+1]);
+            const temp = localArr[j];
+            localArr[j] = localArr[j+1];
+            localArr[j+1] = temp;
+            recordStep(`Byte klart`, "swap", localArr, [j, j+1]);
+          }
+        }
+        localArr[n - i - 1].sorted = true;
+        recordStep(`Index ${n - i - 1} sorterat`, "finished", localArr, [n - i - 1]);
+      }
+      return localArr;
+    }
+
+    function insertionSort(arr) {
+      let localArr = arr.slice();
+      steps = [];
+      for (let i = 1; i < localArr.length; i++) {
+        for (let k = 0; k < i; k++) {
+          localArr[k].sorted = true;
+        }
+        let j = i;
+        while (j > 0 && localArr[j].val < localArr[j - 1].val) {
+          recordStep(`Jämför: index ${j-1} & ${j}`, "compare", localArr, [j-1, j]);
+          const temp = localArr[j];
+          localArr[j] = localArr[j - 1];
+          localArr[j - 1] = temp;
+          recordStep(`Flytta`, "swap", localArr, [j-1, j]);
+          j--;
+        }
+        for (let k = 0; k <= i; k++) {
+          localArr[k].sorted = true;
+        }
+        recordStep(`Insättning färdig för index 0–${i}`, "finished", localArr, Array.from({ length: i + 1 }, (_, idx) => idx));
+      }
+      localArr.forEach(e => (e.sorted = true));
+      recordStep(`Sortering färdig`, "finished", localArr, Array.from({ length: localArr.length }, (_, idx) => idx));
+      return localArr;
+    }
+
+    function mergeSort(arr) {
+      let localArr = arr.slice();
+      steps = [];
+      mergeSortRecursive(localArr, 0, localArr.length - 1);
+      return localArr;
+    }
+
+    function mergeSortRecursive(arr, left, right) {
+      if (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        mergeSortRecursive(arr, left, mid);
+        mergeSortRecursive(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+      }
+    }
+
+    function merge(arr, left, mid, right) {
+      const L = arr.slice(left, mid + 1);
+      const R = arr.slice(mid + 1, right + 1);
+      for (let index = left; index <= mid; index++) {
+        arr[index].mergeState = "V";
+      }
+      for (let index = mid + 1; index <= right; index++) {
+        arr[index].mergeState = "H";
+      }
+      recordStep(`Dela upp V/H: (${left}–${mid}) & (${mid + 1}–${right})`, "mergeTemp", arr, []);
+      let i = 0, j = 0, k = left;
+      while (i < L.length && j < R.length) {
+        recordStep(`Jämför V(${L[i].val}) vs H(${R[j].val})`, "compare", arr, [k]);
+        if (L[i].val <= R[j].val) {
+          arr[k] = L[i];
+          recordStep(`Infoga ${L[i].val} från V`, "merge", arr, [k]);
+          i++;
+        } else {
+          arr[k] = R[j];
+          recordStep(`Infoga ${R[j].val} från H`, "merge", arr, [k]);
+          j++;
+        }
+        k++;
+      }
+      while (i < L.length) {
+        arr[k] = L[i];
+        recordStep(`Infoga resterande ${L[i].val}`, "merge", arr, [k]);
+        i++;
+        k++;
+      }
+      while (j < R.length) {
+        arr[k] = R[j];
+        recordStep(`Infoga resterande ${R[j].val}`, "merge", arr, [k]);
+        j++;
+        k++;
+      }
+      for (let index = left; index <= right; index++) {
+        arr[index].mergeState = "M";
+        if (left === 0 && right === arr.length - 1) {
+          arr[index].sorted = true;
+        }
+      }
+      recordStep(`Sammanfogning klar (${left}–${right})`, "finished", arr, Array.from({ length: right - left + 1 }, (_, i) => left + i));
+    }
+
+    function selectionSort(arr) {
+      let localArr = arr.slice();
+      steps = [];
+      const n = localArr.length;
+      for (let i = 0; i < n; i++) {
+        let minIndex = i;
+        for (let j = i + 1; j < n; j++) {
+          recordStep(`Jämför index ${j} vs minIndex ${minIndex}`, "compare", localArr, [minIndex, j]);
+          if (localArr[j].val < localArr[minIndex].val) {
+            minIndex = j;
+            recordStep(`Ny min: index ${minIndex}`, "compare", localArr, [minIndex]);
+          }
+        }
+        if (minIndex !== i) {
+          recordStep(`Byt index ${i} & ${minIndex}`, "swap", localArr, [i, minIndex]);
+          const temp = localArr[i];
+          localArr[i] = localArr[minIndex];
+          localArr[minIndex] = temp;
+          recordStep(`Byte klart`, "swap", localArr, [i, minIndex]);
+        }
+        localArr[i].sorted = true;
+        recordStep(`Index ${i} sorterat`, "finished", localArr, [i]);
+      }
+      return localArr;
+    }
+
+    /***************************************************************
+     * 8. Animering av steg
+     ***************************************************************/
+    function animateSteps() {
+      currentStep = 0;
+      sortInterval = setInterval(() => {
+        if (currentStep >= steps.length) {
+          clearInterval(sortInterval);
+          sortInterval = null;
+          isSorting = false;
+          startSortBtn.textContent = "Sortera siffror i storleksordning";
+          steps[steps.length - 1].array.forEach(e => e.sorted = true);
+          updateArrayGrid(steps[steps.length - 1].array, null);
+          // Skapa den omarbetade sammanfattningsrutan
+          const summaryEl = document.createElement('div');
+          summaryEl.className = 'summary fade-in';
+          summaryEl.innerHTML = `
+            <div class="summary-text">
+              <h3>Sammanfattning</h3>
+              <p>Jämförelser: ${comparisonsCount}<br>
+              Förflyttningar: ${movesCount}<br>
+              Totalt antal steg: ${steps.length}</p>
+            </div>
+            <div class="summary-emoji">📊</div>
+          `;
+          visualization.appendChild(summaryEl);
+          setTimeout(() => summaryEl.classList.add('show'), 10);
+          visualization.scrollTop = visualization.scrollHeight;
+          return;
+        }
+        const step = steps[currentStep];
+        updateArrayGrid(step.array, step.indices);
+        const stepEl = document.createElement('div');
+        stepEl.innerHTML = renderStep(step);
+        stepEl.className = 'fade-in';
+        visualization.appendChild(stepEl);
+        setTimeout(() => stepEl.classList.add('show'), 10);
+        visualization.scrollTop = visualization.scrollHeight;
+        currentStep++;
+      }, animationDelay);
+    }
+
+    function updateArrayGrid(arr, highlightIndices) {
+      arrayGrid.innerHTML = "";
+      const containerHeight = arrayGrid.clientHeight;
+      const values = arr.map(e => e.val);
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      let cellMinHeight = 60;
+      const tempCell = document.createElement('div');
+      tempCell.className = 'cell';
+      document.body.appendChild(tempCell);
+      const computedStyle = getComputedStyle(tempCell);
+      cellMinHeight = parseFloat(computedStyle.minHeight) || cellMinHeight;
+      document.body.removeChild(tempCell);
+      const cellWidth = arrayGrid.clientWidth / arr.length;
+      const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
+      arr.forEach((item, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, cellMinHeight);
+        cell.style.height = finalHeight + "px";
+        let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
+        if (item.mergeState) {
+          innerContent += `<div class="merge-label ${item.mergeState === "M" ? "finished" : "active"}">${item.mergeState}</div>`;
+        }
+        cell.innerHTML = innerContent;
+        if (highlightIndices && highlightIndices.includes(index)) {
+          cell.style.backgroundColor = "var(--cell_amberyellow)";
+        } else if (item.sorted) {
+          cell.style.backgroundColor = "var(--cell_mediumgreen)";
+        } else {
+          cell.style.backgroundColor = "var(--status_graygreen)";
+        }
+        arrayGrid.appendChild(cell);
+      });
+    }
+
+    function renderStep(step) {
+      let stepClass = "";
+      let emoji = "";
+      switch (step.type) {
+        case "compare":
+          stepClass = "compare";
+          emoji = "🔍";
+          break;
+        case "swap":
+          stepClass = "swap";
+          emoji = "🔄";
+          break;
+        case "insertion":
+          stepClass = "insertion";
+          emoji = "📥";
+          break;
+        case "merge":
+          stepClass = "merge";
+          emoji = "🔀";
+          break;
+        case "mergeTemp":
+          stepClass = "mergeTemp";
+          emoji = "💾";
+          break;
+        case "finished":
+          stepClass = "finished";
+          emoji = "✅";
+          break;
+      }
+      return `
+        <div class="step-container ${stepClass}">
+          <div class="step-header">
+            <div class="step-description">${step.description}</div>
+            <div class="step-emoji">${emoji}</div>
+          </div>
+          <div class="step-array">${step.array.map(e => e.val).join(" ")}</div>
+        </div>
+      `;
+    }
+
+    /***************************************************************
+     * 9. Koppla knappar
+     ***************************************************************/
+    randomizeBtn.addEventListener('click', () => {
+      abortSort();
+      randomizeArray();
+    });
+
+    startSortBtn.addEventListener('click', () => {
+      // Om en sortering redan är igång, avbryt den
+      if (isSorting) {
+        abortSort();
+        return;
+      }
+      // Starta sortering
+      isSorting = true;
+      startSortBtn.textContent = "Avbryt sortering";
+      steps = [];
+      const algo = algorithmSelect.value;
+      switch (algo) {
+        case "bubble":
+          bubbleSort(array);
+          break;
+        case "insertion":
+          insertionSort(array);
+          break;
+        case "merge":
+          mergeSort(array);
+          break;
+        case "selection":
+          selectionSort(array);
+          break;
+      }
+      animateSteps();
+    });
+
+    /***************************************************************
+     * 10. Vid sidladdning: Sätt förval, initiera
+     ***************************************************************/
+    window.onload = () => {
+      algorithmSelect.value = "bubble";
+      algorithmSelect.dispatchEvent(new Event('change'));
+    };
+    </script>
+</body>
+
+</html>
