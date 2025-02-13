@@ -5,11 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skapa slumpmässiga grupper</title>
-  <!-- (Valfria) Ikonlänkar -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <!-- Google Fonts -->
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
   <style>
     /* ====== Grundinställningar ====== */
     *,
@@ -268,12 +265,14 @@
       </p>
 
       <form id="groupForm">
-        <!-- Ruta för elevernas namn och kategorier -->
         <label for="students">
           Ange elevernas namn och eventuella taggar:
         </label>
-        <textarea id="students" rows="6"
-          placeholder="Helt slumpmässig fördelning: Anna, Bengt, Cecilia, o.s.v.&#10;Jämn fördelning mellan könen: Anna:F, Bengt:M, Cecilia:F, o.s.v.&#10;Jämn fördelning mellan programmen: Anna:EK, Bengt:SA, Cecilia:NA, o.s.v.&#10;&#10;Du kan även skapa helt egna taggar om du så önskar."></textarea>
+        <textarea spellcheck="false" id="students" rows="6" placeholder="Helt slumpmässig fördelning: Anna, Bengt, Cecilia, o.s.v.
+Jämn fördelning mellan könen: Anna:F, Bengt:M, Cecilia:F, o.s.v.
+Jämn fördelning mellan programmen: Anna:EK, Bengt:SA, Cecilia:NA, o.s.v.
+
+Du kan även skapa helt egna taggar om du så önskar."></textarea>
 
         <label for="numGroups">Antal grupper:</label>
         <input type="number" id="numGroups" min="1" placeholder="Ange antal grupper" value="2" required />
@@ -281,21 +280,20 @@
         <label class="nameLabel" for="groupNames">
           Ange egna gruppnamn (valfritt):
         </label>
-        <textarea id="groupNames" rows="3"
-          placeholder="Använd gärna denna funktion för att även slumpa ut ämnesområde att arbeta med.&#10;Exempel: Socialism, Liberalism, Konservatism, o.s.v."></textarea>
+        <textarea spellcheck="false" id="groupNames" rows="3" placeholder="Använd gärna denna funktion för att även slumpa ut ämnesområde att arbeta med.
+Exempel: Socialism, Liberalism, Konservatism, o.s.v."></textarea>
 
         <label for="fixedGroups">
           Placera dessa elever i specifika grupper (valfritt):
         </label>
-        <textarea id="fixedGroups" rows="3"
-          placeholder="Använd kolon följt av en siffra för att placera en elev i den gruppen.&#10;Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
+        <textarea spellcheck="false" id="fixedGroups" rows="3" placeholder="Använd kolon följt av en siffra för att placera en elev i den gruppen.
+Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
 
         <button type="submit" class="submit-button">Skapa nya grupper</button>
       </form>
 
       <hr id="separator" />
 
-      <!-- Resultatområdet används både för förhandsvisning av tomma grupper och för visning av genererade grupper -->
       <div id="result" aria-live="polite"></div>
 
       <button id="copyButton">Kopiera grupper till urklipp</button>
@@ -304,9 +302,7 @@
   </div>
 
   <script>
-    // ---------------------------
-    // Hjälpfunktion: Slumpa om en array
-    // ---------------------------
+    // Hjälpfunktion: Blanda om en array
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -315,18 +311,13 @@
       return array;
     }
 
-    // ---------------------------
     // Global flagga: Har grupper redan genererats?
-    // ---------------------------
     let groupsGenerated = false;
 
-    // ---------------------------
-    // Visa förhandsgrupper (placeholder) – används om inga grupper är genererade än
-    // ---------------------------
+    // Visa förhandsgrupper (placeholder)
     function updateEmptyGroups() {
-      const numGroupsInput = document.getElementById('numGroups');
+      const numGroups = parseInt(document.getElementById('numGroups').value) || 0;
       const resultDiv = document.getElementById('result');
-      const numGroups = parseInt(numGroupsInput.value) || 0;
       let html = '';
       for (let i = 1; i <= numGroups; i++) {
         html += `
@@ -341,10 +332,7 @@
       resultDiv.innerHTML = html;
     }
 
-    // ---------------------------
-    // Funktion som uppdaterar grupperna: Om de redan genererats så anropas den riktiga
-    // gruppfunktionen, annars visas placeholder-grupper.
-    // ---------------------------
+    // Uppdatera grupperna (antingen placeholders eller riktiga grupper)
     function updateGroupsPreview() {
       if (groupsGenerated) {
         createGroups();
@@ -353,9 +341,7 @@
       }
     }
 
-    // ---------------------------
-    // Funktion som genererar riktiga grupper utifrån formulärets innehåll
-    // ---------------------------
+    // Generera grupper utifrån formulärets innehåll
     function createGroups() {
       const studentsInput = document.getElementById('students').value.trim();
       const groupNamesInput = document.getElementById('groupNames').value.trim();
@@ -366,16 +352,15 @@
       const copyButton = document.getElementById('copyButton');
       const copyMessage = document.getElementById('copyMessage');
 
-      // Enkel validering
       if (!studentsInput || isNaN(numGroups) || numGroups < 1) {
         resultDiv.innerHTML = 'Vänligen fyll i alla obligatoriska fält korrekt.';
         return;
       }
 
-      // Skapa array med elevnamn och eventuella kategorier
+      // Skapa array med elever (exempelvis "Anna:F" eller "Bengt")
       let studentsLines = studentsInput.split(/[\n,]+/).map(s => s.trim()).filter(s => s !== '');
 
-      // Hantera specifika grupptilldelningar
+      // Hantera manuella placeringar
       let fixedAssignments = {};
       if (fixedGroupsInput) {
         const fixedEntries = fixedGroupsInput.split(/[\n,]+/);
@@ -390,224 +375,148 @@
         }
       }
 
-      // Filtrera bort elever med fasta grupper
+      // Filtrera ut elever som har fasta placeringar
       let unassignedStudents = studentsLines.filter(s => {
-        let name = s.includes(':') ? s.split(':')[0].trim() : s;
+        const name = s.includes(':') ? s.split(':')[0].trim() : s;
         return !(name in fixedAssignments);
       });
 
-      // Skapa en struktur: categories = { kategoriNamn: [elever...] }
+      // Dela in oassignerade elever i kategorier (baserat på tagg)
       let categories = {};
-      for (let line of unassignedStudents) {
+      unassignedStudents.forEach(line => {
+        let name, tag;
         if (line.includes(':')) {
-          let [namePart, categoryPart] = line.split(':').map(s => s.trim());
-          if (!categories[categoryPart]) {
-            categories[categoryPart] = [];
-          }
-          categories[categoryPart].push(namePart);
+          [name, tag] = line.split(':').map(s => s.trim());
         } else {
-          if (!categories["noCategory"]) {
-            categories["noCategory"] = [];
-          }
-          categories["noCategory"].push(line);
+          name = line;
+          tag = "noCategory";
         }
-      }
+        if (!categories[tag]) {
+          categories[tag] = [];
+        }
+        categories[tag].push(name);
+      });
 
-      // Blanda slumpmässigt varje kategorilista
-      for (let cat in categories) {
+      // Blanda varje kategoris lista
+      Object.keys(categories).forEach(cat => {
         shuffleArray(categories[cat]);
-      }
+      });
 
-      // Skapa datastruktur för grupper
+      // Skapa grupper och räkna taggar per grupp
       let groups = {};
-      let categoryCounts = {}; // Håller koll på antalet elever per kategori i varje grupp
+      let categoryCounts = {};
       for (let i = 1; i <= numGroups; i++) {
         groups[i] = [];
         categoryCounts[i] = {};
       }
 
-      // Lägg in de fasta eleverna direkt i rätt grupp
+      // Placera in de manuellt angivna eleverna
       for (let student in fixedAssignments) {
-        let groupNum = fixedAssignments[student];
+        const groupNum = fixedAssignments[student];
         groups[groupNum].push(student);
-
-        // Uppdatera kategoriCounts om eleven har en kategori
-        let studentEntry = studentsLines.find(s => {
-          if (s.includes(':')) {
-            return s.split(':')[0].trim() === student;
-          }
-          return false;
-        });
-        if (studentEntry && studentEntry.includes(':')) {
-          let category = studentEntry.split(':')[1].trim();
-          if (!categoryCounts[groupNum][category]) {
-            categoryCounts[groupNum][category] = 0;
-          }
-          categoryCounts[groupNum][category]++;
+        // Om eleven hade en tagg, uppdatera räknaren
+        const studentEntry = studentsLines.find(s => s.includes(':') && s.split(':')[0].trim() === student);
+        if (studentEntry) {
+          const tag = studentEntry.split(':')[1].trim();
+          categoryCounts[groupNum][tag] = (categoryCounts[groupNum][tag] || 0) + 1;
         }
       }
 
-      // Räkna totala antalet elever
+      // Beräkna önskad gruppstorlek baserat på totalt antal elever (fasta + övriga)
       const totalStudents = studentsLines.length;
       const baseSize = Math.floor(totalStudents / numGroups);
       const extra = totalStudents % numGroups;
 
-      // Beräkna hur många elever som ska läggas i varje grupp, exklusive de fasta
       let targetSizes = {};
       for (let i = 1; i <= numGroups; i++) {
-        let desired = baseSize + (i <= extra ? 1 : 0);
+        const desired = baseSize + (i <= extra ? 1 : 0);
         targetSizes[i] = Math.max(desired - groups[i].length, 0);
       }
 
-      // -------------------------------------------
-      // Tilldela oassignerade elever med minst en per kategori
-      // -------------------------------------------
-      let catKeys = Object.keys(categories);
-      // Sortera så att 'noCategory' hanteras sist
-      catKeys.sort(key => key === "noCategory" ? 1 : 0);
+      // Summera totala lediga platser
+      let totalRemaining = Object.values(targetSizes).reduce((a, b) => a + b, 0);
 
-      // För varje kategori (utom noCategory), tilldela minst en elev per grupp om möjligt
-      for (let cat of catKeys) {
-        if (cat === "noCategory") continue;
-        let catArray = categories[cat];
+      // Tilldela de oassignerade eleverna med jämn balans mellan kategorier
+      while (totalRemaining > 0) {
         for (let i = 1; i <= numGroups; i++) {
-          if (catArray.length === 0) break;
-          if (!categoryCounts[i][cat] && targetSizes[i] > 0) {
-            let student = catArray.shift();
-            groups[i].push(student);
-            targetSizes[i]--;
-            categoryCounts[i][cat] = 1;
+          if (targetSizes[i] <= 0) continue;
+
+          // Samla kategorier med elever kvar
+          let candidateList = [];
+          for (let cat in categories) {
+            if (categories[cat].length > 0) {
+              const count = categoryCounts[i][cat] || 0;
+              candidateList.push({ cat, count });
+            }
           }
+          if (candidateList.length === 0) break;
+
+          // Välj den kategori med lägst antal i gruppen
+          const minCount = Math.min(...candidateList.map(c => c.count));
+          const eligible = candidateList.filter(c => c.count === minCount);
+          const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+
+          // Tilldela en elev från vald kategori
+          const student = categories[chosen.cat].shift();
+          groups[i].push(student);
+          targetSizes[i]--;
+          totalRemaining--;
+          categoryCounts[i][chosen.cat] = (categoryCounts[i][chosen.cat] || 0) + 1;
         }
       }
 
-      // -------------------------------------------
-      // Tilldela resterande elever per kategori med kontroll mot ideal
-      // -------------------------------------------
-      for (let cat of catKeys) {
-        if (cat === "noCategory") continue;
-
-        // Räkna totala antalet elever för denna kategori (både fasta och icke-fasta)
-        let totalCat = studentsLines.filter(s => {
-          if (s.includes(':')) {
-            let [name, tag] = s.split(':').map(s => s.trim());
-            return tag === cat;
-          }
-          return false;
-        }).length;
-
-        // Beräkna det "ideala" antalet per grupp
-        let baseCat = Math.floor(totalCat / numGroups);
-        let extraCat = totalCat % numGroups;
-
-        let catArray = categories[cat];
-        let groupIndex = 1;
-
-        while (catArray.length > 0) {
-          if (groupIndex > numGroups) groupIndex = 1;
-
-          // Det ideala antalet för denna grupp
-          let idealCat = baseCat + (groupIndex <= extraCat ? 1 : 0);
-          let currentCount = categoryCounts[groupIndex][cat] || 0;
-
-          // Tilldela bara om gruppen inte redan har uppnått det ideala antalet
-          if (targetSizes[groupIndex] > 0 && currentCount < idealCat) {
-            let student = catArray.shift();
-            groups[groupIndex].push(student);
-            targetSizes[groupIndex]--;
-            categoryCounts[groupIndex][cat] = currentCount + 1;
-          }
-
-          groupIndex++;
-        }
-      }
-
-      // Hantera 'noCategory'
-      if (categories["noCategory"]) {
-        let noCatArray = categories["noCategory"];
-        shuffleArray(noCatArray);
-        let groupIndex = 1;
-        while (noCatArray.length > 0) {
-          if (groupIndex > numGroups) groupIndex = 1;
-          if (targetSizes[groupIndex] > 0) {
-            let student = noCatArray.shift();
-            groups[groupIndex].push(student);
-            targetSizes[groupIndex]--;
-          }
-          groupIndex++;
-        }
-      }
-
-      // -------------------------------------------
-      // Döp grupperna (använder eventuella angivna namn)
-      // -------------------------------------------
+      // Hantera eventuella egna gruppnamn
       let groupNames = [];
       if (groupNamesInput) {
         groupNames = groupNamesInput.split(/[\n,]+/).map(s => s.trim()).filter(s => s !== '');
         shuffleArray(groupNames);
       }
-
       let usageCount = {};
       if (groupNames.length > 0) {
         for (let i = 1; i <= numGroups; i++) {
-          let name = groupNames[(i - 1) % groupNames.length];
+          const name = groupNames[(i - 1) % groupNames.length];
           usageCount[name] = (usageCount[name] || 0) + 1;
         }
       }
-
       let usageSoFar = {};
       let resultHTML = '';
 
       for (let i = 1; i <= numGroups; i++) {
         const groupStudents = groups[i];
         const isOdd = groupStudents.length % 2 !== 0;
-        let groupTitle = `Grupp ${i}`; // fallback
+        let groupTitle = `Grupp ${i}`;
 
         if (groupNames.length > 0) {
-          let name = groupNames[(i - 1) % groupNames.length];
+          const name = groupNames[(i - 1) % groupNames.length];
           usageSoFar[name] = (usageSoFar[name] || 0) + 1;
           groupTitle = (usageCount[name] > 1) ? name + " " + usageSoFar[name] : name;
         }
 
-        resultHTML += `
-          <div class="group">
-            <h3>${groupTitle}</h3>
-            <div class="students-container ${isOdd ? 'odd' : ''}">
-        `;
-        for (let student of groupStudents) {
-          resultHTML += `<div class="student">${student}</div>`;
-        }
+        resultHTML += `<div class="group"><h3>${groupTitle}</h3><div class="students-container ${isOdd ? 'odd' : ''}">`;
+        groupStudents.forEach(student => {
+          // Visa endast elevens namn (ta bort eventuell tagg)
+          const displayName = student.includes(':') ? student.split(':')[0] : student;
+          resultHTML += `<div class="student">${displayName}</div>`;
+        });
         resultHTML += `</div></div>`;
       }
 
-      // Visa de genererade grupperna
       resultDiv.innerHTML = resultHTML;
       copyMessage.style.display = 'none';
       copyButton.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ---------------------------
-    // Vid sidladdning och ändring av antal grupper: Uppdatera antingen med placeholders eller riktiga grupper
-    // ---------------------------
     document.addEventListener('DOMContentLoaded', updateGroupsPreview);
     document.getElementById('numGroups').addEventListener('input', updateGroupsPreview);
-
-    // ---------------------------
-    // När formuläret skickas: Generera grupper och sätt flaggan att de har genererats
-    // ---------------------------
     document.getElementById('groupForm').addEventListener('submit', function (e) {
       e.preventDefault();
       createGroups();
       groupsGenerated = true;
     });
 
-    // ---------------------------
-    // Kopiera grupper till urklipp
-    // ---------------------------
     document.getElementById('copyButton').addEventListener('click', function () {
       const resultDiv = document.getElementById('result');
       const copyMessage = document.getElementById('copyMessage');
-
       let groupsText = '';
       const groupElements = resultDiv.getElementsByClassName('group');
       for (let groupElement of groupElements) {
@@ -619,12 +528,11 @@
         }
         groupsText += '\n';
       }
-
       navigator.clipboard.writeText(groupsText.trim()).then(function () {
         copyMessage.style.display = 'block';
         setTimeout(function () {
           copyMessage.style.display = 'none';
-        }, 1000); // Dölj meddelandet efter 1 sekund
+        }, 1000);
       }, function (err) {
         alert('Kunde inte kopiera grupperna: ', err);
       });
