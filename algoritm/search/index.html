@@ -2,372 +2,217 @@
 <html lang="sv">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualisering av sökalgoritmer</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
-    <style>
-        :root {
-            --bg: #f4f4f4;
-            --white: #ffffff;
-            --primary: #40534C;
-            --dark: #1A3636;
-            --text: #644117;
-            --subtle: #D6BD98;
-            --effect: #677D6A;
-            --placeholder: #B9AFA1;
-            --textarea: #FCF8F4;
-            --extra_effect: #D98E04;
-            --extra_primary: #E0A030;
-            --extra_primary_dark: #705018;
-            --extra_red: #A44434;
-            --extra_red_dark: #52221A;
-            /* Färgkombinationer för händelser (bakgrund / vänsterram) */
-            --status_graygreen: #8E9775;
-            --status_olivegreen: #5B7052;
-            --status_ochreyellow: #D4A76A;
-            --status_goldenbrown: #C2955C;
-            --status_sienna: #A0522D;
-            --status_burntumber: #8A3324;
-            --status_sandbrown: #C4A484;
-            --status_terracotta: #A66A4C;
-            --status_bronze: #CD7F32;
-            --status_cinnamon: #D2691E;
-            /* Standardfärger för noder */
-            --node_normal: var(--status_graygreen);
-            --node_visited: var(--cell_mediumgreen, #3CB371);
-            --node_current: #ffbf00;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualisering av sökalgoritmer</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --white: #ffffff;
+      --primary: #40534C;
+      --dark: #1A3636;
+      --text: #644117;
+      --subtle: #D6BD98;
+      --effect: #677D6A;
+      --placeholder: #B9AFA1;
+      --textarea: #FCF8F4;
+      --extra_effect: #D98E04;
+      --extra_primary: #E0A030;
+      --extra_primary_dark: #705018;
+      --extra_red: #A44434;
+      --extra_red_dark: #52221A;
+      /* Färgkombinationer för händelser (bakgrund / vänsterram) */
+      --status_graygreen: #8E9775;
+      --status_olivegreen: #5B7052;
+      --status_ochreyellow: #D4A76A;
+      --status_goldenbrown: #C2955C;
+      --status_sienna: #A0522D;
+      --status_burntumber: #8A3324;
+      --status_sandbrown: #C4A484;
+      --status_terracotta: #A66A4C;
+      --status_bronze: #CD7F32;
+      --status_cinnamon: #D2691E;
+      /* Standardfärger för noder */
+      --node_normal: var(--status_graygreen);
+      --node_visited: var(--cell_mediumgreen, #3CB371);
+      --node_current: #ffbf00;
+    }
 
-        body {
-            font-family: 'Source Serif Pro', serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg);
-        }
+    body {
+      font-family: 'Source Serif Pro', serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+    }
 
-        .container {
-            max-width: 700px;
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 20px auto;
-        }
+    .container {
+      max-width: 700px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px auto;
+    }
 
-        h1 {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            font-size: 24px;
-            color: var(--white);
-            background-color: var(--primary);
-            border-radius: 8px 8px 0 0;
-            padding: 10px 20px;
-            box-sizing: border-box;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .inforuta {
-            margin-top: 0;
-            font-size: 15px;
-            color: var(--text);
-            background-color: var(--subtle);
-            border-radius: 0 0 8px 8px;
-            padding: 10px 20px;
-            margin-bottom: 15px;
-        }
+    .inforuta {
+      margin-top: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 0 0 8px 8px;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+    }
 
-        a {
-            color: var(--primary);
-            text-decoration: none;
-        }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
 
-        a:hover {
-            color: var(--extra_red);
-        }
+    a:hover {
+      color: var(--extra_red);
+    }
 
-        .controls-top {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+    .controls-top {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
 
-        /* Flex-baserade breddinställningar med gap: 40%, 40%, 20% */
-        #algorithmSelect {
-            flex: 0 0 calc(40% - 6.67px);
-            padding: 8px;
-            background-color: var(--textarea);
-            border: 1px solid var(--effect);
-            color: var(--dark);
-            border-radius: 5px;
-        }
+    /* Dropdown och knappinställningar */
+    #algorithmSelect,
+    #nodesSelect {
+      flex: 0 0 calc(40% - 6.67px);
+      padding: 8px;
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      border-radius: 5px;
+    }
 
-        #nodesSelect {
-            flex: 0 0 calc(40% - 6.67px);
-            padding: 8px;
-            background-color: var(--textarea);
-            border: 1px solid var(--effect);
-            color: var(--dark);
-            border-radius: 5px;
-        }
+    #generateGraphBtn {
+      flex: 0 0 calc(20% - 6.67px);
+      padding: 10px;
+      background-color: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-        #generateGraphBtn {
-            flex: 0 0 calc(20% - 6.67px);
-            padding: 10px;
-            background-color: var(--dark);
-            color: var(--white);
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    #generateGraphBtn:hover {
+      background-color: var(--effect);
+    }
 
-        #generateGraphBtn:hover {
-            background-color: var(--effect);
-        }
+    .visualization-wrapper {
+      background-color: var(--effect);
+      padding: 15px;
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-        .visualization-wrapper {
-            background-color: var(--effect);
-            padding: 15px;
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    /* Grafbehållare */
+    #graph-container {
+      position: relative;
+      width: 100%;
+      height: 350px;
+      background-color: var(--primary);
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-        /* Grafbehållare */
-        #graph-container {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background-color: var(--primary);
-            border-radius: 8px;
-            overflow: hidden;
-        }
+    /* Noder som cirklar */
+    .node {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--node_normal);
+      text-align: center;
+      line-height: 30px;
+      font-family: monospace;
+      color: var(--white);
+      transition: background-color 0.3s, border 0.3s;
+      z-index: 2;
+    }
 
-        /* Noder ritas ut som cirklar */
-        .node {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: var(--node_normal);
-            text-align: center;
-            line-height: 30px;
-            font-family: monospace;
-            color: var(--white);
-            transition: background-color 0.3s, border 0.3s;
-            z-index: 2;
-        }
+    .node.visited {
+      background-color: var(--node_visited);
+    }
 
-        .node.visited {
-            background-color: var(--node_visited);
-        }
+    .node.current {
+      border: 3px solid var(--node_current);
+    }
 
-        .node.current {
-            border: 3px solid var(--node_current);
-        }
+    /* SVG för kanter */
+    #graph-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
 
-        /* SVG för kanter */
-        #graph-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+    /* Knapp i botten */
+    .controls-bottom {
+      width: 100%;
+      margin-top: 10px;
+    }
 
-        /* Fast höjd för visualiseringsrutan */
-        #visualization-container {
-            box-sizing: border-box;
-            scrollbar-color: var(--effect) var(--primary);
-            height: 215px;
-            overflow-y: auto;
-        }
+    #startSearchBtn {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-        #visualization {
-            font-size: 12px;
-            background-color: var(--primary);
-            border-radius: 8px;
-            box-sizing: border-box;
-            padding: 5px;
-            height: 215px;
-            overflow-y: auto;
-        }
-
-        /* Stegrutor – vit text, vänsterram 5px, och extra högerpadding för att undvika överlapp med emoji */
-        .step-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 10px;
-            padding: 10px 50px 10px 10px;
-            /* Ökad högerpadding */
-            border-left: 5px solid;
-            border-radius: 8px;
-            font-family: monospace;
-            color: #fff;
-        }
-
-        .step-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            /* Notera att vi inte längre behöver extra padding här eftersom föräldern har rätt padding */
-        }
-
-        .step-emoji {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            font-size: 22px;
-        }
-
-        .step-description {
-            font-size: 14px;
-        }
-
-        .step-array {
-            font-size: 12px;
-        }
-
-        .controls-bottom {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        #startSearchBtn {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--dark);
-            color: var(--white);
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #startSearchBtn:hover {
-            background-color: var(--effect);
-        }
-
-        /* Sammanfattningsruta – fast färg, vit text, vänsterram 5px */
-        .summary {
-            background-color: var(--extra_primary);
-            border-left: 5px solid var(--extra_effect);
-            border-radius: 8px;
-            padding: 10px;
-            color: #fff;
-            font-family: monospace;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .summary-text h3 {
-            margin: 0;
-            font-size: 16px;
-        }
-
-        .summary-text p {
-            margin: 3px 0 0 0;
-            font-size: 12px;
-        }
-
-        .summary-emoji {
-            font-size: 22px;
-        }
-
-        .explanation-box {
-            background-color: var(--status_graygreen);
-            color: var(--white);
-            border-left: 5px solid var(--status_olivegreen);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 15px;
-            font-family: monospace;
-            cursor: pointer;
-        }
-
-        .explanation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .explanation-description {
-            font-size: 14px;
-        }
-
-        .explanation-emoji {
-            font-size: 22px;
-        }
-
-        .pseudocode-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
-        }
-
-        .pseudocode-content.expanded {
-            max-height: 1000px;
-        }
-
-        .pseudocode-content pre {
-            margin-bottom: 0;
-            padding-bottom: 5px;
-        }
-
-        .fade-in {
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .fade-in.show {
-            opacity: 1;
-        }
-
-        @media (max-width: 600px) {
-            .controls-top {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            #algorithmSelect,
-            #nodesSelect,
-            #generateGraphBtn {
-                flex: 0 0 100%;
-            }
-        }
-    </style>
+    #startSearchBtn:hover {
+      background-color: var(--effect);
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Visualisering av sökalgoritmer</h1>
-        <p class="inforuta">
-            En visuell demonstration av sökalgoritmer, det finns bara en väg till ett eventuellt sökmål, men den visar tydligt skillnanden mellan algoritmerna. Denna visualisering komplementeras förslagsvis med en visualisering i en labyrint, såsom den från <a href="https://clementmihailescu.github.io/Pathfinding-Visualizer/">[Clement Mihailescu].</a>
-        </p>
-        <div class="controls-top">
-            <select id="algorithmSelect">
+  <div class="container">
+    <h1>Visualisering av sökalgoritmer</h1>
+    <p class="inforuta">
+      En visuell demonstration av sökalgoritmer. Grafen visar sökalgoritmernas progression genom att ändra färg på noderna.
+    </p>
+    <div class="controls-top">
+      <select id="algorithmSelect">
         <option value="dfs">DFS - Depth-first search</option>
         <option value="bfs">BFS - Breadth-first search</option>
         <option value="iddfs">IDDFS - Iterative Deepening DFS</option>
       </select>
-            <select id="nodesSelect">
+      <select id="nodesSelect">
         <option value="15">15 noder</option>
         <option value="16">16 noder</option>
         <option value="17">17 noder</option>
@@ -385,20 +230,17 @@
         <option value="29">29 noder</option>
         <option value="30">30 noder</option>
       </select>
-            <button id="generateGraphBtn">Generera ny graf</button>
-        </div>
-        <div class="visualization-wrapper">
-            <div id="graph-container"></div>
-            <div id="visualization-container">
-                <div id="visualization"></div>
-            </div>
-        </div>
-        <div class="controls-bottom">
-            <button id="startSearchBtn">Starta sökning</button>
-        </div>
+      <button id="generateGraphBtn">Generera ny graf</button>
     </div>
-    <script>
-        /*******************************************************
+    <div class="visualization-wrapper">
+      <div id="graph-container"></div>
+    </div>
+    <div class="controls-bottom">
+      <button id="startSearchBtn">Starta sökning</button>
+    </div>
+  </div>
+  <script>
+    /*******************************************************
      * Globala variabler
      *******************************************************/
     let graph = null; // Innehåller noder och kanter
@@ -408,105 +250,9 @@
     const animationDelay = 500; // ms mellan stegen
     let searchInterval = null;
 
-    const algorithmExplanations = {
-      dfs: "DFS (Depth-first search) besöker så djupt som möjligt innan den backtrackar.",
-      bfs: "BFS (Breadth-first search) besöker noder nivå för nivå.",
-      iddfs: "IDDFS (Iterative Deepening DFS) utför DFS med successivt ökande djupbegränsning."
-    };
-
-    const algorithmPseudocode = {
-      dfs: `<pre>
-function DFS(node):
-  markera node som besökt
-  sätt node som aktuell
-  for each child of node:
-    if child is not visited:
-      DFS(child)
-  ta bort 'aktuell' från node
-</pre>`,
-      bfs: `<pre>
-function BFS(start):
-  queue = [start]
-  markera start som besökt & aktuell
-  while queue is not empty:
-    node = dequeue from queue
-    for each child of node:
-      if child is not visited:
-        markera child som besökt & aktuell
-        enqueue(child)
-    ta bort 'aktuell' från node
-</pre>`,
-      iddfs: `<pre>
-function IDDFS(root, maxDepth):
-  for depth = 0 to maxDepth:
-    DLS(root, depth)
-
-function DLS(node, limit):
-  if limit < 0: return
-  markera node som besökt
-  sätt node som aktuell
-  for each child of node:
-    if child is not visited:
-      DLS(child, limit - 1)
-  ta bort 'aktuell' från node
-</pre>`
-    };
-
     /*******************************************************
-     * Funktion: Välj en unik emoji baserat på händelsebeskrivningen.
-     *******************************************************/
-    function getEmojiForDescription(description) {
-      if (description.includes("Besöker nod") && !description.includes("DLS:")) {
-        return "🔎";
-      } else if (description.includes("Avslutar nod") && !description.includes("DLS:")) {
-        return "🛑";
-      } else if (description.includes("Processar nod")) {
-        return "🔄";
-      } else if (description.includes("Lägger till nod")) {
-        return "➕";
-      } else if (description.includes("Färdig med nod")) {
-        return "✅";
-      } else if (description.includes("IDDFS iteration")) {
-        return "♻️";
-      } else if (description.includes("DLS: Besöker nod")) {
-        return "🔍";
-      } else if (description.includes("DLS: Avslutar nod")) {
-        return "✔️"; // Unik emoji för DLS: Avslutar nod
-      } else {
-        return "❓";
-      }
-    }
-
-    /*******************************************************
-     * Funktion: Välj färgkombination baserat på händelsebeskrivningen.
-     * För IDDFS iteration, välj en unik kombination som inte används för DLS-händelser.
-     *******************************************************/
-    function getColorForDescription(description) {
-      const style = getComputedStyle(document.documentElement);
-      if (description.includes("Besöker nod") && !description.includes("DLS:")) {
-        return { bg: style.getPropertyValue('--status_graygreen').trim(), border: style.getPropertyValue('--status_olivegreen').trim() };
-      } else if (description.includes("Avslutar nod") && !description.includes("DLS:")) {
-        return { bg: style.getPropertyValue('--status_ochreyellow').trim(), border: style.getPropertyValue('--status_goldenbrown').trim() };
-      } else if (description.includes("Processar nod")) {
-        return { bg: style.getPropertyValue('--status_sienna').trim(), border: style.getPropertyValue('--status_burntumber').trim() };
-      } else if (description.includes("Lägger till nod")) {
-        return { bg: style.getPropertyValue('--status_sandbrown').trim(), border: style.getPropertyValue('--status_terracotta').trim() };
-      } else if (description.includes("Färdig med nod")) {
-        return { bg: style.getPropertyValue('--status_bronze').trim(), border: style.getPropertyValue('--status_cinnamon').trim() };
-      } else if (description.includes("IDDFS iteration")) {
-        return { bg: style.getPropertyValue('--status_bronze').trim(), border: style.getPropertyValue('--status_cinnamon').trim() };
-      } else if (description.includes("DLS: Besöker nod")) {
-        return { bg: style.getPropertyValue('--status_graygreen').trim(), border: style.getPropertyValue('--status_olivegreen').trim() };
-      } else if (description.includes("DLS: Avslutar nod")) {
-        return { bg: style.getPropertyValue('--status_ochreyellow').trim(), border: style.getPropertyValue('--status_goldenbrown').trim() };
-      } else {
-        return { bg: style.getPropertyValue('--status_graygreen').trim(), border: style.getPropertyValue('--status_olivegreen').trim() };
-      }
-    }
-
-    /*******************************************************
-     * 1. Bygg ett slumpmässigt träd med max 3 barn per nod.
-     *    Exakt totalt antal noder (15–30) med övre nivågräns 5.
+     * Bygg ett slumpmässigt träd med max 3 barn per nod.
+     * Totalt antal noder (15–30) med övre nivågräns 5.
      *******************************************************/
     function buildGraph() {
       let totalNodes = parseInt(document.getElementById("nodesSelect").value, 10);
@@ -543,14 +289,14 @@ function DLS(node, limit):
       });
       graph = { nodes, edges };
 
-      // Först beräknas layouten (sätter x och y)
+      // Beräkna layout (sätter x och y)
       computeTreeLayout();
-      // Sedan tilldelas noderna nummer baserat på deras x-koordinat
+      // Tilldela noderna sekventiella nummer (utom roten)
       assignNumbers();
     }
 
     /*******************************************************
-     * 1b. Tilldela sekventiella nummer (utom roten).
+     * Tilldela sekventiella nummer (utom roten).
      *******************************************************/
     function assignNumbers() {
       let levels = {};
@@ -571,7 +317,7 @@ function DLS(node, limit):
     }
 
     /*******************************************************
-     * 2. Beräkna en strukturerad layout med "tidy tree"-algoritm.
+     * Beräkna layout med "tidy tree"-algoritm.
      *******************************************************/
     function computeTreeLayout() {
       let childrenMap = {};
@@ -609,7 +355,7 @@ function DLS(node, limit):
     }
 
     /*******************************************************
-     * 3. Rendera grafen – visa kanter och noder.
+     * Rendera grafen – visa kanter och noder.
      *******************************************************/
     function renderGraph() {
       buildGraph();
@@ -650,7 +396,7 @@ function DLS(node, limit):
     }
 
     /*******************************************************
-     * 4. Uppdatera grafen utifrån snapshot.
+     * Uppdatera grafen utifrån ett snapshot.
      *******************************************************/
     function updateGraph(snapshot) {
       snapshot.forEach(nodeSnap => {
@@ -662,68 +408,68 @@ function DLS(node, limit):
     }
 
     /*******************************************************
-     * 5. Inspelning av söksteg.
+     * Inspelning av söksteg (enbart för att animera grafen).
      *******************************************************/
-    function recordStep(description, type) {
+    function recordStep(description) {
       const snapshot = graph.nodes.map(n => ({
         id: n.id,
         visited: n.visited,
         current: n.current
       }));
-      steps.push({ description, type, snapshot });
+      steps.push({ description, snapshot });
     }
 
     /*******************************************************
-     * 6. DFS – rekursiv sökning.
+     * DFS – rekursiv sökning.
      *******************************************************/
     function dfs(nodeId) {
       const node = graph.nodes.find(n => n.id === nodeId);
       node.visited = true;
       node.current = true;
-      recordStep("Besöker nod " + (node.level === 0 ? "root" : node.number), "dfs");
+      recordStep("Besöker nod " + (node.level === 0 ? "root" : node.number));
       const children = graph.nodes.filter(n => n.parent === nodeId);
       children.forEach(child => {
         if (!child.visited) dfs(child.id);
       });
       node.current = false;
-      recordStep("Avslutar nod " + (node.level === 0 ? "root" : node.number), "dfs");
+      recordStep("Avslutar nod " + (node.level === 0 ? "root" : node.number));
     }
 
     /*******************************************************
-     * 7. BFS – iterativ sökning.
+     * BFS – iterativ sökning.
      *******************************************************/
     function bfs() {
       const queue = [];
       const startNode = graph.nodes.find(n => n.id === 0);
       startNode.visited = true;
       startNode.current = true;
-      recordStep("Start: Besöker root", "bfs");
+      recordStep("Start: Besöker root");
       queue.push(0);
       while (queue.length > 0) {
         const nodeId = queue.shift();
         const node = graph.nodes.find(n => n.id === nodeId);
         node.current = true;
-        recordStep("Processar nod " + (node.level === 0 ? "root" : node.number), "bfs");
+        recordStep("Processar nod " + (node.level === 0 ? "root" : node.number));
         const children = graph.nodes.filter(n => n.parent === nodeId);
         children.forEach(child => {
           if (!child.visited) {
             child.visited = true;
             child.current = true;
-            recordStep("Lägger till nod " + child.number, "bfs");
+            recordStep("Lägger till nod " + child.number);
             queue.push(child.id);
           }
         });
         node.current = false;
-        recordStep("Färdig med nod " + (node.level === 0 ? "root" : node.number), "bfs");
+        recordStep("Färdig med nod " + (node.level === 0 ? "root" : node.number));
       }
     }
 
     /*******************************************************
-     * 7b. IDDFS – Iterative Deepening DFS.
+     * IDDFS – Iterative Deepening DFS.
      *******************************************************/
     function iddfs(rootId, maxDepth) {
       for (let limit = 0; limit <= maxDepth; limit++) {
-        recordStep("IDDFS iteration med djupbegränsning " + limit, "iddfs");
+        recordStep("IDDFS iteration med djupbegränsning " + limit);
         dls(rootId, limit);
         graph.nodes.forEach(n => { n.visited = false; n.current = false; });
       }
@@ -735,7 +481,7 @@ function DLS(node, limit):
       if (!node) return;
       node.visited = true;
       node.current = true;
-      recordStep("DLS: Besöker nod " + (node.level === 0 ? "root" : node.number) + " (limit " + limit + ")", "iddfs");
+      recordStep("DLS: Besöker nod " + (node.level === 0 ? "root" : node.number) + " (limit " + limit + ")");
       if (limit > 0) {
         let children = graph.nodes.filter(n => n.parent === nodeId);
         children.forEach(child => {
@@ -743,93 +489,28 @@ function DLS(node, limit):
         });
       }
       node.current = false;
-      // Unik emoji för DLS: Avslutar nod
-      recordStep("DLS: Avslutar nod " + (node.level === 0 ? "root" : node.number) + " (limit " + limit + ")", "iddfs");
+      recordStep("DLS: Avslutar nod " + (node.level === 0 ? "root" : node.number) + " (limit " + limit + ")");
     }
 
     /*******************************************************
-     * 8. Animation av inspelade steg.
+     * Animation av inspelade steg – uppdaterar enbart grafen.
      *******************************************************/
     function animateSteps() {
       currentStep = 0;
-      const startBtn = document.getElementById("startSearchBtn");
-      startBtn.textContent = "Avbryt nuvarande sökning";
       searchInterval = setInterval(() => {
         if (currentStep >= steps.length) {
           clearInterval(searchInterval);
           searchInterval = null;
-          // Skapa sammanfattningsruta med fast färg
-          const summaryEl = document.createElement('div');
-          summaryEl.className = 'summary fade-in';
-          summaryEl.style.backgroundColor = "var(--extra_primary)";
-          summaryEl.style.borderLeft = "5px solid var(--extra_effect)";
-          summaryEl.style.color = "#fff";
-          summaryEl.innerHTML = `
-            <div class="summary-text">
-              <h3>Sammanfattning</h3>
-              <p>Totalt antal steg: ${steps.length}</p>
-            </div>
-            <div class="summary-emoji">📊</div>
-          `;
-          document.getElementById("visualization").appendChild(summaryEl);
-          setTimeout(() => summaryEl.classList.add('show'), 10);
-          document.getElementById("visualization").scrollTop = document.getElementById("visualization").scrollHeight;
-          startBtn.textContent = "Starta sökning";
           return;
         }
         const step = steps[currentStep];
         updateGraph(step.snapshot);
-        const colors = getColorForDescription(step.description);
-        const emoji = getEmojiForDescription(step.description);
-        const stepEl = document.createElement('div');
-        stepEl.innerHTML = `
-          <div class="step-container ${step.type}" style="background-color: ${colors.bg}; border-left: 5px solid ${colors.border}; color: #fff;">
-            <div class="step-header">
-              <div class="step-description">${step.description}</div>
-              <div class="step-emoji">${emoji}</div>
-            </div>
-            <div class="step-array">[${step.snapshot.map(n => n.id + (n.visited ? "*" : "")).join(" ")}]</div>
-          </div>
-        `;
-        stepEl.className = 'fade-in';
-        document.getElementById("visualization").appendChild(stepEl);
-        setTimeout(() => stepEl.classList.add('show'), 10);
-        document.getElementById("visualization").scrollTop = document.getElementById("visualization").scrollHeight;
         currentStep++;
       }, animationDelay);
     }
 
     /*******************************************************
-     * 9. Förklarings- och pseudokodsruta.
-     *******************************************************/
-    function createExplanationAndPseudocode(algo) {
-      const visualization = document.getElementById("visualization");
-      visualization.innerHTML = "";
-      const combinedEl = document.createElement('div');
-      combinedEl.className = 'explanation-box fade-in';
-      combinedEl.innerHTML = `
-        <div class="explanation-header">
-          <div class="explanation-description">
-            ${algorithmExplanations[algo]}
-          </div>
-          <div class="explanation-emoji">ℹ️</div>
-        </div>
-        <div class="pseudocode-content">
-          <h3>Pseudokod</h3>
-          ${algorithmPseudocode[algo]}
-        </div>
-      `;
-      visualization.appendChild(combinedEl);
-      setTimeout(() => combinedEl.classList.add('show'), 10);
-      const header = combinedEl.querySelector('.explanation-header');
-      const codeContent = combinedEl.querySelector('.pseudocode-content');
-      header.addEventListener('click', () => {
-        codeContent.classList.toggle('expanded');
-      });
-    }
-
-    /*******************************************************
-     * 10. Generera en ny graf och rensa söksteg.
+     * Generera en ny graf och rensa söksteg.
      *******************************************************/
     function generateNewGraph() {
       if (searchInterval !== null) {
@@ -842,15 +523,12 @@ function DLS(node, limit):
         graph.nodes.forEach(n => { n.visited = false; n.current = false; });
       }
       renderGraph();
-      const algo = document.getElementById("algorithmSelect").value;
-      createExplanationAndPseudocode(algo);
     }
 
     /*******************************************************
-     * 11. Koppla knappar och dropdown.
+     * Koppla knappar och dropdown.
      *******************************************************/
     document.getElementById("generateGraphBtn").addEventListener('click', () => {
-      document.getElementById("visualization").innerHTML = "";
       generateNewGraph();
     });
     document.getElementById("algorithmSelect").addEventListener('change', () => {
@@ -876,10 +554,9 @@ function DLS(node, limit):
         document.getElementById("startSearchBtn").textContent = "Starta sökning";
         return;
       }
+      // Nollställ nodstatus
       graph.nodes.forEach(n => { n.visited = false; n.current = false; });
       steps = [];
-      const explanation = document.getElementById("visualization").querySelector('.explanation-box');
-      document.getElementById("visualization").innerHTML = explanation ? explanation.outerHTML : "";
       const algo = document.getElementById("algorithmSelect").value;
       if (algo === "dfs") {
         dfs(0);
@@ -893,14 +570,13 @@ function DLS(node, limit):
     });
 
     /*******************************************************
-     * 12. Vid sidladdning: Initiera grafen med DFS som förval.
+     * Vid sidladdning: Initiera grafen med DFS som förvalt.
      *******************************************************/
     window.onload = () => {
       generateNewGraph();
       document.getElementById("algorithmSelect").value = "dfs";
-      createExplanationAndPseudocode("dfs");
     };
-    </script>
+  </script>
 </body>
 
 </html>
