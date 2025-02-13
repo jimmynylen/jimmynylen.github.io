@@ -2,314 +2,309 @@
 <html lang="sv">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Skapa slumpmässiga grupper</title>
-    <!-- (Valfria) Ikonlänkar -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <!-- Google Fonts -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skapa slumpmässiga grupper</title>
+  <!-- (Valfria) Ikonlänkar -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Google Fonts -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <style>
+    /* ====== Grundinställningar ====== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
-    <style>
-        /* ====== Grundinställningar ====== */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-        }
+    :root {
+      --bg: #f4f4f4;
+      --white: #ffffff;
+      --primary: #40534C;
+      --dark: #1A3636;
+      --text: #644117;
+      --subtle: #D6BD98;
+      --effect: #677D6A;
+      --placeholder: #B9AFA1;
+      --textarea: #FCF8F4;
+      --extra_effect: #D98E04;
+      --extra_primary: #E0A030;
+      --extra_red: #A44434;
+    }
 
-        :root {
-            --bg: #f4f4f4; /* ljusgrå */
-            --white: #ffffff; /* vit */
-            --primary: #40534C; /* dämpad grön/blå */
-            --dark: #1A3636; /* mörk teal */
-            --text: #644117; /* mörk brun */
-            --subtle: #D6BD98; /* ljus beige */
-            --effect: #677D6A; /* gråblå/grön */
-            --placeholder: #B9AFA1; /* grå/beige  */
-            --textarea: #FCF8F4; /* ljusbeige till rutor*/
-            --extra_effect: #D98E04; /* mörk senapsgul */
-            --extra_primary: #E0A030; /* lejongul */
-            --extra_red: #A44434; /* bränd röd */
-        }
+    ::placeholder {
+      color: var(--placeholder);
+      opacity: 1;
+    }
 
-        ::placeholder {
-            color: var(--placeholder);
-            opacity: 1;
-            /* Firefox */
-        }
+    body {
+      font-family: 'Source Serif Pro', serif;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            font-family: 'Source Serif Pro', serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-        }
+    p {
+      margin-top: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      padding: 10px 20px;
+      border-radius: 0 0 8px 8px;
+    }
 
-        p {
-            margin-top: 0;
-            font-size: 15px;
-            color: var(--text);
-            background-color: var(--subtle);
-            padding: 10px 20px;
-            border-radius: 0 0 8px 8px;
-        }
+    .container {
+      background-color: var(--white);
+      max-width: 740px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px auto;
+      position: relative;
+    }
 
-        .container {
-            background-color: var(--white);
-            max-width: 740px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 20px auto;
-            position: relative;
-        }
+    .content {
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-        .content {
-            max-width: 700px;
-            width: 100%;
-            margin: 0 auto;
-        }
+    /* ====== Header ====== */
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin-top: 0px;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+      margin-bottom: 0px;
+    }
 
-        /* ====== Header ====== */
-        h1 {
-            font-family: 'Poppins', sans-serif;
-            margin-top: 0px;
-            font-size: 24px;
-            color: var(--white);
-            background-color: var(--primary);
-            border-radius: 8px 8px 0 0;
-            padding: 10px 20px;
-            margin-bottom: 0px;
-        }
+    /* ====== Formulärstilar ====== */
+    label {
+      font-family: monospace;
+      color: var(--primary);
+      font-weight: normal;
+      font-size: 14px;
+      display: block;
+      margin-top: 5px;
+    }
 
-        /* ====== Formulärstilar ====== */
-        label {
-            font-family: monospace;
-            color: var(--primary);
-            font-weight: normal;
-            font-size: 14px;
-            display: block;
-            margin-top: 5px;
-        }
+    textarea,
+    input[type="number"] {
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      font-size: 13px;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
 
-        textarea,
-        input[type="number"] {
-            background-color: var(--textarea);
-            border: 1px solid var(--effect);
-            color: var(--dark);
-            font-size: 13px;
-            width: 100%;
-            max-width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
+    button {
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      background-color: var(--dark);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+      display: block;
+      margin-top: 0px;
+      padding: 10px 0;
+    }
 
-        button {
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-            background-color: var(--dark);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            width: 100%;
-            /* Default för block-knappar */
-            box-sizing: border-box;
-            display: block;
-            margin-top: 0px;
-            padding: 10px 0;
-        }
+    button:hover {
+      background-color: var(--effect);
+    }
 
-        button:hover {
-            background-color: var(--effect);
-        }
+    .submit-button {
+      margin-top: 10px;
+    }
 
-        .submit-button {
-            margin-top: 10px;
-        }
+    #separator {
+      border-top: 1px dashed var(--dark);
+      margin: 20px 0;
+    }
 
-        #separator {
-            border-top: 1px dashed var(--dark);
-            margin: 20px 0;
-        }
+    /* ====== Resultatstilar ====== */
+    .group {
+      background-color: var(--effect);
+      border: 1px solid var(--primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
 
-        /* ====== Resultatstilar ====== */
+    .group:last-child {
+      margin-bottom: 0;
+    }
 
-        .group {
-            background-color: var(--effect);
-            border: 1px solid var(--primary);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
+    .group h3 {
+      margin-top: 0px;
+      margin-bottom: 5px;
+      color: var(--white);
+      font-weight: normal;
+      font-family: monospace;
+      font-size: 14px;
+    }
 
-        .group:last-child {
-            margin-bottom: 0;
-        }
+    .nameLabel {
+      margin-top: 10px;
+    }
 
-        .group h3 {
-            margin-top: 0px;
-            margin-bottom: 5px;
-            color: var(--white);
-            font-weight: normal;
-            font-family: monospace;
-            font-size: 14px;
-        }
+    .students-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
-        .nameLabel {
-            margin-top: 10px;
-        }
+    .student {
+      background-color: var(--primary);
+      padding: 8px 12px;
+      border-radius: 4px;
+      text-align: center;
+      color: var(--white);
+      font-family: monospace;
+      font-size: 14px;
+    }
 
-        .students-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+    .students-container.odd .student:last-child {
+      grid-column: 1 / -1;
+    }
 
-        .student {
-            background-color: var(--primary);
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-align: center;
-            color: var(--white);
-            font-family: monospace;
-            font-size: 14px;
-        }
+    /* ====== Kopieringsknapp ====== */
+    #copyButton {
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      background-color: var(--extra_effect);
+      border: 1px dashed var(--extra_red);
+      color: white;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 20px;
+      padding: 10px 0;
+    }
 
-        .students-container.odd .student:last-child {
-            grid-column: 1 / -1;
-        }
+    #copyButton:hover {
+      background-color: var(--extra_primary);
+    }
 
-        /* ====== Kopieringsknapp ====== */
-        #copyButton {
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-            background-color: var(--extra_effect);
-            border: 1px dashed var(--extra_red);
-            color: white;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-top: 20px;
-            padding: 10px 0;
-        }
+    /* ====== Kopieringsmeddelande ====== */
+    #copyMessage {
+      display: none;
+      margin-top: 5px;
+      font-size: 14px;
+      color: var(--dark);
+      text-align: center;
+    }
 
-        #copyButton:hover {
-            background-color: var(--extra_primary);
-        }
+    /* Responsiv design */
+    @media (max-width: 700px) {
+      .container {
+        padding: 20px;
+      }
 
-        /* ====== Kopieringsmeddelande ====== */
-        #copyMessage {
-            display: none;
-            /* Döljs tills den behövs */
-            margin-top: 5px;
-            font-size: 14px;
-            color: var(--dark);
-            text-align: center;
-        }
+      .content {
+        max-width: 100%;
+      }
 
-        /* Responsiv design */
-        @media (max-width: 700px) {
-            .container {
-                padding: 20px;
-            }
+      h2 {
+        font-size: 20px;
+        padding: 8px 16px;
+      }
 
-            .content {
-                max-width: 100%;
-            }
+      label {
+        font-size: 14px;
+      }
 
-            h2 {
-                font-size: 20px;
-                padding: 8px 16px;
-            }
+      textarea,
+      input[type="number"],
+      button,
+      #copyButton {
+        font-size: 15px;
+        padding: 10px;
+      }
 
-            label {
-                font-size: 14px;
-            }
+      .students-container {
+        grid-template-columns: 1fr;
+      }
 
-            textarea,
-            input[type="number"],
-            button,
-            #copyButton {
-                font-size: 15px;
-                padding: 10px;
-            }
+      .students-container.odd .student:last-child {
+        grid-column: auto;
+      }
 
-            .students-container {
-                grid-template-columns: 1fr;
-            }
+      .group h3 {
+        font-size: 16px;
+      }
 
-            .students-container.odd .student:last-child {
-                grid-column: auto;
-            }
-
-            .group h3 {
-                font-size: 16px;
-            }
-
-            .student {
-                font-size: 14px;
-            }
-        }
-    </style>
+      .student {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="content">
-            <h1>Skapa slumpmässiga grupper</h1>
-            <p>
-                Mata in dina elevers namn och eventuella taggar såsom kön eller gymnasieprogram. De fördelas jämnt i
-                grupperna utifrån de taggar du skapat, så långt det är möjligt. Om ingen tagg anges kommer eleverna att
-                fördelas helt slumpmässigt. Separera namnen med komma eller ny rad.
-            </p>
+  <div class="container">
+    <div class="content">
+      <h1>Skapa slumpmässiga grupper</h1>
+      <p>
+        Mata in dina elevers namn och eventuella taggar såsom kön eller gymnasieprogram. De fördelas jämnt i
+        grupperna utifrån de taggar du skapat, så långt det är möjligt. Om ingen tagg anges kommer eleverna att
+        fördelas helt slumpmässigt. Separera namnen med komma eller ny rad.
+      </p>
 
-            <form id="groupForm">
-                <!-- Ruta för elevernas namn och kategorier -->
-                <label for="students">
+      <form id="groupForm">
+        <!-- Ruta för elevernas namn och kategorier -->
+        <label for="students">
           Ange elevernas namn och eventuella taggar:
         </label>
-                <textarea id="students" rows="6"
+        <textarea id="students" rows="6"
           placeholder="Helt slumpmässig fördelning: Anna, Bengt, Cecilia, o.s.v.&#10;Jämn fördelning mellan könen: Anna:F, Bengt:M, Cecilia:F, o.s.v.&#10;Jämn fördelning mellan programmen: Anna:EK, Bengt:SA, Cecilia:NA, o.s.v.&#10;&#10;Du kan även skapa helt egna taggar om du så önskar."></textarea>
 
-                <label for="numGroups">Antal grupper:</label>
-                <input type="number" id="numGroups" min="1" placeholder="Ange antal grupper" value="2" required />
+        <label for="numGroups">Antal grupper:</label>
+        <input type="number" id="numGroups" min="1" placeholder="Ange antal grupper" value="2" required />
 
-                <label class="nameLabel" for="groupNames">
+        <label class="nameLabel" for="groupNames">
           Ange egna gruppnamn (valfritt):
         </label>
-                <textarea id="groupNames" rows="3"
+        <textarea id="groupNames" rows="3"
           placeholder="Använd gärna denna funktion för att även slumpa ut ämnesområde att arbeta med.&#10;Exempel: Socialism, Liberalism, Konservatism, o.s.v."></textarea>
 
-                <label for="fixedGroups">
+        <label for="fixedGroups">
           Placera dessa elever i specifika grupper (valfritt):
         </label>
-                <textarea id="fixedGroups" rows="3"
+        <textarea id="fixedGroups" rows="3"
           placeholder="Använd kolon följt av en siffra för att placera en elev i den gruppen.&#10;Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
 
-                <button type="submit" class="submit-button">Skapa nya grupper</button>
-            </form>
+        <button type="submit" class="submit-button">Skapa nya grupper</button>
+      </form>
 
-            <hr id="separator" />
+      <hr id="separator" />
 
-            <!-- Resultatområdet används både för förhandsvisning av tomma grupper och för visning av genererade grupper -->
-            <div id="result" aria-live="polite"></div>
+      <!-- Resultatområdet används både för förhandsvisning av tomma grupper och för visning av genererade grupper -->
+      <div id="result" aria-live="polite"></div>
 
-            <button id="copyButton">Kopiera grupper till urklipp</button>
-            <div id="copyMessage">Grupperna har kopierats!</div>
-        </div>
+      <button id="copyButton">Kopiera grupper till urklipp</button>
+      <div id="copyMessage">Grupperna har kopierats!</div>
     </div>
+  </div>
 
-    <script>
-        // ---------------------------
+  <script>
+    // ---------------------------
     // Hjälpfunktion: Slumpa om en array
     // ---------------------------
     function shuffleArray(array) {
@@ -486,22 +481,43 @@
         }
       }
 
-      // Tilldela resterande elever per kategori
+      // -------------------------------------------
+      // Tilldela resterande elever per kategori med kontroll mot ideal
+      // -------------------------------------------
       for (let cat of catKeys) {
         if (cat === "noCategory") continue;
+
+        // Räkna totala antalet elever för denna kategori (både fasta och icke-fasta)
+        let totalCat = studentsLines.filter(s => {
+          if (s.includes(':')) {
+            let [name, tag] = s.split(':').map(s => s.trim());
+            return tag === cat;
+          }
+          return false;
+        }).length;
+
+        // Beräkna det "ideala" antalet per grupp
+        let baseCat = Math.floor(totalCat / numGroups);
+        let extraCat = totalCat % numGroups;
+
         let catArray = categories[cat];
         let groupIndex = 1;
+
         while (catArray.length > 0) {
           if (groupIndex > numGroups) groupIndex = 1;
-          if (targetSizes[groupIndex] > 0) {
+
+          // Det ideala antalet för denna grupp
+          let idealCat = baseCat + (groupIndex <= extraCat ? 1 : 0);
+          let currentCount = categoryCounts[groupIndex][cat] || 0;
+
+          // Tilldela bara om gruppen inte redan har uppnått det ideala antalet
+          if (targetSizes[groupIndex] > 0 && currentCount < idealCat) {
             let student = catArray.shift();
             groups[groupIndex].push(student);
             targetSizes[groupIndex]--;
-            if (!categoryCounts[groupIndex][cat]) {
-              categoryCounts[groupIndex][cat] = 0;
-            }
-            categoryCounts[groupIndex][cat]++;
+            categoryCounts[groupIndex][cat] = currentCount + 1;
           }
+
           groupIndex++;
         }
       }
@@ -613,7 +629,7 @@
         alert('Kunde inte kopiera grupperna: ', err);
       });
     });
-    </script>
+  </script>
 </body>
 
 </html>
