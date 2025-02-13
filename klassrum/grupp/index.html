@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="sv">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -128,9 +127,9 @@
       margin-top: 10px;
     }
 
-    #separator {
-      border-top: 1px dashed var(--dark);
-      margin: 20px 0;
+    /* Dold container för resultatområdet – behåller ursprungliga stilar för avgränsaren och marginaler */
+    #resultContainer {
+      display: none;
     }
 
     /* ====== Resultatstilar ====== */
@@ -208,6 +207,12 @@
       text-align: center;
     }
 
+    /* Avgränsaren – behåll ursprungliga stilar */
+    #separator {
+      border-top: 1px dashed var(--dark);
+      margin: 20px 0;
+    }
+
     /* Responsiv design */
     @media (max-width: 700px) {
       .container {
@@ -253,7 +258,6 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <div class="content">
@@ -268,7 +272,7 @@
         <label for="students">
           Ange elevernas namn och eventuella taggar:
         </label>
-        <textarea spellcheck="false" id="students" rows="6" placeholder="Helt slumpmässig fördelning: Anna, Bengt, Cecilia, o.s.v.
+        <textarea id="students" rows="6" spellcheck="false" placeholder="Helt slumpmässig fördelning: Anna, Bengt, Cecilia, o.s.v.
 Jämn fördelning mellan könen: Anna:F, Bengt:M, Cecilia:F, o.s.v.
 Jämn fördelning mellan programmen: Anna:EK, Bengt:SA, Cecilia:NA, o.s.v.
 
@@ -280,24 +284,25 @@ Du kan även skapa helt egna taggar om du så önskar."></textarea>
         <label class="nameLabel" for="groupNames">
           Ange egna gruppnamn (valfritt):
         </label>
-        <textarea spellcheck="false" id="groupNames" rows="3" placeholder="Använd gärna denna funktion för att även slumpa ut ämnesområde att arbeta med.
+        <textarea id="groupNames" rows="3" spellcheck="false" placeholder="Använd gärna denna funktion för att även slumpa ut ämnesområde att arbeta med.
 Exempel: Socialism, Liberalism, Konservatism, o.s.v."></textarea>
 
         <label for="fixedGroups">
           Placera dessa elever i specifika grupper (valfritt):
         </label>
-        <textarea spellcheck="false" id="fixedGroups" rows="3" placeholder="Använd kolon följt av en siffra för att placera en elev i den gruppen.
+        <textarea id="fixedGroups" rows="3" spellcheck="false" placeholder="Använd kolon följt av en siffra för att placera en elev i den gruppen.
 Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
 
         <button type="submit" class="submit-button">Skapa nya grupper</button>
       </form>
 
-      <hr id="separator" />
-
-      <div id="result" aria-live="polite"></div>
-
-      <button id="copyButton">Kopiera grupper till urklipp</button>
-      <div id="copyMessage">Grupperna har kopierats!</div>
+      <!-- Resultatområdet (inkl. avgränsaren) döljs tills grupperna skapas -->
+      <div id="resultContainer">
+        <hr id="separator" />
+        <div id="result" aria-live="polite"></div>
+        <button id="copyButton">Kopiera grupper till urklipp</button>
+        <div id="copyMessage">Grupperna har kopierats!</div>
+      </div>
     </div>
   </div>
 
@@ -351,6 +356,7 @@ Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
       const resultDiv = document.getElementById('result');
       const copyButton = document.getElementById('copyButton');
       const copyMessage = document.getElementById('copyMessage');
+      const resultContainer = document.getElementById('resultContainer');
 
       if (!studentsInput || isNaN(numGroups) || numGroups < 1) {
         resultDiv.innerHTML = 'Vänligen fyll i alla obligatoriska fält korrekt.';
@@ -504,6 +510,8 @@ Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
       resultDiv.innerHTML = resultHTML;
       copyMessage.style.display = 'none';
       copyButton.scrollIntoView({ behavior: 'smooth' });
+      // Visa nu hela resultatcontainern (inkl. avgränsaren) utan att ändra dess ursprungliga utseende
+      resultContainer.style.display = 'block';
     }
 
     document.addEventListener('DOMContentLoaded', updateGroupsPreview);
@@ -539,5 +547,4 @@ Exempel: Anna:1, Bengt:1, Cecilia:2, o.s.v."></textarea>
     });
   </script>
 </body>
-
 </html>
