@@ -249,7 +249,7 @@
     let array = [];
     let steps = [];
     let currentStep = 0;
-    const animationDelay = 350; // ms mellan varje steg
+    const animationDelay = 300; // ms mellan varje steg
     let comparisonsCount = 0;
     let movesCount = 0;
     let sortInterval = null;
@@ -262,7 +262,7 @@
 
     /* Förvalda startvärden (antal siffror) per algoritm */
     const defaultBars = {
-      bubble: 10,
+      bubble: 12,
       insertion: 12,
       selection: 12,
       merge: 16
@@ -287,11 +287,11 @@
     }
 
     /*******************************************************
-     * Bygg dropdown för antalet siffror (8–32)
+     * Bygg dropdown för antalet siffror (8–16)
      *******************************************************/
     function buildNumBarsOptions() {
       numBarsSelect.innerHTML = "";
-      for (let i = 8; i <= 32; i++) {
+      for (let i = 8; i <= 16; i++) {
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = i + " siffror";
@@ -554,7 +554,7 @@
             } else {
               // Om segmentet är färdigsammanslaget men inte slutgiltigt sorterat, lägg till en vit kant.
               cell.style.backgroundColor = "var(--status_graygreen)";
-              cell.style.border = "2px solid var(--cell_mediumgreen)";
+              cell.style.border = "1px dashed var(--cell_mediumgreen)";
             }
           } else {
             cell.style.backgroundColor = "var(--status_graygreen)";
