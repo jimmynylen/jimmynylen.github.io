@@ -34,6 +34,9 @@
       --status_cinnamon: #D2691E;
       --cell_mediumgreen: #3CB371;
       --cell_amberyellow: #ffbf00;
+      /* Färger för Merge Sort-processen */
+      --merge-left: #42A5F5;   /* blå */
+      --merge-right: #EF5350;  /* röd */
     }
 
     body {
@@ -134,7 +137,7 @@
     /* Använder position: relative istället för flex */
     #array-container {
       position: relative;
-      height: 500px;
+      height: 450px;
       border-radius: 8px;
       background-color: var(--primary);
       padding: 10px;
@@ -171,31 +174,8 @@
       z-index: 2;
     }
 
-    .merge-label {
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 10px;
-      width: 14px;
-      height: 14px;
-      border-radius: 25%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
-
-    .merge-label.finished {
-      background-color: #86ED26;
-      color: var(--dark);
-    }
-
-    .merge-label.active {
-      background-color: #FEDD00;
-      color: var(--dark);
-    }
-
+    /* Vi tar bort merge-labelen helt för MergeSort */
+    
     .controls-bottom {
       width: 100%;
       margin-top: 10px;
@@ -274,6 +254,8 @@
     let movesCount = 0;
     let sortInterval = null;
     let isSorting = false;
+    // Sparar det ursprungliga osorterade tillståndet
+    let initialArray = [];
 
     // Håller referenser till de skapade cellerna (staplarna)
     let cellElements = {};
@@ -296,6 +278,7 @@
       }
       isSorting = false;
       startSortBtn.textContent = "Sortera siffror i storleksordning";
+      // Vi rensar inte DOM:et, så visualiseringen stannar i nuvarande läge
       array.forEach(item => {
         item.sorted = false;
         item.mergeState = "";
@@ -360,6 +343,8 @@
       comparisonsCount = 0;
       movesCount = 0;
       updateCells(array, null);
+      // Spara en kopia av det osorterade tillståndet
+      initialArray = JSON.parse(JSON.stringify(array));
     }
 
     /*******************************************************
@@ -405,22 +390,15 @@
 
     /*******************************************************
      * Insertion Sort
-     * Modifierad version: Endast stapeln som flyttas markeras med gult.
-     * Dessutom markeras den första stapeln (längst till vänster) som sorterad (grön)
-     * redan från början, eftersom den utgör den initiala sorterade delen.
      *******************************************************/
     function insertionSort(arr) {
       let localArr = arr.slice();
       steps = [];
-      // Markera det första elementet som redan sorterat (grönt)
       localArr[0].sorted = true;
-      recordStep(localArr, []); // Registrera ett steg utan gul highlight
-
+      recordStep(localArr, []);
       for (let i = 1; i < localArr.length; i++) {
         let j = i;
-        // Flytta den "insatta" stapeln till rätt plats
         while (j > 0 && localArr[j].val < localArr[j - 1].val) {
-          // Endast den stapel som flyttas markeras med gult
           recordStep(localArr, [j]);
           const temp = localArr[j];
           localArr[j] = localArr[j - 1];
@@ -428,7 +406,6 @@
           recordStep(localArr, [j - 1]);
           j--;
         }
-        // Markera den stapel som nu placerats rätt som sorterad (grön)
         localArr[j].sorted = true;
         recordStep(localArr, []);
       }
@@ -535,12 +512,14 @@
      * med hjälp av absolut positionering. Här beräknas även
      * den nya vänsterpositionen (left) för att animera flytten.
      * Gap mellan cellerna hanteras genom att cellbredden och left rundas.
+     * För MergeSort används nu färger för att markera vilken del som kommer från vänster (blå) eller höger (röd).
+     * Vid färdig sammanslagning (mergeState "M") markeras segmentet med en vit kant om det inte är helt sorterat (då blir det grönt i slutet).
      *******************************************************/
     function updateCells(snapshot, highlightIndices) {
       const containerWidth = arrayGrid.clientWidth;
       const containerHeight = arrayGrid.clientHeight;
       const totalCells = snapshot.length;
-      const gap = 4; // Gap i pixlar mellan staplarna
+      const gap = 4;
       const cellWidth = Math.round((containerWidth - gap * (totalCells - 1)) / totalCells);
       const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
       const values = snapshot.map(e => e.val);
@@ -554,17 +533,39 @@
         cell.style.left = Math.round(index * (cellWidth + gap)) + "px";
         const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, 60);
         cell.style.height = finalHeight + "px";
+        // Skapa innehållet med bara siffran, utan merge-label
         let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
-        if (item.mergeState) {
-          innerContent += `<div class="merge-label ${item.mergeState === "M" ? "finished" : "active"}">${item.mergeState}</div>`;
-        }
         cell.innerHTML = innerContent;
+        // Färgsättning
         if (highlightIndices && highlightIndices.includes(index)) {
           cell.style.backgroundColor = "var(--cell_amberyellow)";
+          cell.style.border = "";
+        } else if (algorithmSelect.value === "merge" && item.mergeState) {
+          if (item.mergeState === "V") {
+            cell.style.backgroundColor = "var(--merge-left)";
+            cell.style.border = "";
+          } else if (item.mergeState === "H") {
+            cell.style.backgroundColor = "var(--merge-right)";
+            cell.style.border = "";
+          } else if (item.mergeState === "M") {
+            if (item.sorted) {
+              cell.style.backgroundColor = "var(--cell_mediumgreen)";
+              cell.style.border = "";
+            } else {
+              // Om segmentet är färdigsammanslaget men inte slutgiltigt sorterat, lägg till en vit kant.
+              cell.style.backgroundColor = "var(--status_graygreen)";
+              cell.style.border = "2px solid var(--cell_mediumgreen)";
+            }
+          } else {
+            cell.style.backgroundColor = "var(--status_graygreen)";
+            cell.style.border = "";
+          }
         } else if (item.sorted) {
           cell.style.backgroundColor = "var(--cell_mediumgreen)";
+          cell.style.border = "";
         } else {
           cell.style.backgroundColor = "var(--status_graygreen)";
+          cell.style.border = "";
         }
       });
     }
@@ -600,9 +601,13 @@
 
     startSortBtn.addEventListener('click', () => {
       if (isSorting) {
+        // Vid avbrytning stannar visualiseringen i nuvarande läge.
         abortSort();
         return;
       }
+      // Vid nytt sorteringsförsök, återställ arrayen till det ursprungliga osorterade tillståndet
+      array = JSON.parse(JSON.stringify(initialArray));
+      updateCells(array, null);
       isSorting = true;
       startSortBtn.textContent = "Avbryt sortering";
       steps = [];
