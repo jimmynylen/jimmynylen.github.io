@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="sv">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -132,10 +131,9 @@
       margin: 15px 0;
     }
 
+    /* Använder position: relative istället för flex */
     #array-container {
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
+      position: relative;
       height: 500px;
       border-radius: 8px;
       background-color: var(--primary);
@@ -144,23 +142,21 @@
       margin-bottom: 10px;
     }
 
+    /* Absolut positionering för att animera staplarna */
     #array-grid {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
+      position: relative;
       height: 100%;
       width: 100%;
     }
 
     .cell {
-      background-color: var(--status_graygreen);
-      border-radius: 8px;
+      position: absolute;
+      bottom: 0;
+      transition: left 0.3s ease, height 0.3s ease, background-color 0.3s ease;
       text-align: center;
       font-family: monospace;
       box-sizing: border-box;
-      flex: 1;
-      margin: 0 1px;
-      position: relative;
+      border-radius: 8px;
       overflow: hidden;
       min-height: 60px;
       color: var(--white);
@@ -233,12 +229,11 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1>Visualisering av sorteringsalgoritmer</h1>
     <p class="inforuta">
-      Algoritmer för sortering används här för att demonstrera hur siffror sorteras visuellt.
+      Algoritmer för sortering är snarare ett generellt programmeringskoncept än ett AI-koncept, men jag har använt det som en kort introduktion till jämförelsen av hur en människa och en artificiell intelligens löser samma problem, vilket är en del av kursen Artificiell Intelligens 1.
     </p>
     <div class="controls-top">
       <select id="algorithmSelect">
@@ -253,7 +248,7 @@
     <div class="visualization-wrapper">
       <div id="array-container">
         <div id="array-grid">
-          <!-- Staplar genereras här -->
+          <!-- Staplarna skapas här och uppdateras under animationen -->
         </div>
       </div>
     </div>
@@ -277,9 +272,11 @@
     const animationDelay = 350; // ms mellan varje steg
     let comparisonsCount = 0;
     let movesCount = 0;
-
     let sortInterval = null;
     let isSorting = false;
+
+    // Håller referenser till de skapade cellerna (staplarna)
+    let cellElements = {};
 
     /* Förvalda startvärden (antal siffror) per algoritm */
     const defaultBars = {
@@ -303,7 +300,7 @@
         item.sorted = false;
         item.mergeState = "";
       });
-      renderArray(array);
+      updateCells(array, null);
     }
 
     /*******************************************************
@@ -341,56 +338,33 @@
 
     /*******************************************************
      * Slumpa array baserat på dropdown-värde
+     * Skapar även cellerna (DOM-elementen) en gång.
      *******************************************************/
     function randomizeArray() {
       let count = parseInt(numBarsSelect.value, 10);
       if (isNaN(count) || count < 8) count = 8;
       if (count > 32) count = 32;
       array = [];
+      cellElements = {};
+      arrayGrid.innerHTML = "";
+
       for (let i = 0; i < count; i++) {
         const num = Math.floor(Math.random() * 90) + 10;
-        array.push({ val: num, sorted: false });
+        array.push({ id: i, val: num, sorted: false, mergeState: "" });
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.id = i;
+        arrayGrid.appendChild(cell);
+        cellElements[i] = cell;
       }
       comparisonsCount = 0;
       movesCount = 0;
-      renderArray(array);
+      updateCells(array, null);
     }
 
     /*******************************************************
-     * Rendera staplar i array-container
+     * Räkna ut cellens höjd baserat på värdet
      *******************************************************/
-    function renderArray(arr) {
-      arrayGrid.innerHTML = "";
-      const containerHeight = arrayGrid.clientHeight;
-      const values = arr.map(e => e.val);
-      const minValue = Math.min(...values);
-      const maxValue = Math.max(...values);
-      let cellMinHeight = 60;
-      const tempCell = document.createElement('div');
-      tempCell.className = 'cell';
-      document.body.appendChild(tempCell);
-      const computedStyle = getComputedStyle(tempCell);
-      cellMinHeight = parseFloat(computedStyle.minHeight) || cellMinHeight;
-      document.body.removeChild(tempCell);
-      const cellWidth = arrayGrid.clientWidth / arr.length;
-      const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
-      arr.forEach(item => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, cellMinHeight);
-        cell.style.height = finalHeight + "px";
-        let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
-        if (item.mergeState) {
-          innerContent += `<div class="merge-label ${item.mergeState === "M" ? "finished" : "active"}">${item.mergeState}</div>`;
-        }
-        cell.innerHTML = innerContent;
-        if (item.sorted) {
-          cell.style.backgroundColor = "var(--cell_mediumgreen)";
-        }
-        arrayGrid.appendChild(cell);
-      });
-    }
-
     function calculateCellHeight(val, minValue, maxValue, containerHeight, cellMinHeight) {
       if (maxValue === minValue) {
         return containerHeight;
@@ -431,32 +405,40 @@
 
     /*******************************************************
      * Insertion Sort
+     * Modifierad version: Endast stapeln som flyttas markeras med gult.
+     * Dessutom markeras den första stapeln (längst till vänster) som sorterad (grön)
+     * redan från början, eftersom den utgör den initiala sorterade delen.
      *******************************************************/
     function insertionSort(arr) {
       let localArr = arr.slice();
       steps = [];
+      // Markera det första elementet som redan sorterat (grönt)
+      localArr[0].sorted = true;
+      recordStep(localArr, []); // Registrera ett steg utan gul highlight
+
       for (let i = 1; i < localArr.length; i++) {
         let j = i;
+        // Flytta den "insatta" stapeln till rätt plats
         while (j > 0 && localArr[j].val < localArr[j - 1].val) {
-          recordStep(localArr, [j - 1, j]);
+          // Endast den stapel som flyttas markeras med gult
+          recordStep(localArr, [j]);
           const temp = localArr[j];
           localArr[j] = localArr[j - 1];
           localArr[j - 1] = temp;
-          recordStep(localArr, [j - 1, j]);
+          recordStep(localArr, [j - 1]);
           j--;
         }
-        for (let k = 0; k <= i; k++) {
-          localArr[k].sorted = true;
-        }
-        recordStep(localArr, Array.from({ length: i + 1 }, (_, idx) => idx));
+        // Markera den stapel som nu placerats rätt som sorterad (grön)
+        localArr[j].sorted = true;
+        recordStep(localArr, []);
       }
       localArr.forEach(e => (e.sorted = true));
-      recordStep(localArr, Array.from({ length: localArr.length }, (_, idx) => idx));
+      recordStep(localArr, []);
       return localArr;
     }
 
     /*******************************************************
-     * Merge Sort
+     * Merge Sort (oförändrad – dock uppdaterar vi via updateCells)
      *******************************************************/
     function mergeSort(arr) {
       let localArr = arr.slice();
@@ -484,9 +466,7 @@
         arr[index].mergeState = "H";
       }
       recordStep(arr, []);
-      let i = 0,
-        j = 0,
-        k = left;
+      let i = 0, j = 0, k = left;
       while (i < L.length && j < R.length) {
         recordStep(arr, [k]);
         if (L[i].val <= R[j].val) {
@@ -551,45 +531,28 @@
     }
 
     /*******************************************************
-     * Animation av inspelade steg – enbart uppdatering av array-grid
+     * Uppdatera cellerna (staplarna) enligt ett givet "snapshot"
+     * med hjälp av absolut positionering. Här beräknas även
+     * den nya vänsterpositionen (left) för att animera flytten.
+     * Gap mellan cellerna hanteras genom att cellbredden och left rundas.
      *******************************************************/
-    function animateSteps() {
-      currentStep = 0;
-      sortInterval = setInterval(() => {
-        if (currentStep >= steps.length) {
-          clearInterval(sortInterval);
-          sortInterval = null;
-          isSorting = false;
-          startSortBtn.textContent = "Sortera siffror i storleksordning";
-          steps[steps.length - 1].array.forEach(e => e.sorted = true);
-          updateArrayGrid(steps[steps.length - 1].array, null);
-          return;
-        }
-        const step = steps[currentStep];
-        updateArrayGrid(step.array, step.indices);
-        currentStep++;
-      }, animationDelay);
-    }
-
-    function updateArrayGrid(arr, highlightIndices) {
-      arrayGrid.innerHTML = "";
+    function updateCells(snapshot, highlightIndices) {
+      const containerWidth = arrayGrid.clientWidth;
       const containerHeight = arrayGrid.clientHeight;
-      const values = arr.map(e => e.val);
+      const totalCells = snapshot.length;
+      const gap = 4; // Gap i pixlar mellan staplarna
+      const cellWidth = Math.round((containerWidth - gap * (totalCells - 1)) / totalCells);
+      const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
+      const values = snapshot.map(e => e.val);
       const minValue = Math.min(...values);
       const maxValue = Math.max(...values);
-      let cellMinHeight = 60;
-      const tempCell = document.createElement('div');
-      tempCell.className = 'cell';
-      document.body.appendChild(tempCell);
-      const computedStyle = getComputedStyle(tempCell);
-      cellMinHeight = parseFloat(computedStyle.minHeight) || cellMinHeight;
-      document.body.removeChild(tempCell);
-      const cellWidth = arrayGrid.clientWidth / arr.length;
-      const fontSize = Math.min(16, Math.max(8, cellWidth * 0.4));
-      arr.forEach((item, index) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, cellMinHeight);
+
+      snapshot.forEach((item, index) => {
+        const cell = cellElements[item.id];
+        if (!cell) return;
+        cell.style.width = cellWidth + "px";
+        cell.style.left = Math.round(index * (cellWidth + gap)) + "px";
+        const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, 60);
         cell.style.height = finalHeight + "px";
         let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
         if (item.mergeState) {
@@ -603,8 +566,28 @@
         } else {
           cell.style.backgroundColor = "var(--status_graygreen)";
         }
-        arrayGrid.appendChild(cell);
       });
+    }
+
+    /*******************************************************
+     * Animation av inspelade steg – uppdaterar cellernas positioner
+     *******************************************************/
+    function animateSteps() {
+      currentStep = 0;
+      sortInterval = setInterval(() => {
+        if (currentStep >= steps.length) {
+          clearInterval(sortInterval);
+          sortInterval = null;
+          isSorting = false;
+          startSortBtn.textContent = "Sortera siffror i storleksordning";
+          steps[steps.length - 1].array.forEach(e => e.sorted = true);
+          updateCells(steps[steps.length - 1].array, null);
+          return;
+        }
+        const step = steps[currentStep];
+        updateCells(step.array, step.indices);
+        currentStep++;
+      }, animationDelay);
     }
 
     /*******************************************************
@@ -650,5 +633,4 @@
     };
   </script>
 </body>
-
 </html>
