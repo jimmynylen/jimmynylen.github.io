@@ -174,8 +174,6 @@
       z-index: 2;
     }
 
-    /* Vi tar bort merge-labelen helt för MergeSort */
-    
     .controls-bottom {
       width: 100%;
       margin-top: 10px;
@@ -249,11 +247,12 @@
     let array = [];
     let steps = [];
     let currentStep = 0;
-    const animationDelay = 300; // ms mellan varje steg
-    let comparisonsCount = 0;
-    let movesCount = 0;
-    let sortInterval = null;
+    const animationDelay = 300; // ms för övriga algoritmer
+    const mergeAnimationDelay = 600; // ms för MergeSort (för övriga steg)
+    const extraPauseFactor = 0.3;    // Faktor för extra pausens tid (t.ex. 0.5 för hälften)
     let isSorting = false;
+    // Variabel för att lagra aktuell timeout för animering
+    let animationTimeout = null;
     // Sparar det ursprungliga osorterade tillståndet
     let initialArray = [];
 
@@ -272,13 +271,14 @@
      * Avbryt pågående sortering
      *******************************************************/
     function abortSort() {
-      if (sortInterval) {
-        clearInterval(sortInterval);
-        sortInterval = null;
-      }
       isSorting = false;
       startSortBtn.textContent = "Sortera siffror i storleksordning";
-      // Vi rensar inte DOM:et, så visualiseringen stannar i nuvarande läge
+      // Rensa eventuell aktiv timeout för animering
+      if (animationTimeout !== null) {
+        clearTimeout(animationTimeout);
+        animationTimeout = null;
+      }
+      // Återställ sorteringstillståndet
       array.forEach(item => {
         item.sorted = false;
         item.mergeState = "";
@@ -340,8 +340,6 @@
         arrayGrid.appendChild(cell);
         cellElements[i] = cell;
       }
-      comparisonsCount = 0;
-      movesCount = 0;
       updateCells(array, null);
       // Spara en kopia av det osorterade tillståndet
       initialArray = JSON.parse(JSON.stringify(array));
@@ -359,10 +357,11 @@
 
     /*******************************************************
      * Inspelning av sorteringssteg för animation
+     * Nu med ett extra valfritt parameter: delayFactor (default 1)
      *******************************************************/
-    function recordStep(arraySnapshot, indices) {
+    function recordStep(arraySnapshot, indices, delayFactor = 1) {
       const snapshot = JSON.parse(JSON.stringify(arraySnapshot));
-      steps.push({ array: snapshot, indices });
+      steps.push({ array: snapshot, indices, delayFactor });
     }
 
     /*******************************************************
@@ -415,7 +414,7 @@
     }
 
     /*******************************************************
-     * Merge Sort (oförändrad – dock uppdaterar vi via updateCells)
+     * Merge Sort
      *******************************************************/
     function mergeSort(arr) {
       let localArr = arr.slice();
@@ -433,48 +432,64 @@
       }
     }
 
+    // Uppdaterad merge-funktion:
+    // 1. Markera vänster segment med "V" (blå) och höger med "H" (röd) och spela in ett steg.
+    // 2. Utför merge-logiken och kopiera den sammanslagna ordningen men behåll mergeState ("V" och "H").
+    // 3. Spela in ett steg för själva förflyttningen (färgerna röd/blå).
+    // 4. Spela in ett extra steg med en förkortad delay (delayFactor = extraPauseFactor) för den extra pausen.
+    // 5. Uppdatera sedan mergeState till "M" och spela in det slutgiltiga steget.
     function merge(arr, left, mid, right) {
       const L = arr.slice(left, mid + 1);
       const R = arr.slice(mid + 1, right + 1);
+      // Markera segmenten
       for (let index = left; index <= mid; index++) {
         arr[index].mergeState = "V";
       }
       for (let index = mid + 1; index <= right; index++) {
         arr[index].mergeState = "H";
       }
+      // Steg 1: Visa de färgade segmenten
       recordStep(arr, []);
-      let i = 0, j = 0, k = left;
+
+      // Utför merge-logiken
+      let merged = [];
+      let i = 0, j = 0;
       while (i < L.length && j < R.length) {
-        recordStep(arr, [k]);
         if (L[i].val <= R[j].val) {
-          arr[k] = L[i];
-          recordStep(arr, [k]);
+          merged.push(L[i]);
           i++;
         } else {
-          arr[k] = R[j];
-          recordStep(arr, [k]);
+          merged.push(R[j]);
           j++;
         }
-        k++;
       }
       while (i < L.length) {
-        arr[k] = L[i];
-        recordStep(arr, [k]);
+        merged.push(L[i]);
         i++;
-        k++;
       }
       while (j < R.length) {
-        arr[k] = R[j];
-        recordStep(arr, [k]);
+        merged.push(R[j]);
         j++;
-        k++;
       }
+      // Kopiera tillbaka den sammanslagna ordningen men behåll mergeState ("V" och "H")
+      for (let k = 0; k < merged.length; k++) {
+        arr[left + k] = merged[k];
+      }
+      
+      // Steg 2: Animering av staplarnas förflyttning – färgerna (röd/blå) syns under rörelsen
+      recordStep(arr, Array.from({ length: right - left + 1 }, (_, i) => left + i));
+      
+      // Steg 3: Håll kvar färgerna ytterligare en period med reducerad tid
+      recordStep(arr, Array.from({ length: right - left + 1 }, (_, i) => left + i), extraPauseFactor);
+      
+      // Uppdatera mergeState till "M" (och markera som sorterade om det är den sista sammanslagningen)
       for (let index = left; index <= right; index++) {
         arr[index].mergeState = "M";
         if (left === 0 && right === arr.length - 1) {
           arr[index].sorted = true;
         }
       }
+      // Steg 4: Visa den slutgiltiga ordningen med den uppdaterade mergeState
       recordStep(arr, Array.from({ length: right - left + 1 }, (_, i) => left + i));
     }
 
@@ -509,11 +524,7 @@
 
     /*******************************************************
      * Uppdatera cellerna (staplarna) enligt ett givet "snapshot"
-     * med hjälp av absolut positionering. Här beräknas även
-     * den nya vänsterpositionen (left) för att animera flytten.
-     * Gap mellan cellerna hanteras genom att cellbredden och left rundas.
-     * För MergeSort används nu färger för att markera vilken del som kommer från vänster (blå) eller höger (röd).
-     * Vid färdig sammanslagning (mergeState "M") markeras segmentet med en vit kant om det inte är helt sorterat (då blir det grönt i slutet).
+     * med hjälp av absolut positionering.
      *******************************************************/
     function updateCells(snapshot, highlightIndices) {
       const containerWidth = arrayGrid.clientWidth;
@@ -530,37 +541,35 @@
         const cell = cellElements[item.id];
         if (!cell) return;
         cell.style.width = cellWidth + "px";
+        // Använd alltid left-transition så att staplarna animeras
+        cell.style.transition = "left 0.3s ease, height 0.3s ease, background-color 0.3s ease";
         cell.style.left = Math.round(index * (cellWidth + gap)) + "px";
         const finalHeight = calculateCellHeight(item.val, minValue, maxValue, containerHeight, 60);
         cell.style.height = finalHeight + "px";
-        // Skapa innehållet med bara siffran, utan merge-label
+        // Visa bara värdet
         let innerContent = `<span style="font-size: ${fontSize}px;">${item.val}</span>`;
         cell.innerHTML = innerContent;
-        // Färgsättning
-        if (highlightIndices && highlightIndices.includes(index)) {
-          cell.style.backgroundColor = "var(--cell_amberyellow)";
-          cell.style.border = "";
-        } else if (algorithmSelect.value === "merge" && item.mergeState) {
+        // För MergeSort: använd färgning enligt mergeState
+        if (algorithmSelect.value === "merge" && item.mergeState) {
           if (item.mergeState === "V") {
             cell.style.backgroundColor = "var(--merge-left)";
-            cell.style.border = "";
           } else if (item.mergeState === "H") {
             cell.style.backgroundColor = "var(--merge-right)";
-            cell.style.border = "";
           } else if (item.mergeState === "M") {
-            if (item.sorted) {
-              cell.style.backgroundColor = "var(--cell_mediumgreen)";
-              cell.style.border = "";
-            } else {
-              // Om segmentet är färdigsammanslaget men inte slutgiltigt sorterat, lägg till en vit kant.
-              cell.style.backgroundColor = "var(--status_graygreen)";
-              cell.style.border = "1px dashed var(--cell_mediumgreen)";
-            }
+            cell.style.backgroundColor = item.sorted 
+              ? "var(--cell_mediumgreen)" 
+              : "var(--status_graygreen)";
           } else {
             cell.style.backgroundColor = "var(--status_graygreen)";
-            cell.style.border = "";
           }
-        } else if (item.sorted) {
+          cell.style.border = "";
+        } 
+        // För övriga algoritmer – använd den gula färgen vid highlight
+        else if (highlightIndices && highlightIndices.includes(index)) {
+          cell.style.backgroundColor = "var(--cell_amberyellow)";
+          cell.style.border = "";
+        } 
+        else if (item.sorted) {
           cell.style.backgroundColor = "var(--cell_mediumgreen)";
           cell.style.border = "";
         } else {
@@ -571,14 +580,12 @@
     }
 
     /*******************************************************
-     * Animation av inspelade steg – uppdaterar cellernas positioner
+     * Animation av inspelade steg – animering med dynamisk delay
      *******************************************************/
     function animateSteps() {
       currentStep = 0;
-      sortInterval = setInterval(() => {
+      function nextStep() {
         if (currentStep >= steps.length) {
-          clearInterval(sortInterval);
-          sortInterval = null;
           isSorting = false;
           startSortBtn.textContent = "Sortera siffror i storleksordning";
           steps[steps.length - 1].array.forEach(e => e.sorted = true);
@@ -587,8 +594,14 @@
         }
         const step = steps[currentStep];
         updateCells(step.array, step.indices);
+        let delay = animationDelay;
+        if (algorithmSelect.value === "merge") {
+          delay = mergeAnimationDelay * (step.delayFactor || 1);
+        }
         currentStep++;
-      }, animationDelay);
+        animationTimeout = setTimeout(nextStep, delay);
+      }
+      nextStep();
     }
 
     /*******************************************************
@@ -601,11 +614,10 @@
 
     startSortBtn.addEventListener('click', () => {
       if (isSorting) {
-        // Vid avbrytning stannar visualiseringen i nuvarande läge.
         abortSort();
         return;
       }
-      // Vid nytt sorteringsförsök, återställ arrayen till det ursprungliga osorterade tillståndet
+      // Återställ arrayen till ursprungligt osorterat tillstånd
       array = JSON.parse(JSON.stringify(initialArray));
       updateCells(array, null);
       isSorting = true;
