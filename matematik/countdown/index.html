@@ -110,6 +110,7 @@
       border-top: 1px dashed var(--dark);
       margin: 20px 0;
       display: block;
+      /* visas alltid */
     }
     /* Inmatningsraden för antal stora/små siffror */
     .input-row {
@@ -129,11 +130,17 @@
       text-align: center;
       padding: 15px;
     }
+    /*
+      .numbers-area: 6 kolumner, 2 rader:
+      - Rad 1: 6 slot-rutor
+      - Rad 2: 1 sum-slot (spänner över 6 kolumner)
+    */
     .numbers-area {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 10px;
     }
+    /* De 6 siffrorna */
     .slot {
       background-color: var(--primary);
       border-radius: 5px;
@@ -143,11 +150,14 @@
       align-items: center;
       justify-content: center;
       font-size: 36px;
+      /* Stora siffror */
       font-weight: bold;
       color: var(--white);
     }
+    /* Summasiffra (mål) */
     .sum-slot {
       grid-column: 1 / 7;
+      /* spänner över 6 kolumner */
       background-color: var(--primary);
       border-radius: 5px;
       width: 100%;
@@ -156,11 +166,13 @@
       align-items: center;
       justify-content: center;
       font-size: 40px;
+      /* lite större */
       font-weight: bold;
       color: var(--white);
     }
+    /* Timerruta längst ner (grön) */
     .timer-container {
-      display: none;
+      display: none; /* Döljer timerrutan tills timern startar */
       font-family: 'Poppins', sans-serif;
       background-color: var(--extra_effect);
       border: 1px solid var(--extra_red);
@@ -187,12 +199,15 @@
     }
     @media (max-width: 600px) {
       .numbers-area {
+        /* Gå från 6 kolumner till 3 kolumner */
         grid-template-columns: repeat(3, 1fr);
       }
       .sum-slot {
+        /* Summa-rutan ska spänna över alla 3 kolumner i stället för 6 */
         grid-column: 1 / 4;
       }
     }
+    /* === Flash/zoom-effekt när en slot stannar === */
     .slot-chosen {
       animation: highlight 0.8s ease-in-out;
     }
@@ -228,48 +243,28 @@
         <input type="number" id="smallCount" value="4" readonly />
       </div>
     </div>
-    <!-- Timer- och ljudeffektinställning i samma rad -->
-    <div style="display: flex; gap: 10px; align-items: flex-end;">
-      <div style="flex: 1;">
-        <label for="timerInput">Timer (sekunder):</label>
-        <input type="number" id="timerInput" value="45" min="10" max="120" />
-      </div>
-      <div style="flex: 1;">
-        <label for="loopSoundSelect">Loopande ljudeffekt:</label>
-        <select id="loopSoundSelect">
-          <?php
-            $directory = 'sounds/';
-            // Hämta alla .wav- och .mp3-filer
-            $sounds = glob($directory . '*.{wav,mp3}', GLOB_BRACE);
-            foreach($sounds as $sound) {
-              $soundFile = basename($sound);
-              // Uteslut end.wav
-              if($soundFile === "end.wav") continue;
-              // Förvald: tick-tock-percussion.wav
-              $selected = ($soundFile === "tick-tock-percussion.wav") ? 'selected' : '';
-              echo "<option value='$soundFile' $selected>$soundFile</option>";
-            }
-          ?>
-        </select>
-      </div>
-    </div>
-    <!-- Startknappen -->
+    <!-- Timer-inställning -->
+    <label for="timerInput">Timer (sekunder):</label>
+    <input type="number" id="timerInput" value="45" min="10" max="120" />
+    <!-- Knappen som först startar spelet, men senare blir "Starta om spelet" -->
     <button id="startButton" onclick="startGame()">Starta spelet</button>
-    <!-- Avgränsare -->
+    <!-- Avgränsare: visas direkt -->
     <div class="divider" id="divider"></div>
-    <!-- Beige container för siffror -->
+    <!-- Beige container (siffror är synliga redan vid sidstart) -->
     <div id="numbersContainer" class="numbers-container">
       <div id="numbersArea" class="numbers-area">
+        <!-- 6 slots på rad 1 -->
         <div class="slot" id="slot0">?</div>
         <div class="slot" id="slot1">?</div>
         <div class="slot" id="slot2">?</div>
         <div class="slot" id="slot3">?</div>
         <div class="slot" id="slot4">?</div>
         <div class="slot" id="slot5">?</div>
+        <!-- Summasiffra (rad 2) -->
         <div class="sum-slot" id="sumSlot">?</div>
       </div>
     </div>
-    <!-- Timer-ruta -->
+    <!-- Timer-ruta längst ner (OBS: Inledningsvis visas endast timer-emoji) -->
     <div id="timerContainer" class="timer-container">
       <p id="timerDisplay" class="timer">⏱️</p>
     </div>
@@ -281,9 +276,11 @@
     let timeLeft;        // Antal sekunder kvar
     let slotMachines = []; // array av { slotElement, intervalId, stopSlot(finalNumber), isSumSlot }
 
-    /* ==== Ljudhantering ==== */
-    // Slutljudet definieras med tickande end.wav
-    const endSound = new Audio('sounds/end.wav');
+    /* ==== Ljudhantering (NYTT) ==== */
+    // Ange sökvägar/filnamn för dina ljudfiler
+    const loopSound = new Audio('sound_loop.wav');
+    loopSound.loop = true;
+    const endSound = new Audio('sound_end.wav');
     endSound.volume = 0.30; 
 
     // Funktion för att fade:a ut ett ljud under en angiven tid (ms)
@@ -324,10 +321,12 @@
       const smallNumbers = [1,2,3,4,5,6,7,8,9,10];
       const largeNumbers = [25,50,75,100];
       const selectedNumbers = [];
+      // Välj "largeCount" st från largeNumbers
       for (let i = 0; i < largeCount; i++) {
         const idx = Math.floor(Math.random() * largeNumbers.length);
         selectedNumbers.push(largeNumbers.splice(idx, 1)[0]);
       }
+      // Välj "smallCount" st från smallNumbers
       for (let i = 0; i < smallCount; i++) {
         const idx = Math.floor(Math.random() * smallNumbers.length);
         selectedNumbers.push(smallNumbers.splice(idx, 1)[0]);
@@ -336,17 +335,22 @@
     }
 
     // Starta kontinuerlig snurr
+    // - "isSumSlot" true => slumpa 3-siffriga tal (100..999)
+    // - annars => slumpa 2-siffriga tal (1..99)
     function startContinuousSpin(slotElement, isSumSlot=false) {
       const intervalId = setInterval(() => {
         let randVal;
         if(isSumSlot){
+          // Summasiffran: slumpa 100..999
           randVal = Math.floor(Math.random()*900)+100;
         } else {
+          // Vanlig ruta: slumpa 1..99
           randVal = Math.floor(Math.random()*99)+1;
         }
         slotElement.textContent = randVal;
       }, 50);
 
+      // stopSlot: avslutar spin + visar vald siffra + flash-animation
       function stopSlot(finalNumber) {
         clearInterval(intervalId);
         slotElement.textContent = finalNumber;
@@ -356,7 +360,7 @@
       return { slotElement, intervalId, stopSlot, isSumSlot };
     }
 
-    // Starta snurr för alla 7 rutor vid sidstart
+    // Startar snurr för alla 7 rutor redan vid sidstart
     window.addEventListener("DOMContentLoaded", () => {
       const slots = [
         document.getElementById("slot0"),
@@ -365,8 +369,9 @@
         document.getElementById("slot3"),
         document.getElementById("slot4"),
         document.getElementById("slot5"),
-        document.getElementById("sumSlot")
+        document.getElementById("sumSlot") // sista rutan är summaslot
       ];
+      // 6 första får isSumSlot=false (default), sista true
       slotMachines = slots.map((slotEl, index) => {
         return (index < 6)
           ? startContinuousSpin(slotEl, false)
@@ -374,35 +379,36 @@
       });
     });
 
-    // Stoppar slots i turordning
+    // Stoppar slots i turordning (6 siffror, sedan sum)
     async function stopSlotsInOrder(numbers, sumNumber) {
-      const stopDelayBetweenSlots = 500; // ms mellan stopp
-      const pauseBeforeSum = 1000;       // ms innan sumSlot stoppas
-      const pauseBeforeTimer = 1000;     // 1s paus innan timer startar
+      const stopDelayBetweenSlots = 500; // ms mellan att stoppa varje siffra
+      const pauseBeforeSum = 1000;       // ms innan målsiffran stoppas
+      const pauseBeforeTimer = 1000;     // 1s fördröjning innan timern startar
 
-      for(let i = 0; i < 6; i++){
+      // Stanna de 6 siffer-rutorna
+      for(let i=0; i<6; i++){
         await new Promise(r => setTimeout(r, stopDelayBetweenSlots));
         slotMachines[i].stopSlot(numbers[i]);
       }
+      // Vänta innan du stoppar målsiffran
       await new Promise(r => setTimeout(r, pauseBeforeSum));
       slotMachines[6].stopSlot(sumNumber);
+      // Innan timern startar: 1s paus
       await new Promise(r => setTimeout(r, pauseBeforeTimer));
+      // ...och sedan startar timern
       startTimer(parseInt(document.getElementById("timerInput").value));
     }
 
-    // Startar timern samt spelar upp valt loopande ljud
+    // Startar timern samt hanterar ljuduppspelning (minst ändring här)
     function startTimer(duration) {
       const timerContainer = document.getElementById('timerContainer');
-      timerContainer.style.display = 'block';
+      timerContainer.style.display = 'block'; // Visa timerrutan när timern startar
       const timerDisplay = document.getElementById('timerDisplay');
 
       timeLeft = duration;
       timerDisplay.innerHTML = `⏱️ ${timeLeft}`;
 
-      // Hämta valt ljud från dropdown-menyn
-      const selectedSound = document.getElementById("loopSoundSelect").value;
-      const loopSound = new Audio('sounds/' + selectedSound);
-      loopSound.loop = true;
+      // Starta loopande ljud med full volym
       loopSound.volume = 1;
       loopSound.play();
 
@@ -410,6 +416,7 @@
         timeLeft--;
         timerDisplay.innerHTML = `⏱️ ${timeLeft}`;
 
+        // När 1 sekund återstår, påbörja fade-out på loopljudet
         if (timeLeft === 1) {
           fadeOut(loopSound, 1000);
         }
@@ -417,9 +424,12 @@
         if (timeLeft <= 0) {
           clearInterval(countdown);
           timerDisplay.innerHTML = "⏱️ Tiden är ute!";
+          // Stoppa loopljudet (om det inte redan är faded ut)
           loopSound.pause();
           loopSound.currentTime = 0;
+          // Spela slutljudet
           endSound.play();
+          // Byt ut knappens text/funktion
           const startBtn = document.getElementById("startButton");
           startBtn.textContent = "Starta om spelet";
           startBtn.onclick = () => {
@@ -429,11 +439,14 @@
       }, 1000);
     }
 
-    // Startknappen
+    // Klick på "Starta spelet"-knappen
     function startGame() {
+      // Omstart av eventuell tidigare timer
       clearInterval(countdown);
+      // Slumpa nya siffror
       const numbers = getRandomNumbers();
       const sumNumber = generateTargetNumber();
+      // Stoppa slots i ordning
       stopSlotsInOrder(numbers, sumNumber);
     }
   </script>
