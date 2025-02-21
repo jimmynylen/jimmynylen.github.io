@@ -49,6 +49,7 @@
       margin: 20px auto;
     }
     
+    /* Rubrik med titeln och epsilon-värdet */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -73,7 +74,7 @@
       margin-bottom: 15px;
     }
     
-    /* Inställningar */
+    /* Inställningar – placerade mellan spelplanen och knapparna */
     .settings {
       margin-bottom: 15px;
     }
@@ -83,10 +84,11 @@
       margin-bottom: 10px;
     }
     .settings-item {
-      flex: 1;
+      flex: 0 0 calc((100% - 20px) / 3);
       display: flex;
       flex-direction: column;
     }
+    
     label {
       font-family: monospace;
       color: var(--primary);
@@ -124,7 +126,6 @@
       gap: 15px;
       align-items: stretch;
     }
-    /* Spelplanen (vänster) */
     #game-container {
       font-family: 'Lucida Console', monospace;
       flex: 0 0 40%;
@@ -140,7 +141,6 @@
       background-color: var(--primary);
       image-rendering: pixelated;
     }
-    /* Förklaringsrutan (höger) */
     #explanation-container {
       flex: 1 1 auto;
       height: 280px;
@@ -151,12 +151,12 @@
       overflow-y: auto;
       font-family: monospace;
       font-size: 14px;
+      scrollbar-color: var(--effect) var(--primary);
     }
     
-    /* "Step"-rutornas utseende */
     .step-container {
       display: flex;
-      gap: 1em;
+      gap: 0.5em;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 8px;
@@ -181,14 +181,33 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    .explanation-content {
+      flex: 1;
+    }
+    .explanation-content .heading {
+      margin-bottom: 5px;
+    }
+    .explanation-content .description {
+      margin-bottom: 5px;
+    }
+    .explanation-content ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .explanation-emoji {
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+    }
     
-    /* Knappar */
+    /* Knappar: ligger på samma rad */
     .controls {
       display: flex;
       gap: 10px;
       margin-bottom: 15px;
     }
     .controls button {
+      flex: 1;
       padding: 10px 20px;
       background-color: var(--dark);
       color: var(--white);
@@ -202,7 +221,7 @@
       background-color: var(--effect);
     }
     
-    /* Statusruta */
+    /* Statusruta – visar highscore */
 
     #status {
             background-color: var(--extra_primary);
@@ -214,6 +233,10 @@
             margin: 0;
         }
 
+        /* Klass för emoji-skugga */
+        .emoji-shadow {
+            text-shadow: 0px 0px 10px var(--status_sienna);
+        }
 
     #status_outside {
       font-family: 'Poppins', sans-serif;
@@ -225,19 +248,84 @@
       padding: 15px;
       width: 100%;
     }
-    #status_outside span {
-      font-size: 40px;
-      font-weight: bold;
-      color: var(--white);
-    }
+
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Snake med Q-learning</h1>
+    <h1>
+      Snake med Q-learning
+      <span id="epsilonDisplay" style="font-size:18px;">ε: 1.000</span>
+    </h1>
     <p class="inforuta">
       Spelagenten tränas genom förstärkningsinlärning med algoritmen Q‑learning. Ändra variablerna för algoritmen och träna agenten för att nå en så hög highscore som möjligt men med minsta möjliga mängd träningstillfällen. Algoritmen är mycket känslig för valet av hyperparametrar.
     </p>
+    
+    <!-- Spelplan och förklaringsruta -->
+    <div class="outer-game-container">
+      <div class="flex-row">
+        <div id="game-container">
+          <canvas id="snakeCanvas" width="280" height="280"></canvas>
+        </div>
+        <div id="explanation-container">
+          <div class="step-container computer">
+            <div class="explanation-content">
+              <div class="heading"><strong>Epsilon:</strong></div>
+              <div class="description">Sannolikheten att välja en slumpmässig handling (utforskning).</div>
+              <ul>
+                <li><strong>Högt värde:</strong> Mer slumpmässighet.</li>
+                <li><strong>Lågt värde:</strong> Mer exploatering.</li>
+              </ul>
+            </div>
+            <div class="explanation-emoji">🎲</div>
+          </div>
+          <div class="step-container player">
+            <div class="explanation-content">
+              <div class="heading"><strong>Epsilon decay:</strong></div>
+              <div class="description">Faktorn med vilken Epsilon minskar vid varje träningsomgång.</div>
+              <ul>
+                <li><strong>Högt värde:</strong> Bibehåller utforskningen längre.</li>
+                <li><strong>Lågt värde:</strong> Prioriterar exploatering tidigare.</li>
+              </ul>
+            </div>
+            <div class="explanation-emoji">⏳</div>
+          </div>
+          <div class="step-container prune">
+            <div class="explanation-content">
+              <div class="heading"><strong>Epsilon min:</strong></div>
+              <div class="description">Det lägsta värdet Epsilon får nå.</div>
+              <ul>
+                <li><strong>Högt värde:</strong> Behåller viss utforskning.</li>
+                <li><strong>Lågt värde:</strong> Nästan ingen utforskning.</li>
+              </ul>
+            </div>
+            <div class="explanation-emoji">🔻</div>
+          </div>
+          <div class="step-container computer">
+            <div class="explanation-content">
+              <div class="heading"><strong>Learning rate:</strong></div>
+              <div class="description">Hur snabbt agenten anpassar sig efter nya erfarenheter.</div>
+              <ul>
+                <li><strong>Högt värde:</strong> Snabb inlärning, men risk för instabilitet.</li>
+                <li><strong>Lågt värde:</strong> Långsammare, men stabil inlärning.</li>
+              </ul>
+            </div>
+            <div class="explanation-emoji">⚡</div>
+          </div>
+          <div class="step-container player">
+            <div class="explanation-content">
+              <div class="heading"><strong>Discount factor:</strong></div>
+              <div class="description">Hur mycket framtida belöningar prioriteras.</div>
+              <ul>
+                <li><strong>Högt värde:</strong> Framtida belöningar ges högt värde.</li>
+                <li><strong>Lågt värde:</strong> Fokuserar mer på omedelbara belöningar.</li>
+              </ul>
+            </div>
+            <div class="explanation-emoji">🔮</div>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- Inställningar -->
     <div class="settings">
@@ -250,6 +338,10 @@
           <label for="epsilonMinInput">Epsilon min:</label>
           <input id="epsilonMinInput" type="number" step="0.01" value="0.01">
         </div>
+        <div class="settings-item">
+          <label for="episodesPerTrainInput">Episoder/träning:</label>
+          <input id="episodesPerTrainInput" type="number" step="1" value="1000">
+        </div>
       </div>
       <div class="settings-row">
         <div class="settings-item">
@@ -260,43 +352,9 @@
           <label for="discountFactorInput">Discount factor:</label>
           <input id="discountFactorInput" type="number" step="0.01" value="0.9">
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-item">
-          <label for="episodesPerTrainInput">Episoder/träning:</label>
-          <input id="episodesPerTrainInput" type="number" step="1" value="100">
-        </div>
         <div class="settings-item">
           <label for="trainedEpisodesDisplay">Tränade episoder:</label>
           <input id="trainedEpisodesDisplay" type="number" value="0" readonly>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Spelplan och förklaringsruta sida vid sida -->
-    <div class="outer-game-container">
-      <div class="flex-row">
-        <!-- Spelplan (Snake) -->
-        <div id="game-container">
-          <canvas id="snakeCanvas" width="280" height="280"></canvas>
-        </div>
-        <!-- Förklaringsruta -->
-        <div id="explanation-container">
-          <div class="step-container computer">
-            <div><strong>Epsilon:</strong> Sannolikheten att välja en slumpmässig handling (utforskning).</div>
-          </div>
-          <div class="step-container player">
-            <div><strong>Epsilon decay:</strong> Faktorn med vilken Epsilon minskar vid varje träningsomgång.</div>
-          </div>
-          <div class="step-container prune">
-            <div><strong>Epsilon min:</strong> Det lägsta värdet Epsilon får nå.</div>
-          </div>
-          <div class="step-container computer">
-            <div><strong>Learning rate:</strong> Hur snabbt agenten anpassar sig utifrån nya erfarenheter.</div>
-          </div>
-          <div class="step-container player">
-            <div><strong>Discount factor:</strong> Hur mycket framtida belöningar prioriteras.</div>
-          </div>
         </div>
       </div>
     </div>
@@ -305,16 +363,15 @@
     <div class="controls">
       <button id="trainBtn">Träna agent</button>
       <button id="testBtn">Testa agent</button>
-      <button id="resetBtn">Återställ</button>
     </div>
     
     <hr id="separator" />
     
-    <!-- Statusruta -->
+    <!-- Statusruta: visar highscore -->
     <div id="status_outside">
-      <div id="status">
-        <span>Epsilon: 1.000</span>
-      </div>
+        <div id="status">
+          <span class="emoji-shadow">🏆 0</span>
+        </div>
     </div>
   </div>
   
@@ -332,7 +389,11 @@
     let learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
     let discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
     let episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 100;
+    // Återinförd variabel för UI-uppdatering (var 100:e episod)
+    const updateFrequency = 1000;
     let totalEpisodesTrained = 0;
+    
+    let highscore = 0;
     
     let snake = [];
     let food = {};
@@ -460,6 +521,7 @@
       return { reward, gameOver: false, newState: getState() };
     }
     
+    // Funktion för att köra en episod utan extra bestraffning
     function runEpisode() {
       resetGame();
       let stepsCount = 0;
@@ -481,9 +543,11 @@
         runEpisode();
         epsilon = Math.max(epsilonMin, epsilon * epsilonDecay);
         totalEpisodesTrained++;
-        document.getElementById('trainedEpisodesDisplay').value = totalEpisodesTrained;
-        document.querySelector('#status_outside span').textContent = `Epsilon: ${epsilon.toFixed(3)}`;
-        await new Promise(r => setTimeout(r, 1));
+        if ((i + 1) % updateFrequency === 0 || i === episodes - 1) {
+          document.getElementById('trainedEpisodesDisplay').value = totalEpisodesTrained;
+          document.getElementById('epsilonDisplay').textContent = `ε: ${epsilon.toFixed(3)}`;
+          await new Promise(r => setTimeout(r, 1));
+        }
       }
     }
     
@@ -511,11 +575,12 @@
       gameInterval = setInterval(() => {
         const state = getState();
         const action = chooseAction(state);
-        const { reward, gameOver } = step(action);
+        const { gameOver } = step(action);
         drawGame();
         if (gameOver) {
           clearInterval(gameInterval);
-          document.querySelector('#status_outside span').textContent = `Epsilon: ${savedEpsilon.toFixed(3)}`;
+          if (score > highscore) { highscore = score; }
+          document.querySelector('#status_outside span').textContent = `🏆 ${highscore}`;
           epsilon = savedEpsilon;
         }
       }, 80);
@@ -532,17 +597,6 @@
     
     document.getElementById('testBtn').addEventListener('click', () => {
       testGame();
-    });
-    
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (gameInterval) clearInterval(gameInterval);
-      totalEpisodesTrained = 0;
-      epsilon = 1.0;
-      qTable = {};
-      resetGame();
-      drawGame();
-      document.getElementById('trainedEpisodesDisplay').value = totalEpisodesTrained;
-      document.querySelector('#status_outside span').textContent = 'Epsilon: 1.000';
     });
     
     resetGame();
