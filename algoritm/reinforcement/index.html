@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake med Q-learning</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --white: #ffffff;
+      --primary: #40534C;
+      --dark: #1A3636;
+      --text: #644117;
+      --subtle: #D6BD98;
+      --effect: #677D6A;
+      --placeholder: #B9AFA1;
+      --textarea: #FCF8F4;
+      --extra_effect: #D98E04;
+      --extra_primary: #E0A030;
+      --extra_primary_dark: #705018;
+      --extra_red: #A44434;
+      --extra_red_dark: #52221A;
+      --cell_mediumgreen: #3CB371;
+      --cell_amberyellow: #ffbf00;
+    }
+
+    body {
+      font-family: 'Source Serif Pro', serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+    }
+
+    .container {
+      max-width: 700px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px auto; /* Centrerad container */
+      text-align: left; /* Vänsterjusterad text */
+    }
+
+    header h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      width: 100%;
+      text-align: left;
+    }
+
+    label {
+      font-family: monospace;
+      color: var(--primary);
+      font-weight: normal;
+      font-size: 14px;
+      display: block;
+      /*margin-top: 5px;*/
+    }
+
+    textarea,
+    input {
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      font-size: 13px;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+
+    /* Inforuta sitter ihop med rubriken */
+    .inforuta {
+      margin: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 0 0 8px 8px;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+    }
+
+    /* Inställningsområdet ovanför spelet */
+    .settings-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .settings-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .controls button {
+      padding: 10px 20px;
+      background-color: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .controls button:hover {
+      background-color: var(--effect);
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    canvas {
+      background-color: var(--primary);
+      display: block;
+      margin: 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Snake med Q-learning</h1>
+      <p class="inforuta">
+        Agenten tränas genom förstärkningsinlärning med algoritmen Q‑learning. Ändra variablerna för algoritmen och träna agenten för att nå en så hög highscore som möjligt men med minsta möjliga mängd träningstillfällen.
+      </p>
+    </header>
+    
+    <div class="settings">
+      <div class="settings-row">
+        <div class="settings-item">
+          <label for="epsilonDecayInput">Epsilon decay:</label>
+          <input id="epsilonDecayInput" type="number" step="0.001" value="0.995">
+        </div>
+        <div class="settings-item">
+          <label for="epsilonMinInput">Epsilon min:</label>
+          <input id="epsilonMinInput" type="number" step="0.01" value="0.01">
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-item">
+          <label for="learningRateInput">Learning rate:</label>
+          <input id="learningRateInput" type="number" step="0.01" value="0.1">
+        </div>
+        <div class="settings-item">
+          <label for="discountFactorInput">Discount factor:</label>
+          <input id="discountFactorInput" type="number" step="0.01" value="0.9">
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-item">
+          <label for="episodesPerTrainInput">Episoder/träning:</label>
+          <input id="episodesPerTrainInput" type="number" step="1" value="100">
+        </div>
+      </div>
+    </div>
+    
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+      <button id="trainBtn">Träna agent</button>
+      <button id="testBtn">Testa agent</button>
+      <button id="resetBtn">Återställ</button>
+    </div>
+    <div id="status">Tränade episoder: 0</div>
+  </div>
+  
+  <script>
+    // Spelinställningar
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const canvasSize = 400;
+    const gridCount = 20;
+    const cellSize = canvasSize / gridCount;
+
+    // RL-variabler
+    let qTable = {}; // Q-värdes-tabell: state -> [Q(vänster), Q(rakt), Q(höger)]
+    const actions = [0, 1, 2]; // 0: vänster, 1: rakt, 2: höger
+    let epsilon = 1.0;
+    let epsilonMin = 0.01;
+    let epsilonDecay = 0.995;
+    let learningRate = 0.1;
+    let discountFactor = 0.9;
+    let episodesPerTrain = 100;
+    let totalEpisodesTrained = 0; // Totalt antal tränade episoder
+
+    // Spelvariabler
+    let snake = [];
+    let food = {};
+    let direction = { x: 0, y: 0 };
+    let score = 0;
+    let gameInterval = null;
+
+    // RL- och spelmiljöfunktioner
+
+    function resetGame() {
+      snake = [{ x: Math.floor(gridCount / 2), y: Math.floor(gridCount / 2) }];
+      direction = { x: 0, y: -1 }; // Startar med att gå uppåt
+      score = 0;
+      placeFood();
+    }
+
+    function placeFood() {
+      food = {
+        x: Math.floor(Math.random() * gridCount),
+        y: Math.floor(Math.random() * gridCount)
+      };
+      while (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        food = {
+          x: Math.floor(Math.random() * gridCount),
+          y: Math.floor(Math.random() * gridCount)
+        };
+      }
+    }
+
+    function isCollision(pos) {
+      if (pos.x < 0 || pos.x >= gridCount || pos.y < 0 || pos.y >= gridCount) return true;
+      if (snake.some(segment => segment.x === pos.x && segment.y === pos.y)) return true;
+      return false;
+    }
+
+    // Returnerar en diskret representation av tillståndet (som en sträng)
+    function getState() {
+      const head = snake[0];
+      let leftVec, straightVec, rightVec;
+      if (direction.x === 0 && direction.y === -1) { // upp
+        leftVec = { x: -1, y: 0 };
+        straightVec = { x: 0, y: -1 };
+        rightVec = { x: 1, y: 0 };
+      } else if (direction.x === 0 && direction.y === 1) { // ner
+        leftVec = { x: 1, y: 0 };
+        straightVec = { x: 0, y: 1 };
+        rightVec = { x: -1, y: 0 };
+      } else if (direction.x === -1 && direction.y === 0) { // vänster
+        leftVec = { x: 0, y: 1 };
+        straightVec = { x: -1, y: 0 };
+        rightVec = { x: 0, y: -1 };
+      } else if (direction.x === 1 && direction.y === 0) { // höger
+        leftVec = { x: 0, y: -1 };
+        straightVec = { x: 1, y: 0 };
+        rightVec = { x: 0, y: 1 };
+      }
+      const dangerLeft = isCollision({ x: head.x + leftVec.x, y: head.y + leftVec.y }) ? 1 : 0;
+      const dangerStraight = isCollision({ x: head.x + straightVec.x, y: head.y + straightVec.y }) ? 1 : 0;
+      const dangerRight = isCollision({ x: head.x + rightVec.x, y: head.y + rightVec.y }) ? 1 : 0;
+      const foodLeft = food.x < head.x ? 1 : 0;
+      const foodRight = food.x > head.x ? 1 : 0;
+      const foodUp = food.y < head.y ? 1 : 0;
+      const foodDown = food.y > head.y ? 1 : 0;
+      return [dangerLeft, dangerStraight, dangerRight, foodLeft, foodRight, foodUp, foodDown].join('');
+    }
+
+    function getQ(state) {
+      if (!(state in qTable)) {
+        qTable[state] = [0, 0, 0];
+      }
+      return qTable[state];
+    }
+
+    function chooseAction(state) {
+      if (Math.random() < epsilon) {
+        return actions[Math.floor(Math.random() * actions.length)];
+      } else {
+        const qValues = getQ(state);
+        return qValues.indexOf(Math.max(...qValues));
+      }
+    }
+
+    function updateQ(prevState, action, reward, newState) {
+      const qPrev = getQ(prevState)[action];
+      const maxFutureQ = Math.max(...getQ(newState));
+      const newQ = (1 - learningRate) * qPrev + learningRate * (reward + discountFactor * maxFutureQ);
+      qTable[prevState][action] = newQ;
+    }
+
+    function getNewDirection(currentDir, action) {
+      let newDir;
+      if (currentDir.x === 0 && currentDir.y === -1) {
+        if (action === 0) newDir = { x: -1, y: 0 };
+        else if (action === 1) newDir = { x: 0, y: -1 };
+        else if (action === 2) newDir = { x: 1, y: 0 };
+      } else if (currentDir.x === 0 && currentDir.y === 1) {
+        if (action === 0) newDir = { x: 1, y: 0 };
+        else if (action === 1) newDir = { x: 0, y: 1 };
+        else if (action === 2) newDir = { x: -1, y: 0 };
+      } else if (currentDir.x === -1 && currentDir.y === 0) {
+        if (action === 0) newDir = { x: 0, y: 1 };
+        else if (action === 1) newDir = { x: -1, y: 0 };
+        else if (action === 2) newDir = { x: 0, y: -1 };
+      } else if (currentDir.x === 1 && currentDir.y === 0) {
+        if (action === 0) newDir = { x: 0, y: -1 };
+        else if (action === 1) newDir = { x: 1, y: 0 };
+        else if (action === 2) newDir = { x: 0, y: 1 };
+      }
+      return newDir;
+    }
+
+    function step(action) {
+      const prevState = getState();
+      direction = getNewDirection(direction, action);
+      const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+      if (isCollision(newHead)) {
+        return { reward: -10, gameOver: true, newState: getState() };
+      }
+      snake.unshift(newHead);
+      let reward = -0.1;
+      if (newHead.x === food.x && newHead.y === food.y) {
+        reward = 10;
+        score++;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+      return { reward, gameOver: false, newState: getState() };
+    }
+
+    function runEpisode() {
+      resetGame();
+      let stepsCount = 0;
+      let maxSteps = 200;
+      let gameOver = false;
+      while (!gameOver && stepsCount < maxSteps) {
+        const state = getState();
+        const action = chooseAction(state);
+        const { reward, gameOver: over, newState } = step(action);
+        updateQ(state, action, reward, newState);
+        gameOver = over;
+        stepsCount++;
+      }
+      return stepsCount;
+    }
+
+    async function trainAgent(episodes) {
+      for (let i = 0; i < episodes; i++) {
+        runEpisode();
+        if (epsilon > epsilonMin) {
+          epsilon *= epsilonDecay;
+        }
+        totalEpisodesTrained++;
+        if ((i + 1) % 10 === 0) {
+          document.getElementById('status').textContent = `Tränade episoder: ${totalEpisodesTrained} | Epsilon: ${epsilon.toFixed(3)}`;
+          await new Promise(r => setTimeout(r, 1));
+        }
+      }
+      document.getElementById('status').textContent = `Tränade episoder: ${totalEpisodesTrained} | Epsilon: ${epsilon.toFixed(3)}`;
+    }
+
+    function drawGame() {
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--extra_primary');
+      ctx.fillRect(food.x * cellSize, food.y * cellSize, cellSize, cellSize);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cell_mediumgreen');
+      snake.forEach((segment, index) => {
+        ctx.fillRect(segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
+        if (index === 0) {
+          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--extra_red');
+          ctx.strokeRect(segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
+        }
+      });
+    }
+
+    function testGame() {
+      resetGame();
+      const savedEpsilon = epsilon;
+      epsilon = 0;
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(() => {
+        const state = getState();
+        const action = chooseAction(state);
+        const { reward, gameOver } = step(action);
+        drawGame();
+        if (gameOver) {
+          clearInterval(gameInterval);
+          document.getElementById('status').textContent = `Testspel slut. Poäng: ${score} | Tränade episoder: ${totalEpisodesTrained}`;
+          epsilon = savedEpsilon;
+        }
+      }, 80);
+    }
+
+    // Koppla knapp-händelser
+    document.getElementById('trainBtn').addEventListener('click', async () => {
+      if (gameInterval) clearInterval(gameInterval);
+      // Uppdatera inställningarna direkt från inmatningsfälten
+      epsilonDecay = parseFloat(document.getElementById('epsilonDecayInput').value) || 0.995;
+      learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
+      discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
+      epsilonMin = parseFloat(document.getElementById('epsilonMinInput').value) || 0.01;
+      episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 100;
+      document.getElementById('status').textContent = `Tränar agenten... Tränade episoder: ${totalEpisodesTrained}`;
+      await trainAgent(episodesPerTrain);
+    });
+
+    document.getElementById('testBtn').addEventListener('click', () => {
+      testGame();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (gameInterval) clearInterval(gameInterval);
+      totalEpisodesTrained = 0;
+      epsilon = 1.0;
+      qTable = {};
+      resetGame();
+      drawGame();
+      document.getElementById('status').textContent = 'Tränade episoder: 0';
+    });
+
+    // Rita initialt spel vid sidladdning
+    resetGame();
+    drawGame();
+    document.getElementById('status').textContent = 'Tränade episoder: 0';
+  </script>
+</body>
+</html>
