@@ -418,7 +418,7 @@
     let learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
     let discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
     let episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 1000;
-    const updateFrequency = 531;
+    const updateFrequency = 250;
     let totalEpisodesTrained = 0;
     
     // High score-resultat sparas som objekt med score och antal tränade episoder
@@ -624,7 +624,7 @@
       ctx.textAlign = "center";
       ctx.font = "bold 32px sans-serif";
       // Visa endast poängsiffran
-      ctx.fillText(`${score}`, canvas.width / 2, canvas.height / 2);
+      ctx.fillText(`${score} poäng`, canvas.width / 2, canvas.height / 2);
       ctx.font = "16px sans-serif";
       ctx.fillText(reason, canvas.width / 2, canvas.height / 2 + 35);
     }
