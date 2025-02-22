@@ -33,6 +33,10 @@
       box-sizing: border-box;
     }
     
+    .explanation-content ul {
+      margin-bottom: 5px;
+    }
+
     body {
       font-family: 'Source Serif Pro', serif;
       margin: 0;
@@ -50,7 +54,7 @@
       margin: 20px auto;
     }
     
-    /* Rubrik med titeln och orm-emoji */
+    /* Rubriken delas upp i två delar: vänster titel och höger "episode-info" */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -64,6 +68,17 @@
       justify-content: space-between;
       align-items: center;
     }
+    .episode-info {
+      display: flex;
+      align-items: center;
+    }
+    /* Gör episodräknaren mindre – OBS: Denna ligger i rubriken och inte längre i statusrutan */
+    #episodesCount {
+      font-family: monospace;
+      font-size: 0.8em;
+      font-weight: 600;
+      margin-right: 5px;
+    }
     
     .inforuta {
       margin-top: 0;
@@ -75,44 +90,36 @@
       margin-bottom: 15px;
     }
     
-    /* High-score-ruta */
-    #topResults {
-      font-family: monospace;
-      background-color: var(--extra_primary);
-      border-left: 5px solid var(--extra_effect);
+    /* Gula rutan: Nu visas endast high‑score-listan och den centreras */
+    #status_outside {
+      font-family: 'Poppins', sans-serif;
+      background-color: #D98E04;
+      border: 1px solid #A44434;
       border-radius: 5px;
+      margin-top: 20px;
       padding: 15px;
-      margin-bottom: 10px;
+      width: 100%;
+      font-size: 24px;
       color: var(--white);
     }
-    #topResults .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    #topResults .header h3 {
+    /* Ändra #status så att innehållet centreras */
+    #status {
+      background-color: var(--extra_primary);
+      font-size: 40px;
+      font-weight: 500;
+      color: var(--white);
+      border-radius: 5px;
+      padding: 10px;
       margin: 0;
-      font-size: 18px;
-      text-align: left;
+      text-shadow: 0px 0px 7px var(--extra_red);
+      text-align: center;
     }
     
-    /* Rubriker i förklaringsrutan med fontstorlek 18px */
+    /* Övriga stilar (oförändrade) */
     .explanation-content .heading {
       margin-bottom: 5px;
       font-size: 18px;
     }
-    
-    /* Listan med highscore-resultat */
-    #resultsList {
-      font-family: monospace;
-      font-size: 14px;
-    }
-    #resultsList div {
-      margin-bottom: 5px;
-    }
-    
-    /* Inställningar – 2 rader */
     .settings {
       margin-bottom: 15px;
     }
@@ -126,7 +133,6 @@
       display: flex;
       flex-direction: column;
     }
-    
     label {
       font-family: monospace;
       color: var(--primary);
@@ -142,13 +148,11 @@
       border-radius: 5px;
     }
     
-    /* Separator */
     #separator {
       border-top: 1px dashed var(--dark);
       margin: 20px 0;
     }
     
-    /* Layout: spelplan och förklaringsruta sida vid sida */
     .outer-game-container {
       background-color: var(--effect);
       padding: 15px;
@@ -219,7 +223,6 @@
       to { opacity: 1; }
     }
     
-    /* Knappar: ligger på samma rad */
     .controls {
       display: flex;
       gap: 10px;
@@ -240,58 +243,24 @@
       background-color: var(--effect);
     }
     
-    /* Gula rutan: visar antalet tränade episoder */
-    #status {
-      background-color: var(--extra_primary);
-      font-size: 40px;
-      font-weight: 500;
-      color: var(--white);
-      border-radius: 5px;
-      padding: 10px;
-      margin: 0;
-      text-shadow: 0px 0px 7px var(--extra_red);
-    }
-    #status_outside {
-      font-family: monospace;
-      background-color: #D98E04;
-      border: 1px solid #A44434;
-      border-radius: 5px;
-      text-align: center;
-      margin-top: 20px;
-      padding: 15px;
-      width: 100%;
-      font-size: 24px;
-      color: var(--white);
-    }
-
-    /* Media Query för mobilläge */
     @media (max-width: 600px) {
-      /* Gör container bredden 100% och tar bort minsta bredd */
       .container {
         width: 100%;
         min-width: 0;
         margin: 10px;
       }
-      
-      /* Placera spelplanen ovanför förklaringsrutan */
       .flex-row {
         flex-direction: column;
       }
-      
-      /* Visa varje inställningsfält på en egen rad */
       .settings-row {
         flex-direction: column;
       }
       .settings-item {
         flex: 1 1 100%;
       }
-      
-      /* Placera knapparna på varsin rad */
       .controls {
         flex-direction: column;
       }
-      
-      /* Anpassa spelplanen så att den fyller hela containerns bredd */
       #game-container {
         width: 100%;
       }
@@ -305,23 +274,25 @@
 </head>
 <body>
   <div class="container">
+    <!-- Rubriken med titel och episode-info (episodräknare och orm-emoji) -->
     <h1>
-      Snake med Q-learning
-      <!-- Orm-emoji istället för high-score -->
-      <span id="snakeEmoji" style="font-size:18px;">🐍</span>
+      <span class="title">Snake med Q-learning</span>
+      <span class="episode-info">
+        <span id="episodesCount">0</span>
+        <span id="snakeEmoji" style="font-size:18px;">🐍</span>
+      </span>
     </h1>
     <p class="inforuta">
       Spelagenten tränas genom förstärkningsinlärning med algoritmen Q‑learning. Ändra variablerna för algoritmen och träna agenten för att nå en så hög highscore som möjligt med minsta möjliga antal träningstillfällen. Algoritmen är mycket känslig för valet av hyperparametrar.
     </p>
     
-    <!-- Spelplan och förklaringsruta -->
     <div class="outer-game-container">
       <div class="flex-row">
         <div id="game-container">
           <canvas id="snakeCanvas" width="280" height="280"></canvas>
         </div>
         <div id="explanation-container">
-          <!-- High-score-rutan läggs in dynamiskt ovanst i förklaringsrutan -->
+          <!-- High-score-listan har tagits bort här, den visas istället i statusrutan -->
           <div class="step-container computer">
             <div class="explanation-content">
               <div class="heading">
@@ -386,7 +357,6 @@
       </div>
     </div>
     
-    <!-- Inställningar – 2 rader -->
     <div class="settings">
       <div class="settings-row">
         <div class="settings-item">
@@ -418,23 +388,23 @@
       </div>
     </div>
     
-    <!-- Knappar -->
     <div class="controls">
-      <button id="trainBtn">Träna agent</button>
-      <button id="testBtn">Testa agent</button>
+      <button id="trainBtn">Träna agent "Solid Snake"</button>
+      <button id="testBtn">Testa agent "Solid Snake"</button>
     </div>
     
     <hr id="separator" />
     
-    <!-- Gula rutan: visar antalet tränade episoder -->
+    <!-- Gula rutan: Nu visas endast high-score-listan, centrerad -->
     <div id="status_outside">
       <div id="status">
-        🏋🏼0
+        <span id="topResults"></span>
       </div>
     </div>
   </div>
   
   <script>
+    // JavaScript-delen (oförändrad utom uppdatering av high-score-listan)
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
     const gridCount = 20;
@@ -451,7 +421,7 @@
     const updateFrequency = 531;
     let totalEpisodesTrained = 0;
     
-    // High score results lagras som objekt med score och antal tränade episoder
+    // High score-resultat sparas som objekt med score och antal tränade episoder
     let results = [];
     
     let snake = [];
@@ -619,7 +589,8 @@
         epsilon = Math.max(epsilonMin, epsilon * epsilonDecay);
         totalEpisodesTrained++;
         if ((i + 1) % updateFrequency === 0 || i === episodes - 1) {
-          document.getElementById('status').textContent = `🏋🏼${totalEpisodesTrained}`;
+          // Uppdatera episodräknaren i rubriken
+          document.getElementById('episodesCount').textContent = totalEpisodesTrained;
           document.getElementById('epsilonExplanation').textContent = epsilon.toFixed(3);
           document.getElementById('epsilonDecayExplanation').textContent = epsilonDecay;
           document.getElementById('epsilonMinExplanation').textContent = epsilonMin;
@@ -652,39 +623,26 @@
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "center";
       ctx.font = "bold 32px sans-serif";
-      ctx.fillText(`${score} poäng`, canvas.width / 2, canvas.height / 2 + 0);
+      // Visa endast poängsiffran
+      ctx.fillText(`${score}`, canvas.width / 2, canvas.height / 2);
       ctx.font = "16px sans-serif";
       ctx.fillText(reason, canvas.width / 2, canvas.height / 2 + 35);
     }
     
-    // Uppdaterad funktion som visar endast de tre bästa resultaten
-    // med antalet tränade episoder vid tidpunkten för resultatet
+    // Uppdaterad funktion som visar endast de tre bästa resultaten med medalj‑emojis.
+    // Tooltip med antal tränade episoder visas nu för alla medaljer.
     function updateTopResults() {
-      let container = document.getElementById("topResults");
-      if (!container) {
-        container = document.createElement("div");
-        container.id = "topResults";
-        const explanationContainer = document.getElementById("explanation-container");
-        explanationContainer.insertBefore(container, explanationContainer.firstChild);
-      }
-      // Sortera resultaten efter score (högsta först)
       let sortedResults = results.slice().sort((a, b) => b.score - a.score);
-      // Ta bara de tre bästa resultaten
       let top3 = sortedResults.slice(0, 3);
-      
+      let medals = ["🥇", "🥈", "🥉"];
       let html = "";
-      html += `<div class="header">
-                 <h3>High-score</h3>
-               </div>`;
-      html += `<div id="resultsList">`;
       top3.forEach((result, index) => {
-        html += `<div>${index + 1}. ${result.score} poäng &#8669; ${result.episodes} episoder</div>`;
+        let marginRight = (index < top3.length - 1) ? "20px" : "0";
+        html += `<span title="${result.episodes} episoder" style="margin-right:${marginRight};"><span style="margin-right:2px;">${medals[index]}</span>${result.score}</span>`;
       });
-      html += "</div>";
-      container.innerHTML = html;
+      document.getElementById('topResults').innerHTML = html;
     }
     
-    // Funktioner för att spara och ladda high scores med localStorage
     function saveResults() {
       localStorage.setItem('highScores', JSON.stringify(results));
     }
@@ -732,7 +690,6 @@
       testGame();
     });
     
-    // Kör all initiering efter att DOM:en laddats
     document.addEventListener("DOMContentLoaded", () => {
       loadResults();
       resetGame();
