@@ -412,9 +412,8 @@
     const updateFrequency = 531;
     let totalEpisodesTrained = 0;
     
-    let highscore = 0;
-    // results sparas nu som objekt med score och antal tränade episoder
-    let results = []; 
+    // High score results lagras som objekt med score och antal tränade episoder
+    let results = [];
     
     let snake = [];
     let food = {};
@@ -646,6 +645,19 @@
       container.innerHTML = html;
     }
     
+    // Funktioner för att spara och ladda high scores med localStorage
+    function saveResults() {
+      localStorage.setItem('highScores', JSON.stringify(results));
+    }
+    
+    function loadResults() {
+      const storedResults = localStorage.getItem('highScores');
+      if (storedResults) {
+        results = JSON.parse(storedResults);
+        updateTopResults();
+      }
+    }
+    
     function testGame() {
       resetGame();
       maxStepsWithoutFood = parseInt(document.getElementById('maxStepsWithoutFoodInput').value) || 200;
@@ -662,6 +674,7 @@
           drawGameOverText(gameOverReason, score);
           results.push({ score: score, episodes: totalEpisodesTrained });
           updateTopResults();
+          saveResults();
           epsilon = savedEpsilon;
         }
       }, 80);
@@ -680,8 +693,12 @@
       testGame();
     });
     
-    resetGame();
-    drawGame();
+    // Kör all initiering efter att DOM:en laddats
+    document.addEventListener("DOMContentLoaded", () => {
+      loadResults();
+      resetGame();
+      drawGame();
+    });
   </script>
 </body>
 </html>
