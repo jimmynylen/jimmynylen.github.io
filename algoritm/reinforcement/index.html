@@ -49,7 +49,7 @@
       margin: 20px auto;
     }
     
-    /* Rubrik med titeln och epsilon-värdet */
+    /* Rubrik med titeln och orm-emoji */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -74,7 +74,44 @@
       margin-bottom: 15px;
     }
     
-    /* Inställningar – placerade mellan spelplanen och knapparna */
+    /* High-score-ruta */
+    #topResults {
+      font-family: monospace;
+      background-color: var(--extra_primary);
+      border-left: 5px solid var(--extra_effect);
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+      color: var(--white);
+    }
+    #topResults .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #topResults .header h3 {
+      margin: 0;
+      font-size: 18px;
+      text-align: left;
+    }
+    
+    /* Rubriker i förklaringsrutan med fontstorlek 18px */
+    .explanation-content .heading {
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+    
+    /* Listan med highscore-resultat */
+    #resultsList {
+      font-family: monospace;
+      font-size: 14px;
+    }
+    #resultsList div {
+      margin-bottom: 5px;
+    }
+    
+    /* Inställningar – 2 rader */
     .settings {
       margin-bottom: 15px;
     }
@@ -103,9 +140,6 @@
       padding: 10px;
       border-radius: 5px;
     }
-    input[readonly] {
-      background-color: #e8e0c8;
-    }
     
     /* Separator */
     #separator {
@@ -133,6 +167,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     #snakeCanvas {
       width: 280px;
@@ -156,7 +191,8 @@
     
     .step-container {
       display: flex;
-      gap: 0.5em;
+      align-items: flex-start;
+      gap: 10px;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 8px;
@@ -181,24 +217,6 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    .explanation-content {
-      flex: 1;
-    }
-    .explanation-content .heading {
-      margin-bottom: 5px;
-    }
-    .explanation-content .description {
-      margin-bottom: 5px;
-    }
-    .explanation-content ul {
-      margin: 0;
-      padding-left: 20px;
-    }
-    .explanation-emoji {
-      font-size: 32px;
-      display: flex;
-      align-items: center;
-    }
     
     /* Knappar: ligger på samma rad */
     .controls {
@@ -221,25 +239,19 @@
       background-color: var(--effect);
     }
     
-    /* Statusruta – visar highscore */
-
+    /* Gula rutan: visar antalet tränade episoder */
     #status {
-            background-color: var(--extra_primary);
-            font-size: 40px;
-            font-weight: bold;
-            color: var(--white);
-            border-radius: 5px;
-            padding: 10px;
-            margin: 0;
-        }
-
-        /* Klass för emoji-skugga */
-        .emoji-shadow {
-            text-shadow: 0px 0px 10px var(--status_sienna);
-        }
-
+      background-color: var(--extra_primary);
+      font-size: 40px;
+      font-weight: 500;
+      color: var(--white);
+      border-radius: 5px;
+      padding: 10px;
+      margin: 0;
+      text-shadow: 0px 0px 7px var(--extra_red);
+    }
     #status_outside {
-      font-family: 'Poppins', sans-serif;
+      font-family: monospace;
       background-color: #D98E04;
       border: 1px solid #A44434;
       border-radius: 5px;
@@ -247,18 +259,20 @@
       margin-top: 20px;
       padding: 15px;
       width: 100%;
+      font-size: 24px;
+      color: var(--white);
     }
-
   </style>
 </head>
 <body>
   <div class="container">
     <h1>
       Snake med Q-learning
-      <span id="epsilonDisplay" style="font-size:18px;">ε: 1.000</span>
+      <!-- Orm-emoji istället för high-score -->
+      <span id="snakeEmoji" style="font-size:18px;">🐍</span>
     </h1>
     <p class="inforuta">
-      Spelagenten tränas genom förstärkningsinlärning med algoritmen Q‑learning. Ändra variablerna för algoritmen och träna agenten för att nå en så hög highscore som möjligt men med minsta möjliga mängd träningstillfällen. Algoritmen är mycket känslig för valet av hyperparametrar.
+      Spelagenten tränas genom förstärkningsinlärning med algoritmen Q‑learning. Ändra variablerna för algoritmen och träna agenten för att nå en så hög highscore som möjligt med minsta möjliga antal träningstillfällen. Algoritmen är mycket känslig för valet av hyperparametrar.
     </p>
     
     <!-- Spelplan och förklaringsruta -->
@@ -268,66 +282,72 @@
           <canvas id="snakeCanvas" width="280" height="280"></canvas>
         </div>
         <div id="explanation-container">
+          <!-- High-score-rutan läggs in dynamiskt ovanst i förklaringsrutan -->
           <div class="step-container computer">
             <div class="explanation-content">
-              <div class="heading"><strong>Epsilon:</strong></div>
+              <div class="heading">
+                <strong>Epsilon: <span id="epsilonExplanation">1.000</span></strong>
+              </div>
               <div class="description">Sannolikheten att välja en slumpmässig handling (utforskning).</div>
               <ul>
                 <li><strong>Högt värde:</strong> Mer slumpmässighet.</li>
                 <li><strong>Lågt värde:</strong> Mer exploatering.</li>
               </ul>
             </div>
-            <div class="explanation-emoji">🎲</div>
           </div>
           <div class="step-container player">
             <div class="explanation-content">
-              <div class="heading"><strong>Epsilon decay:</strong></div>
-              <div class="description">Faktorn med vilken Epsilon minskar vid varje träningsomgång.</div>
+              <div class="heading">
+                <strong>Epsilon decay: <span id="epsilonDecayExplanation">0.995</span></strong>
+              </div>
+              <div class="description">Faktorn med vilken epsilon minskar vid varje träningsomgång.</div>
               <ul>
-                <li><strong>Högt värde:</strong> Bibehåller utforskningen längre.</li>
-                <li><strong>Lågt värde:</strong> Prioriterar exploatering tidigare.</li>
+                <li><strong>Högt värde:</strong> Utforskningen bibehålls längre.</li>
+                <li><strong>Lågt värde:</strong> Exploatering prioriteras tidigare.</li>
               </ul>
             </div>
-            <div class="explanation-emoji">⏳</div>
           </div>
           <div class="step-container prune">
             <div class="explanation-content">
-              <div class="heading"><strong>Epsilon min:</strong></div>
-              <div class="description">Det lägsta värdet Epsilon får nå.</div>
+              <div class="heading">
+                <strong>Epsilon min: <span id="epsilonMinExplanation">0.01</span></strong>
+              </div>
+              <div class="description">Det lägsta värdet epsilon får nå.</div>
               <ul>
-                <li><strong>Högt värde:</strong> Behåller viss utforskning.</li>
+                <li><strong>Högt värde:</strong> Bibehåller en viss nivå av utforskning.</li>
                 <li><strong>Lågt värde:</strong> Nästan ingen utforskning.</li>
               </ul>
             </div>
-            <div class="explanation-emoji">🔻</div>
           </div>
           <div class="step-container computer">
             <div class="explanation-content">
-              <div class="heading"><strong>Learning rate:</strong></div>
+              <div class="heading">
+                <strong>Learning rate: <span id="learningRateExplanation">0.1</span></strong>
+              </div>
               <div class="description">Hur snabbt agenten anpassar sig efter nya erfarenheter.</div>
               <ul>
-                <li><strong>Högt värde:</strong> Snabb inlärning, men risk för instabilitet.</li>
-                <li><strong>Lågt värde:</strong> Långsammare, men stabil inlärning.</li>
+                <li><strong>Högt värde:</strong> Snabb inlärning men risk för instabilitet.</li>
+                <li><strong>Lågt värde:</strong> Långsammare men stabil inlärning.</li>
               </ul>
             </div>
-            <div class="explanation-emoji">⚡</div>
           </div>
           <div class="step-container player">
             <div class="explanation-content">
-              <div class="heading"><strong>Discount factor:</strong></div>
+              <div class="heading">
+                <strong>Discount factor: <span id="discountFactorExplanation">0.9</span></strong>
+              </div>
               <div class="description">Hur mycket framtida belöningar prioriteras.</div>
               <ul>
-                <li><strong>Högt värde:</strong> Framtida belöningar ges högt värde.</li>
-                <li><strong>Lågt värde:</strong> Fokuserar mer på omedelbara belöningar.</li>
+                <li><strong>Högt värde:</strong> Framtida belöningar ges hög vikt.</li>
+                <li><strong>Lågt värde:</strong> Fokus på omedelbara belöningar.</li>
               </ul>
             </div>
-            <div class="explanation-emoji">🔮</div>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Inställningar -->
+    <!-- Inställningar – 2 rader -->
     <div class="settings">
       <div class="settings-row">
         <div class="settings-item">
@@ -353,8 +373,8 @@
           <input id="discountFactorInput" type="number" step="0.01" value="0.9">
         </div>
         <div class="settings-item">
-          <label for="trainedEpisodesDisplay">Tränade episoder:</label>
-          <input id="trainedEpisodesDisplay" type="number" value="0" readonly>
+          <label for="maxStepsWithoutFoodInput">Max steg utan mat:</label>
+          <input id="maxStepsWithoutFoodInput" type="number" step="1" value="200">
         </div>
       </div>
     </div>
@@ -367,11 +387,11 @@
     
     <hr id="separator" />
     
-    <!-- Statusruta: visar highscore -->
+    <!-- Gula rutan: visar antalet tränade episoder -->
     <div id="status_outside">
-        <div id="status">
-          <span class="emoji-shadow">🏆 0</span>
-        </div>
+      <div id="status">
+        🏋🏼0
+      </div>
     </div>
   </div>
   
@@ -388,12 +408,13 @@
     let epsilonDecay = parseFloat(document.getElementById('epsilonDecayInput').value) || 0.995;
     let learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
     let discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
-    let episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 100;
-    // Återinförd variabel för UI-uppdatering (var 100:e episod)
-    const updateFrequency = 1000;
+    let episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 1000;
+    const updateFrequency = 531;
     let totalEpisodesTrained = 0;
     
     let highscore = 0;
+    // results sparas nu som objekt med score och antal tränade episoder
+    let results = []; 
     
     let snake = [];
     let food = {};
@@ -401,10 +422,16 @@
     let score = 0;
     let gameInterval = null;
     
+    let stepsWithoutFood = 0;
+    let maxStepsWithoutFood = parseInt(document.getElementById('maxStepsWithoutFoodInput').value) || 200;
+    let gameOverReason = "";
+    
     function resetGame() {
       snake = [{ x: Math.floor(gridCount / 2), y: Math.floor(gridCount / 2) }];
       direction = { x: 0, y: -1 };
       score = 0;
+      stepsWithoutFood = 0;
+      gameOverReason = "";
       placeFood();
     }
     
@@ -419,12 +446,6 @@
           y: Math.floor(Math.random() * gridCount)
         };
       }
-    }
-    
-    function isCollision(pos) {
-      if (pos.x < 0 || pos.x >= gridCount || pos.y < 0 || pos.y >= gridCount) return true;
-      if (snake.some(segment => segment.x === pos.x && segment.y === pos.y)) return true;
-      return false;
     }
     
     function getState() {
@@ -447,9 +468,12 @@
         straightVec = { x: 1, y: 0 };
         rightVec = { x: 0, y: 1 };
       }
-      const dangerLeft = isCollision({ x: snake[0].x + leftVec.x, y: snake[0].y + leftVec.y }) ? 1 : 0;
-      const dangerStraight = isCollision({ x: snake[0].x + straightVec.x, y: snake[0].y + straightVec.y }) ? 1 : 0;
-      const dangerRight = isCollision({ x: snake[0].x + rightVec.x, y: snake[0].y + rightVec.y }) ? 1 : 0;
+      const dangerLeft = (snake[0].x + leftVec.x < 0 || snake[0].x + leftVec.x >= gridCount || snake[0].y + leftVec.y < 0 || snake[0].y + leftVec.y >= gridCount ||
+                           snake.some(segment => segment.x === snake[0].x + leftVec.x && segment.y === snake[0].y + leftVec.y)) ? 1 : 0;
+      const dangerStraight = (snake[0].x + straightVec.x < 0 || snake[0].x + straightVec.x >= gridCount || snake[0].y + straightVec.y < 0 || snake[0].y + straightVec.y >= gridCount ||
+                              snake.some(segment => segment.x === snake[0].x + straightVec.x && segment.y === snake[0].y + straightVec.y)) ? 1 : 0;
+      const dangerRight = (snake[0].x + rightVec.x < 0 || snake[0].x + rightVec.x >= gridCount || snake[0].y + rightVec.y < 0 || snake[0].y + rightVec.y >= gridCount ||
+                           snake.some(segment => segment.x === snake[0].x + rightVec.x && segment.y === snake[0].y + rightVec.y)) ? 1 : 0;
       const foodLeft = food.x < snake[0].x ? 1 : 0;
       const foodRight = food.x > snake[0].x ? 1 : 0;
       const foodUp = food.y < snake[0].y ? 1 : 0;
@@ -506,26 +530,38 @@
       const prevState = getState();
       direction = getNewDirection(direction, action);
       const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-      if (isCollision(newHead)) {
+      
+      if (newHead.x < 0 || newHead.x >= gridCount || newHead.y < 0 || newHead.y >= gridCount) {
+        gameOverReason = "Krockade med väggen";
         return { reward: -10, gameOver: true, newState: getState() };
       }
+      if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+        gameOverReason = "Slog knut på sig själv";
+        return { reward: -10, gameOver: true, newState: getState() };
+      }
+      
       snake.unshift(newHead);
       let reward = -0.1;
       if (newHead.x === food.x && newHead.y === food.y) {
         reward = 10;
         score++;
         placeFood();
+        stepsWithoutFood = 0;
       } else {
         snake.pop();
+        stepsWithoutFood++;
+        if (stepsWithoutFood >= maxStepsWithoutFood) {
+          gameOverReason = "Tiden tog slut";
+          return { reward: -10, gameOver: true, newState: getState() };
+        }
       }
       return { reward, gameOver: false, newState: getState() };
     }
     
-    // Funktion för att köra en episod utan extra bestraffning
     function runEpisode() {
       resetGame();
       let stepsCount = 0;
-      const maxSteps = 200;
+      const maxSteps = 1000;
       let gameOver = false;
       while (!gameOver && stepsCount < maxSteps) {
         const state = getState();
@@ -539,13 +575,18 @@
     }
     
     async function trainAgent(episodes) {
+      maxStepsWithoutFood = parseInt(document.getElementById('maxStepsWithoutFoodInput').value) || 200;
       for (let i = 0; i < episodes; i++) {
         runEpisode();
         epsilon = Math.max(epsilonMin, epsilon * epsilonDecay);
         totalEpisodesTrained++;
         if ((i + 1) % updateFrequency === 0 || i === episodes - 1) {
-          document.getElementById('trainedEpisodesDisplay').value = totalEpisodesTrained;
-          document.getElementById('epsilonDisplay').textContent = `ε: ${epsilon.toFixed(3)}`;
+          document.getElementById('status').textContent = `🏋🏼${totalEpisodesTrained}`;
+          document.getElementById('epsilonExplanation').textContent = epsilon.toFixed(3);
+          document.getElementById('epsilonDecayExplanation').textContent = epsilonDecay;
+          document.getElementById('epsilonMinExplanation').textContent = epsilonMin;
+          document.getElementById('learningRateExplanation').textContent = learningRate;
+          document.getElementById('discountFactorExplanation').textContent = discountFactor;
           await new Promise(r => setTimeout(r, 1));
         }
       }
@@ -560,15 +601,54 @@
       snake.forEach((segment, index) => {
         ctx.fillRect(segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
         if (index === 0) {
-          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--extra_red');
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--status_olivegreen');
+          ctx.lineWidth = 1;
           ctx.strokeRect(segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
         }
       });
     }
     
+    function drawGameOverText(reason, score) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.font = "bold 32px sans-serif";
+      ctx.fillText(`${score} poäng`, canvas.width / 2, canvas.height / 2 + 0);
+      ctx.font = "16px sans-serif";
+      ctx.fillText(reason, canvas.width / 2, canvas.height / 2 + 35);
+    }
+    
+    // Uppdaterad funktion som visar endast de tre bästa resultaten
+    // med antalet tränade episoder vid tidpunkten för resultatet
+    function updateTopResults() {
+      let container = document.getElementById("topResults");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "topResults";
+        const explanationContainer = document.getElementById("explanation-container");
+        explanationContainer.insertBefore(container, explanationContainer.firstChild);
+      }
+      // Sortera resultaten efter score (högsta först)
+      let sortedResults = results.slice().sort((a, b) => b.score - a.score);
+      // Ta bara de tre bästa resultaten
+      let top3 = sortedResults.slice(0, 3);
+      
+      let html = "";
+      html += `<div class="header">
+                 <h3>High-score</h3>
+               </div>`;
+      html += `<div id="resultsList">`;
+      top3.forEach((result, index) => {
+        html += `<div>${index + 1}. ${result.score} poäng &#8669; ${result.episodes} episoder</div>`;
+      });
+      html += "</div>";
+      container.innerHTML = html;
+    }
+    
     function testGame() {
       resetGame();
+      maxStepsWithoutFood = parseInt(document.getElementById('maxStepsWithoutFoodInput').value) || 200;
       const savedEpsilon = epsilon;
       epsilon = 0;
       if (gameInterval) clearInterval(gameInterval);
@@ -579,8 +659,9 @@
         drawGame();
         if (gameOver) {
           clearInterval(gameInterval);
-          if (score > highscore) { highscore = score; }
-          document.querySelector('#status_outside span').textContent = `🏆 ${highscore}`;
+          drawGameOverText(gameOverReason, score);
+          results.push({ score: score, episodes: totalEpisodesTrained });
+          updateTopResults();
           epsilon = savedEpsilon;
         }
       }, 80);
@@ -591,7 +672,7 @@
       learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
       discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
       epsilonMin = parseFloat(document.getElementById('epsilonMinInput').value) || 0.01;
-      episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 100;
+      episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 1000;
       await trainAgent(episodesPerTrain);
     });
     
