@@ -264,33 +264,43 @@
       color: var(--white);
     }
 
+    /* Media Query för mobilläge */
     @media (max-width: 600px) {
-  /* Gör container bredden 100% och tar bort minsta bredd */
-  .container {
-    width: 100%;
-    min-width: 0;
-    margin: 10px;
-  }
-
-  /* Placera spelplanen ovanför förklaringsrutan */
-  .flex-row {
-    flex-direction: column;
-  }
-
-  /* Visa varje inställningsfält på en egen rad */
-  .settings-row {
-    flex-direction: column;
-  }
-  .settings-item {
-    flex: 1 1 100%;
-  }
-
-  /* Placera knapparna på varsin rad */
-  .controls {
-    flex-direction: column;
-  }
-}
-
+      /* Gör container bredden 100% och tar bort minsta bredd */
+      .container {
+        width: 100%;
+        min-width: 0;
+        margin: 10px;
+      }
+      
+      /* Placera spelplanen ovanför förklaringsrutan */
+      .flex-row {
+        flex-direction: column;
+      }
+      
+      /* Visa varje inställningsfält på en egen rad */
+      .settings-row {
+        flex-direction: column;
+      }
+      .settings-item {
+        flex: 1 1 100%;
+      }
+      
+      /* Placera knapparna på varsin rad */
+      .controls {
+        flex-direction: column;
+      }
+      
+      /* Anpassa spelplanen så att den fyller hela containerns bredd */
+      #game-container {
+        width: 100%;
+      }
+      #snakeCanvas {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+      }
+    }
   </style>
 </head>
 <body>
