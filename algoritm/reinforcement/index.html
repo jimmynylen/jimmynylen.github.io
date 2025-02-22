@@ -262,6 +262,34 @@
       font-size: 24px;
       color: var(--white);
     }
+
+    @media (max-width: 740px) {
+  /* Gör container bredden 100% och tar bort minsta bredd */
+  .container {
+    width: 100%;
+    min-width: 0;
+    margin: 10px;
+  }
+
+  /* Placera spelplanen ovanför förklaringsrutan */
+  .flex-row {
+    flex-direction: column;
+  }
+
+  /* Visa varje inställningsfält på en egen rad */
+  .settings-row {
+    flex-direction: column;
+  }
+  .settings-item {
+    flex: 1 1 100%;
+  }
+
+  /* Placera knapparna på varsin rad */
+  .controls {
+    flex-direction: column;
+  }
+}
+
   </style>
 </head>
 <body>
