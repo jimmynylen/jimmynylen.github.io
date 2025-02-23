@@ -31,14 +31,12 @@
       --status_darkblue:  #2C3E50;
       --status_mjuklavendel: #A7A0C9;
       --status_dämpadlila:  #6B5876;
-  
     }
     
     * {
       box-sizing: border-box;
     }
   
-
     body {
       font-family: 'Source Serif Pro', serif;
       margin: 0;
@@ -56,7 +54,6 @@
       margin: 20px auto;
     }
     
-    /* Rubriken delas upp i två delar: vänster titel och höger "episode-info" */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -74,7 +71,6 @@
       display: flex;
       align-items: center;
     }
-    /* Gör episodräknaren mindre – OBS: Denna ligger i rubriken och inte längre i statusrutan */
     #episodesCount {
       font-family: monospace;
       font-size: 0.8em;
@@ -92,7 +88,6 @@
       margin-bottom: 15px;
     }
     
-    /* Gula rutan: Nu visas endast high‑score-listan och den centreras */
     #status_outside {
       font-family: 'Poppins', sans-serif;
       background-color: #D98E04;
@@ -104,7 +99,6 @@
       font-size: 24px;
       color: var(--white);
     }
-    /* Ändra #status så att innehållet centreras */
     #status {
       background-color: var(--extra_primary);
       font-size: 40px;
@@ -117,7 +111,6 @@
       text-align: center;
     }
     
-    /* Övriga stilar (oförändrade) */
     .explanation-content .heading {
       margin-bottom: 5px;
       font-size: 16px;
@@ -125,11 +118,11 @@
     .description{
       margin-bottom: 5px;
     }
-
-    ul{
+    
+    ul {
       margin-top: 5px;
     }
-
+    
     ul li {
       margin-left: -15px;
     }
@@ -194,11 +187,11 @@
       background-color: var(--primary);
       image-rendering: pixelated;
     }
-
+    
     .explanation-content ul {
       margin-bottom: 5px;
     }
-
+    
     #explanation-container {
       flex: 1 1 auto;
       height: 280px;
@@ -214,7 +207,8 @@
     
     .step-container {
       display: flex;
-      align-items: flex-start;
+      align-items: center; /* Centrerar innehållet vertikalt */
+      justify-content: space-between; /* Håller emojin längst till höger */
       gap: 10px;
       margin-bottom: 10px;
       padding: 10px;
@@ -232,21 +226,29 @@
       color: var(--white);
     }
     .step-container.min {
+      background-color: var(--status_steelblue);
+      border-left: 5px solid var(--status_darkblue);
+      color: var(--white);
+    }
+    .step-container.learning {
+      background-color: var(--status_mjuklavendel);
+      border-left: 5px solid var(--status_dämpadlila);
+      color: var(--white);
+    }
+    .step-container.discount {
       background-color: var(--status_sienna);
       border-left: 5px solid var(--status_burntumber);
       color: var(--white);
     }
 
-    .step-container.learning {
-      background-color: var(--status_steelblue);
-      border-left: 5px solid var(--status_darkblue);
-      color: var(--white);
+    .explanation-content {
+      flex: 1; /* Tar upp resterande utrymme så att texten inte hamnar under emojin */
     }
 
-    .step-container.discount {
-      background-color: var(--status_mjuklavendel);
-      border-left: 5px solid var(--status_dämpadlila);
-      color: var(--white);
+    .emoji {
+      margin-left: 10px;
+      font-size: 24px; /* Justera storleken efter behov */
+      flex-shrink: 0; /* Förhindrar att emojin krymper */
     }
 
     @keyframes fadeIn {
@@ -305,7 +307,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Rubriken med titel och episode-info (episodräknare och orm-emoji) -->
     <h1>
       <span class="title">Snake med Q-learning</span>
       <span class="episode-info">
@@ -323,66 +324,80 @@
           <canvas id="snakeCanvas" width="280" height="280"></canvas>
         </div>
         <div id="explanation-container">
-          <!-- High-score-listan har tagits bort här, den visas istället i statusrutan -->
           <div class="step-container epsilon">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Epsilon: <span id="epsilonExplanation">1.000</span></strong>
               </div>
-              <div class="description">Sannolikheten att välja en slumpmässig handling (utforskning).</div>
+              <div class="description">
+                Sannolikheten att välja en slumpmässig handling (utforskning).
+              </div>
               <ul>
                 <li><strong>Högt värde:</strong> Mer utforskning.</li>
                 <li><strong>Lågt värde:</strong> Mer exploatering.</li>
               </ul>
             </div>
+            <span class="emoji" aria-hidden="true">🎲</span>
           </div>
           <div class="step-container decay">
             <div class="explanation-content">
               <div class="heading">
-                <strong>Epsilon decay: <span id="epsilonDecayExplanation">0.995</span></strong>
+                <strong>Epsilon, nedtrappning: <span id="epsilonDecayExplanation">0.995</span></strong>
               </div>
-              <div class="description">Förändringsfaktorn med vilken epsilon minskar vid varje träningsomgång.</div>
+              <div class="description">
+                Den faktor med vilken epsilon minskar vid varje träningsomgång.
+              </div>
               <ul>
                 <li><strong>Högt värde:</strong> Utforskningen bibehålls längre.</li>
                 <li><strong>Lågt värde:</strong> Exploatering prioriteras tidigare.</li>
               </ul>
             </div>
+            <span class="emoji" aria-hidden="true">⏳</span>
           </div>
           <div class="step-container min">
             <div class="explanation-content">
               <div class="heading">
-                <strong>Epsilon min: <span id="epsilonMinExplanation">0.01</span></strong>
+                <strong>Epsilon, minimum: <span id="epsilonMinExplanation">0.01</span></strong>
               </div>
-              <div class="description">Det lägsta värdet epsilon får nå.</div>
+              <div class="description">
+                Det lägsta värdet epsilon får nå.
+              </div>
               <ul>
                 <li><strong>Högt värde:</strong> Bibehåller en viss nivå av utforskning.</li>
                 <li><strong>Lågt värde:</strong> Nästan ingen utforskning.</li>
               </ul>
             </div>
+            <span class="emoji" aria-hidden="true">🔻</span>
           </div>
           <div class="step-container learning">
             <div class="explanation-content">
               <div class="heading">
-                <strong>Learning rate: <span id="learningRateExplanation">0.1</span></strong>
+                <strong>Inlärningshastighet: <span id="learningRateExplanation">0.1</span></strong>
               </div>
-              <div class="description">Hur snabbt agenten anpassar sig efter nya erfarenheter.</div>
+              <div class="description">
+                Hur snabbt agenten anpassar sig efter nya erfarenheter.
+              </div>
               <ul>
                 <li><strong>Högt värde:</strong> Snabb inlärning men risk för instabilitet.</li>
                 <li><strong>Lågt värde:</strong> Långsammare men stabil inlärning.</li>
               </ul>
             </div>
+            <span class="emoji" aria-hidden="true">⚡</span>
           </div>
           <div class="step-container discount">
             <div class="explanation-content">
               <div class="heading">
-                <strong>Discount factor: <span id="discountFactorExplanation">0.9</span></strong>
+                <strong>Diskonteringsfaktor: <span id="discountFactorExplanation">0.9</span></strong>
               </div>
-              <div class="description">Hur mycket framtida belöningar prioriteras.</div>
+              <div class="description">
+                Hur mycket framtida belöningar prioriteras.
+              </div>
               <ul>
                 <li><strong>Högt värde:</strong> Framtida belöningar ges hög vikt.</li>
                 <li><strong>Lågt värde:</strong> Fokus på omedelbara belöningar.</li>
               </ul>
             </div>
+            <span class="emoji" aria-hidden="true">🔮</span>
           </div>
         </div>
       </div>
@@ -391,26 +406,26 @@
     <div class="settings">
       <div class="settings-row">
         <div class="settings-item">
-          <label for="epsilonDecayInput">Epsilon decay:</label>
-          <input id="epsilonDecayInput" type="number" step="0.001" value="0.995">
+          <label for="epsilonDecayInput">Epsilon, nedtrappning:</label>
+          <input id="epsilonDecayInput" type="number" step="0.001" value="0.995" min="0" max="1">
         </div>
         <div class="settings-item">
-          <label for="epsilonMinInput">Epsilon min:</label>
-          <input id="epsilonMinInput" type="number" step="0.001" value="0.01">
+          <label for="epsilonMinInput">Epsilon, minimum:</label>
+          <input id="epsilonMinInput" type="number" step="0.001" value="0.01" min="0" max="1">
         </div>
         <div class="settings-item">
-          <label for="episodesPerTrainInput">Episoder/träning:</label>
+          <label for="episodesPerTrainInput">Episoder per träning:</label>
           <input id="episodesPerTrainInput" type="number" step="1" value="1000">
         </div>
       </div>
       <div class="settings-row">
         <div class="settings-item">
-          <label for="learningRateInput">Learning rate:</label>
-          <input id="learningRateInput" type="number" step="0.01" value="0.1">
+          <label for="learningRateInput">Inlärningshastighet:</label>
+          <input id="learningRateInput" type="number" step="0.01" value="0.1" min="0" max="1">
         </div>
         <div class="settings-item">
-          <label for="discountFactorInput">Discount factor:</label>
-          <input id="discountFactorInput" type="number" step="0.01" value="0.9">
+          <label for="discountFactorInput">Diskonteringsfaktor:</label>
+          <input id="discountFactorInput" type="number" step="0.01" value="0.9" min="0" max="1">
         </div>
         <div class="settings-item">
           <label for="maxStepsWithoutFoodInput">Max steg utan mat:</label>
@@ -426,7 +441,6 @@
     
     <hr id="separator" />
     
-    <!-- Gula rutan: Nu visas endast high-score-listan, centrerad -->
     <div id="status_outside">
       <div id="status">
         <span id="topResults"></span>
@@ -435,7 +449,6 @@
   </div>
   
   <script>
-    // JavaScript-delen (oförändrad utom uppdatering av high-score-listan)
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
     const gridCount = 20;
@@ -452,7 +465,6 @@
     const updateFrequency = 256;
     let totalEpisodesTrained = 0;
     
-    // High score-resultat sparas som objekt med score och antal tränade episoder
     let results = [];
     
     let snake = [];
@@ -620,7 +632,6 @@
         epsilon = Math.max(epsilonMin, epsilon * epsilonDecay);
         totalEpisodesTrained++;
         if ((i + 1) % updateFrequency === 0 || i === episodes - 1) {
-          // Uppdatera episodräknaren i rubriken
           document.getElementById('episodesCount').textContent = totalEpisodesTrained;
           document.getElementById('epsilonExplanation').textContent = epsilon.toFixed(3);
           document.getElementById('epsilonDecayExplanation').textContent = epsilonDecay;
@@ -654,14 +665,11 @@
       ctx.fillStyle = "#ffffff";
       ctx.textAlign = "center";
       ctx.font = "bold 32px monospace";
-      // Visa endast poängsiffran
       ctx.fillText(`${score} poäng`, canvas.width / 2, canvas.height / 2);
       ctx.font = "16px monospace";
       ctx.fillText(reason, canvas.width / 2, canvas.height / 2 + 35);
     }
     
-    // Uppdaterad funktion som visar endast de tre bästa resultaten med medalj‑emojis.
-    // Tooltip med antal tränade episoder visas nu för alla medaljer.
     function updateTopResults() {
       let sortedResults = results.slice().sort((a, b) => b.score - a.score);
       let top3 = sortedResults.slice(0, 3);
@@ -709,10 +717,32 @@
     }
     
     document.getElementById('trainBtn').addEventListener('click', async () => {
-      epsilonDecay = parseFloat(document.getElementById('epsilonDecayInput').value) || 0.995;
-      learningRate = parseFloat(document.getElementById('learningRateInput').value) || 0.1;
-      discountFactor = parseFloat(document.getElementById('discountFactorInput').value) || 0.9;
-      epsilonMin = parseFloat(document.getElementById('epsilonMinInput').value) || 0.01;
+      let epsilonDecayInput = parseFloat(document.getElementById('epsilonDecayInput').value);
+      let epsilonMinInput = parseFloat(document.getElementById('epsilonMinInput').value);
+      let learningRateInput = parseFloat(document.getElementById('learningRateInput').value);
+      let discountFactorInput = parseFloat(document.getElementById('discountFactorInput').value);
+      
+      if (epsilonDecayInput < 0 || epsilonDecayInput > 1) {
+        alert("Epsilon‑nedtrappning måste vara mellan 0 och 1!");
+        return;
+      }
+      if (epsilonMinInput < 0 || epsilonMinInput > 1) {
+        alert("Minimalt epsilon måste vara mellan 0 och 1!");
+        return;
+      }
+      if (learningRateInput < 0 || learningRateInput > 1) {
+        alert("Inlärningshastigheten måste vara mellan 0 och 1!");
+        return;
+      }
+      if (discountFactorInput < 0 || discountFactorInput > 1) {
+        alert("Diskonteringsfaktorn måste vara mellan 0 och 1!");
+        return;
+      }
+      
+      epsilonDecay = epsilonDecayInput;
+      epsilonMin = epsilonMinInput;
+      learningRate = learningRateInput;
+      discountFactor = discountFactorInput;
       episodesPerTrain = parseInt(document.getElementById('episodesPerTrainInput').value) || 1000;
       await trainAgent(episodesPerTrain);
     });
