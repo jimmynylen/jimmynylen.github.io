@@ -723,19 +723,19 @@
       let discountFactorInput = parseFloat(document.getElementById('discountFactorInput').value);
       
       if (epsilonDecayInput < 0 || epsilonDecayInput > 1) {
-        alert("Epsilon‑nedtrappning måste vara mellan 0 och 1!");
+        alert("[Epsilon, nedtrappning] måste vara mellan 0 och 1!");
         return;
       }
       if (epsilonMinInput < 0 || epsilonMinInput > 1) {
-        alert("Minimalt epsilon måste vara mellan 0 och 1!");
+        alert("[Epsilon, minimum] måste vara mellan 0 och 1!");
         return;
       }
       if (learningRateInput < 0 || learningRateInput > 1) {
-        alert("Inlärningshastigheten måste vara mellan 0 och 1!");
+        alert("[Inlärningshastighet] måste vara mellan 0 och 1!");
         return;
       }
       if (discountFactorInput < 0 || discountFactorInput > 1) {
-        alert("Diskonteringsfaktorn måste vara mellan 0 och 1!");
+        alert("[Diskonteringsfaktor] måste vara mellan 0 och 1!");
         return;
       }
       
