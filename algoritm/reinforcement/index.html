@@ -27,15 +27,17 @@
       --status_goldenbrown: #C2955C;
       --status_sienna: #A0522D;
       --status_burntumber: #8A3324;
+      --status_steelblue: #4682B4;
+      --status_darkblue:  #2C3E50;
+      --status_mjuklavendel: #A7A0C9;
+      --status_dämpadlila:  #6B5876;
+  
     }
     
     * {
       box-sizing: border-box;
     }
-    
-    .explanation-content ul {
-      margin-bottom: 5px;
-    }
+  
 
     body {
       font-family: 'Source Serif Pro', serif;
@@ -118,7 +120,18 @@
     /* Övriga stilar (oförändrade) */
     .explanation-content .heading {
       margin-bottom: 5px;
-      font-size: 18px;
+      font-size: 16px;
+    }
+    .description{
+      margin-bottom: 5px;
+    }
+
+    ul{
+      margin-top: 5px;
+    }
+
+    ul li {
+      margin-left: -15px;
     }
     .settings {
       margin-bottom: 15px;
@@ -181,6 +194,11 @@
       background-color: var(--primary);
       image-rendering: pixelated;
     }
+
+    .explanation-content ul {
+      margin-bottom: 5px;
+    }
+
     #explanation-container {
       flex: 1 1 auto;
       height: 280px;
@@ -203,21 +221,34 @@
       border-radius: 8px;
       animation: fadeIn 0.5s ease-in;
     }
-    .step-container.computer {
+    .step-container.epsilon {
       background-color: var(--status_graygreen);
       border-left: 5px solid var(--status_olivegreen);
       color: var(--white);
     }
-    .step-container.player {
+    .step-container.decay {
       background-color: var(--status_ochreyellow);
       border-left: 5px solid var(--status_goldenbrown);
       color: var(--white);
     }
-    .step-container.prune {
+    .step-container.min {
       background-color: var(--status_sienna);
       border-left: 5px solid var(--status_burntumber);
       color: var(--white);
     }
+
+    .step-container.learning {
+      background-color: var(--status_steelblue);
+      border-left: 5px solid var(--status_darkblue);
+      color: var(--white);
+    }
+
+    .step-container.discount {
+      background-color: var(--status_mjuklavendel);
+      border-left: 5px solid var(--status_dämpadlila);
+      color: var(--white);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -293,31 +324,31 @@
         </div>
         <div id="explanation-container">
           <!-- High-score-listan har tagits bort här, den visas istället i statusrutan -->
-          <div class="step-container computer">
+          <div class="step-container epsilon">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Epsilon: <span id="epsilonExplanation">1.000</span></strong>
               </div>
               <div class="description">Sannolikheten att välja en slumpmässig handling (utforskning).</div>
               <ul>
-                <li><strong>Högt värde:</strong> Mer slumpmässighet.</li>
+                <li><strong>Högt värde:</strong> Mer utforskning.</li>
                 <li><strong>Lågt värde:</strong> Mer exploatering.</li>
               </ul>
             </div>
           </div>
-          <div class="step-container player">
+          <div class="step-container decay">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Epsilon decay: <span id="epsilonDecayExplanation">0.995</span></strong>
               </div>
-              <div class="description">Faktorn med vilken epsilon minskar vid varje träningsomgång.</div>
+              <div class="description">Förändringsfaktorn med vilken epsilon minskar vid varje träningsomgång.</div>
               <ul>
                 <li><strong>Högt värde:</strong> Utforskningen bibehålls längre.</li>
                 <li><strong>Lågt värde:</strong> Exploatering prioriteras tidigare.</li>
               </ul>
             </div>
           </div>
-          <div class="step-container prune">
+          <div class="step-container min">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Epsilon min: <span id="epsilonMinExplanation">0.01</span></strong>
@@ -329,7 +360,7 @@
               </ul>
             </div>
           </div>
-          <div class="step-container computer">
+          <div class="step-container learning">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Learning rate: <span id="learningRateExplanation">0.1</span></strong>
@@ -341,7 +372,7 @@
               </ul>
             </div>
           </div>
-          <div class="step-container player">
+          <div class="step-container discount">
             <div class="explanation-content">
               <div class="heading">
                 <strong>Discount factor: <span id="discountFactorExplanation">0.9</span></strong>
@@ -365,7 +396,7 @@
         </div>
         <div class="settings-item">
           <label for="epsilonMinInput">Epsilon min:</label>
-          <input id="epsilonMinInput" type="number" step="0.01" value="0.01">
+          <input id="epsilonMinInput" type="number" step="0.001" value="0.01">
         </div>
         <div class="settings-item">
           <label for="episodesPerTrainInput">Episoder/träning:</label>
@@ -389,8 +420,8 @@
     </div>
     
     <div class="controls">
-      <button id="trainBtn">Träna agent "Solid Snake"</button>
-      <button id="testBtn">Testa agent "Solid Snake"</button>
+      <button id="trainBtn">Träna agent <strong>SOLID SNAKE</strong></button>
+      <button id="testBtn">Testa agent <strong>SOLID SNAKE</strong></button>
     </div>
     
     <hr id="separator" />
