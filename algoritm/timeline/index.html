@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tidslinjespel: När då då?</title>
+  <title>Timeline &#11136; Artificiell Intelligens</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
   <style>
@@ -11,11 +11,27 @@
       --bg: #f4f4f4;
       --white: #ffffff;
       --primary: #40534C;
-      --green: #3CB371;
+      --cell_mediumgreen: #3CB371;
       --dark: #1A3636;
       --text: #644117;
       --subtle: #D6BD98;
       --effect: #677D6A;
+      --placeholder: #B9AFA1;
+      --textarea: #FCF8F4;
+      --extra_effect: #D98E04;
+      --extra_primary: #E0A030;
+      --extra_red: #A44434;
+      --status_graygreen: #8E9775;
+      --status_olivegreen: #5B7052;
+      --status_ochreyellow: #D4A76A;
+      --status_goldenbrown: #C2955C;
+      --status_sienna: #A0522D;
+      --status_burntumber: #8A3324;
+      --status_steelblue: #4682B4;
+      --status_darkblue:  #2C3E50;
+      --status_mjuklavendel: #A7A0C9;
+      --status_dämpadlila:  #6B5876;
+      
       --card-bg: #E0F2E9;
       --timeline-bg: #F9E79F;
       --score-bg: #D98E04;
@@ -50,10 +66,18 @@
       border-radius: 8px 8px 0 0;
       padding: 10px 20px;
       display: flex;
-      justify-content: center;
-      align-items: center;
     }
     
+    .inforuta {
+      margin-top: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 0 0 8px 8px;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+    }
+
     .score-board {
       background-color: var(--score-bg);
       color: var(--score-text);
@@ -67,15 +91,16 @@
     .game-area {
       display: flex;
       gap: 15px;
-      background-color: var(--green);
+      background-color: var(--effect);
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 15px;
+      border: 1px solid var(--primary);
     }
     
     .cards-container {
       flex: 0 0 40%;
-      background-color: var(--card-bg);
+      background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
     }
@@ -109,7 +134,7 @@
     
     .timeline-container {
       flex: 1;
-      background-color: var(--timeline-bg);
+      background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
       position: relative;
@@ -151,8 +176,12 @@
     }
     
     .drop-zone {
-      background-color: rgba(255, 255, 255, 0.6);
-      border: 2px dashed var(--dark);
+      background-color: var(--primary);
+      color: var(--white);
+      border: 1px dashed var(--effect);
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 4px;
       margin: 5px 0;
       padding: 10px;
       text-align: center;
@@ -178,10 +207,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>Tidslinjespel: När då då?</h1>
-    <div class="score-board">
-      Poäng: <span id="score">0</span> | Misstag kvar: <span id="lives">5</span>
-    </div>
+    <h1>Timeline &#11136; Artificiell Intelligens 😵</h1>
+    <p class="inforuta">
+      Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna är i första hand hämtade från AI:ns historia, men även datorns historia då de är sammanlänkade. <strong>Spelet är över efter 5 fel.</strong>
+    </p>
+
+
     <div class="game-area">
       <div class="cards-container" id="cards-container">
         <!-- Spelkorten visas här (rubrik + dold beskrivning som visas vid klick) -->
@@ -191,7 +222,14 @@
       </div>
     </div>
     <button id="reset-btn">Starta om</button>
+
+    <div class="score-board">
+      Poäng: <span id="score">0</span> | Misstag kvar: <span id="lives">5</span>
+    </div>
+
   </div>
+
+
   
   <script>
     /* 
