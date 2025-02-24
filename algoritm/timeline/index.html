@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tidslinjespel: När då då?</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --white: #ffffff;
+      --primary: #40534C;
+      --green: #3CB371;
+      --dark: #1A3636;
+      --text: #644117;
+      --subtle: #D6BD98;
+      --effect: #677D6A;
+      --card-bg: #E0F2E9;
+      --timeline-bg: #F9E79F;
+      --score-bg: #D98E04;
+      --score-text: #ffffff;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Source Serif Pro', serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+    }
+    
+    .container {
+      width: 740px;
+      min-width: 740px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px auto;
+    }
+    
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px 8px 0 0;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .score-board {
+      background-color: var(--score-bg);
+      color: var(--score-text);
+      font-size: 24px;
+      text-align: center;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 15px 0;
+    }
+    
+    .game-area {
+      display: flex;
+      gap: 15px;
+      background-color: var(--green);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .cards-container {
+      flex: 0 0 40%;
+      background-color: var(--card-bg);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    
+    .card {
+      background-color: var(--white);
+      border: 1px solid var(--effect);
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    
+    .card.selected {
+      border-color: var(--primary);
+      background-color: var(--subtle);
+    }
+    
+    .card-headline {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+    
+    .card-description {
+      font-size: 14px;
+      color: var(--text);
+      margin-top: 5px;
+      display: none;
+    }
+    
+    .timeline-container {
+      flex: 1;
+      background-color: var(--timeline-bg);
+      padding: 10px;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .timeline-event {
+      background-color: var(--white);
+      border: 1px solid var(--effect);
+      border-radius: 4px;
+      margin: 5px 0;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+    
+    /* Året visas med större font och i en separat ruta */
+    .event-year {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      min-width: 60px;
+      text-align: center;
+    }
+    
+    .event-headline {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+    
+    .event-description {
+      display: none;
+      margin-top: 5px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    
+    .drop-zone {
+      background-color: rgba(255, 255, 255, 0.6);
+      border: 2px dashed var(--dark);
+      margin: 5px 0;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    button {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background-color: var(--effect);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tidslinjespel: När då då?</h1>
+    <div class="score-board">
+      Poäng: <span id="score">0</span> | Misstag kvar: <span id="lives">5</span>
+    </div>
+    <div class="game-area">
+      <div class="cards-container" id="cards-container">
+        <!-- Spelkorten visas här (rubrik + dold beskrivning som visas vid klick) -->
+      </div>
+      <div class="timeline-container" id="timeline-container">
+        <!-- Tidslinjen med händelser visas här (år, rubrik och klickbar beskrivning) -->
+      </div>
+    </div>
+    <button id="reset-btn">Starta om</button>
+  </div>
+  
+  <script>
+    /* 
+      Händelsedata: Varje objekt innehåller:
+      - year: årtalet
+      - headline: en kort, slagkraftig rubrik
+      - description: längre beskrivning som visas vid klick
+      - importance: 1, 2 eller 3 (1 används först; 0 = utesluts)
+    */
+    const eventsData = [
+      { year: 1822, headline: "Babbage konceptualiserar sin revolutionerande maskin", description: "Charles Babbage konceptualiserar Difference Engine", importance: 2 },
+      { year: 1837, headline: "Ada Lovelace skriver första algoritmen", description: "Ada Lovelace skriver det första algoritmiska konceptet för Babbages maskin", importance: 1 },
+      { year: 1936, headline: "Turing definierar Turingmaskinen", description: "Alan Turing publicerar 'On Computable Numbers' och introducerar Turingmaskinen", importance: 1 },
+      { year: 1943, headline: "Neurala nätverk tar sin början", description: "McCulloch och Pitts presenterar den första matematiska modellen av neurala nätverk", importance: 2 },
+      { year: 1943, headline: "Colossus knäcker koder", description: "Colossus – världens första programmerbara digitala dator – används för att knäcka tyska koder under andra världskriget", importance: 2 },
+      { year: 1946, headline: "ENIAC revolutionen startar", description: "ENIAC, den första elektroniska allmänna datorn, tas i bruk", importance: 1 },
+      { year: 1947, headline: "Transistorn förändrar allt", description: "Transistorn uppfinns vid Bell Labs, vilket revolutionerar elektronikindustrin", importance: 1 },
+      { year: 1950, headline: "Turing introducerar Turingtestet", description: "Alan Turing introducerar Turingtestet i 'Computing Machinery and Intelligence'", importance: 1 },
+      { year: 1951, headline: "Ferranti Mark 1 lanseras", description: "Ferranti Mark 1 blir den första kommersiellt tillgängliga datorn", importance: 2 },
+      { year: 1952, headline: "Samuel skapar AI-schackprogram", description: "Arthur Samuel utvecklar ett schackprogram med maskininlärning – ett tidigt exempel på AI", importance: 2 },
+      { year: 1956, headline: "Begreppet Artificiell Intelligens myntas", description: "Dartmouth-konferensen hålls och myntar begreppet 'artificiell intelligens'", importance: 1 },
+      { year: 1958, headline: "Integrerade kretsar sätter ny standard", description: "Inventionen av integrerade kretsar (av Jack Kilby och Robert Noyce) sätter en ny teknisk era", importance: 1 },
+      { year: 1962, headline: "ELIZA simulerar mänskligt samtal", description: "Joseph Weizenbaum skapar ELIZA, ett tidigt program som simulerar naturligt samtal", importance: 2 },
+      { year: 1964, headline: "IBM revolutionerar med System/360", description: "IBM lanserar System/360, en serie datorer som sätter standarden för arkitektur", importance: 2 },
+      { year: 1965, headline: "Moores lag förutspår datorkraftens ökning", description: "Gordon Moore formulerar Moores lag, som förutspår den exponentiella ökningen av datorkraft", importance: 2 },
+      { year: 1966, headline: "Shakey roboten rör sig för första gången", description: "Shakey the Robot, den första mobila roboten med perceptuella och beslutsfattande förmågor, utvecklas", importance: 2 },
+      { year: 1969, headline: "ARPANET banar väg för internet", description: "ARPANET lanseras – en föregångare till dagens Internet", importance: 1 },
+      { year: 1970, headline: "Relationsdatabasen tar form", description: "Edgar F. Codd introducerar den relationsdatabasmodell som revolutionerar datalagring", importance: 2 },
+      { year: 1971, headline: "Mikroprocessorn 4004 lanseras", description: "Intel släpper mikroprocessorn 4004, som markerar början på modern datorteknik", importance: 1 },
+      { year: 1972, headline: "Pong underhåller världen", description: "Videospelsfenomenet 'Pong' lanseras och visar på digital underhållnings potential", importance: 3 },
+      { year: 1973, headline: "GUI introduceras med Xerox Alto", description: "Xerox Alto introduceras med grafiskt användargränssnitt (GUI) och musen – förebådar dagens datorer", importance: 2 },
+      { year: 1974, headline: "MYCIN diagnostiserar med AI", description: "MYCIN, ett tidigt expertssystem för medicinsk diagnostik, utvecklas", importance: 2 },
+      { year: 1975, headline: "Altair kickstartar PC-eran", description: "Altair 8800 släpps och sätter igång persondatorrevolutionen", importance: 2 },
+      { year: 1976, headline: "Apple grundas – en ny era inleds", description: "Apple Computer grundas av Steve Jobs, Steve Wozniak och Ronald Wayne", importance: 1 },
+      { year: 1977, headline: "Apple II populariserar persondatorn", description: "Apple II lanseras och bidrar till att popularisera persondatorer", importance: 2 },
+      { year: 1978, headline: "Intresse för neurala nätverk återupplivas", description: "Forskningsinsatser återupplivar intresset för artificiella neurala nätverk", importance: 3 },
+      { year: 1979, headline: "Expertssystem börjar användas brett", description: "De första expert systemen börjar få genomslag inom olika tillämpningsområden", importance: 3 },
+      { year: 1980, headline: "Industriell AI expanderar", description: "Expertssystem expanderar inom industri och medicin", importance: 3 },
+      { year: 1981, headline: "IBM PC definierar persondatorn", description: "IBM introducerar den första IBM PC:n, vilket standardiserar persondatorer", importance: 1 },
+      { year: 1982, headline: "Portabla datorer visar framtiden", description: "De första portabla datorerna och mobiltelefonerna börjar visa datorns framtid i rörelse", importance: 3 },
+      { year: 1983, headline: "Backpropagation återupptäcks", description: "Backpropagation-algoritmen återupptäcks och banar väg för modern träning av neurala nätverk", importance: 2 },
+      { year: 1984, headline: "Macintosh med grafiskt gränssnitt lanseras", description: "Apple lanserar Macintosh med sitt banbrytande grafiska gränssnitt", importance: 1 },
+      { year: 1985, headline: "TCP/IP standardiseras", description: "TCP/IP blir standardprotokoll, vilket möjliggör global datakommunikation", importance: 2 },
+      { year: 1986, headline: "Genombrott inom neurala nätverk", description: "Geoffrey Hinton och kollegor publicerar banbrytande arbeten om neurala nätverk", importance: 2 },
+      { year: 1987, headline: "Fuzzy logic tar plats i industrin", description: "Fuzzy logic introduceras i industriella styrsystem för att hantera osäker information", importance: 3 },
+      { year: 1988, headline: "Förberedelser för World Wide Web", description: "Tidiga koncept och tekniska förberedelser för det som snart blir World Wide Web", importance: 3 },
+      { year: 1989, headline: "WWW-förslaget", description: "Tim Berners-Lee föreslår World Wide Web, en idé som revolutionerar informationsspridning", importance: 1 },
+      { year: 1990, headline: "Internet expanderar med WWW", description: "World Wide Web blir allmänt tillgängligt och transformerar global kommunikation", importance: 2 },
+      { year: 1991, headline: "Linux och öppen källkod tar fart", description: "Linux-kärnan lanseras av Linus Torvalds, vilket sätter igång öppen källkodsrörelsen", importance: 2 },
+      { year: 1992, headline: "Statistiska metoder vinner mark", description: "Statistiska maskininlärningsmetoder, såsom support vector machines, börjar få genomslag", importance: 3 },
+      { year: 1993, headline: "Deep Blue förbereds", description: "IBM inleder projektet Deep Blue med målet att utmana schackens mästare", importance: 3 },
+      { year: 1994, headline: "DVD-teknologin förändrar multimedia", description: "DVD-teknologin introduceras och möjliggör lagring av högkvalitativ multimedia", importance: 3 },
+      { year: 1995, headline: "Java förenklar utveckling", description: "Java programmeringsspråk lanseras, vilket underlättar plattformsoberoende utveckling", importance: 3 },
+      { year: 1996, headline: "Deep Blue möter Kasparov", description: "IBM:s Deep Blue möter Garry Kasparov i schack, en signal om AI:s framsteg", importance: 3 },
+      { year: 1997, headline: "Deep Blue besegrar Kasparov", description: "IBM:s Deep Blue besegrar Garry Kasparov – en historisk milstolpe för AI", importance: 1 },
+      { year: 1998, headline: "Google startar sökrevolutionen", description: "Google grundas och förändrar hur vi söker och hanterar information", importance: 1 },
+      { year: 1999, headline: "Robotik visar praktisk AI", description: "Framsteg inom robotik, med humanoida prototyper och autonoma system, visar AI:s praktiska tillämpningar", importance: 3 },
+      { year: 2000, headline: "Smartphones och kameror tar över", description: "Konsumentelektroniken tar ett stort kliv med digitala kameror och de första smartphones", importance: 3 },
+      { year: 2001, headline: "E-handel omformar global handel", description: "E-handeln växer, trots dot-com-krisen, och omformar global handel", importance: 3 },
+      { year: 2002, headline: "Roomba introduceras i hushållet", description: "iRobot lanserar Roomba – ett tidigt exempel på AI i hushållsprodukter", importance: 3 },
+      { year: 2003, headline: "Genomprojektet avslutas", description: "Det mänskliga genomprojektet avslutas, ett bevis på avancerad datorkraft inom biovetenskap", importance: 3 },
+      { year: 2004, headline: "Facebook förändrar kommunikationen", description: "Facebook lanseras och omdefinierar sättet vi kommunicerar på nätet", importance: 3 },
+      { year: 2005, headline: "YouTube banar videodelning", description: "YouTube startar, vilket banar väg för digitalt videoinnehåll och global delning", importance: 3 },
+      { year: 2006, headline: "Djupinlärning återupplivas", description: "Geoffrey Hinton och forskargruppen återupplivar djupinlärning, vilket utlöser en AI-revolution", importance: 1 },
+      { year: 2007, headline: "iPhone revolutionerar mobilteknik", description: "Apple introducerar iPhone, vilket revolutionerar mobil datorteknik och app-ekonomi", importance: 1 },
+      { year: 2008, headline: "Molntjänster omdefinierar IT", description: "Amazon lanserar AWS, och molntjänster blir en ny global IT-infrastruktur", importance: 1 },
+      { year: 2009, headline: "Bitcoin sätter blockchain-grunden", description: "Bitcoin-whitepaper publiceras av Satoshi Nakamoto, vilket lägger grunden för blockchain och kryptovalutor", importance: 1 },
+      { year: 2010, headline: "iPad introducerar en ny plattform", description: "Apple lanserar iPad, vilket populariserar surfplattor som en ny datorplattform", importance: 3 },
+      { year: 2011, headline: "Watson visar AI:s språkförmåga", description: "IBM:s Watson vinner Jeopardy! och demonstrerar AI:s förmåga att hantera naturligt språk", importance: 1 },
+      { year: 2012, headline: "AlexNet visar djupinlärningens potential", description: "AlexNet vinner ImageNet-tävlingen och visar den enorma potentialen hos djupinlärning", importance: 1 },
+      { year: 2013, headline: "Självkörande bilar visar framtidens transport", description: "Google presenterar sina självstyrande bilprojekt, vilket visar AI:s roll i transportens framtid", importance: 3 },
+      { year: 2014, headline: "AlphaGo tar sig an spelet Go", description: "AlphaGo-projektet inleds med ambitionen att bemästra det komplexa spelet Go", importance: 3 },
+      { year: 2015, headline: "OpenAI startar säker AI-forskning", description: "OpenAI grundas med målet att utveckla säker och fördelaktig AI", importance: 3 },
+      { year: 2016, headline: "AlphaGo besegrar Lee Sedol", description: "AlphaGo besegrar den koreanska Go-mästaren Lee Sedol – en milstolpe för maskininlärning", importance: 1 },
+      { year: 2017, headline: "AI utmanar eSport", description: "AI-system som OpenAI Five visar upp avancerade tekniker inom förstärkt lärande genom att tävla i spel (t.ex. Dota 2)", importance: 3 },
+      { year: 2018, headline: "Google Duplex visar naturliga samtal", description: "Google Duplex imponerar med förmågan att föra naturliga samtal och boka tider via AI", importance: 3 },
+      { year: 2019, headline: "GPT-2 driver språkmodellrevolutionen", description: "OpenAI släpper GPT-2, vilket driver fram utvecklingen inom generativ språkmodellering", importance: 3 },
+      { year: 2020, headline: "GPT-3 imponerar med sin kraft", description: "OpenAI lanserar GPT-3, en av de mest kraftfulla språkmodellerna hittills", importance: 1 },
+      { year: 2021, headline: "Transformer-modeller omformar AI-forskningen", description: "Transformerbaserade modeller dominerar AI-forskningen och banar väg för nya applikationer", importance: 3 },
+      { year: 2022, headline: "ChatGPT förändrar AI-interaktionen", description: "ChatGPT och liknande konversationsmodeller introduceras och förändrar interaktionen med AI", importance: 1 },
+      { year: 2023, headline: "Multimodala AI-system expanderar", description: "Fortsatta framsteg inom storskaliga och multimodala AI-system expanderar möjligheterna inom både forskning och kommersiella applikationer", importance: 3 }
+    ];
+    
+    // Spelvariabler
+    let deck = [];      // Kortleken, sorterad efter importance
+    let hand = [];      // Spelarens aktuella hand (5 kort)
+    let timeline = [];  // Händelser placerade på tidslinjen
+    let score = 0;
+    let lives = 5;
+    const handSize = 5;
+    
+    // Referenser till DOM-element
+    const cardsContainer = document.getElementById('cards-container');
+    const timelineContainer = document.getElementById('timeline-container');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const resetBtn = document.getElementById('reset-btn');
+    let selectedCard = null;
+    
+    // Initiera (eller återställ) spelet
+    function initGame() {
+      // Endast händelser med importance > 0 används.
+      // Gruppindelning: importance 1 först, därefter 2, sedan 3.
+      const groups = [[], [], []];
+      eventsData.forEach(event => {
+        if (event.importance > 0) {
+          groups[event.importance - 1].push(event);
+        }
+      });
+      // Blanda inom varje grupp och slå sedan ihop
+      groups.forEach(group => group.sort(() => Math.random() - 0.5));
+      deck = [...groups[0], ...groups[1], ...groups[2]];
+      
+      hand = [];
+      timeline = [];
+      score = 0;
+      lives = 5;
+      selectedCard = null;
+      scoreEl.textContent = score;
+      livesEl.textContent = lives;
+      
+      // Starta tidslinjen med ett slumpat evenemang
+      addEventToTimeline(deck.shift());
+      
+      // Fyll spelarens hand med 5 kort (om det finns)
+      while (hand.length < handSize && deck.length > 0) {
+        hand.push(deck.shift());
+      }
+      
+      renderHand();
+      renderTimeline();
+    }
+    
+    // Rendera spelarens hand – visar rubriken och, vid klick, även beskrivningen.
+    function renderHand() {
+      cardsContainer.innerHTML = "";
+      hand.forEach((card, index) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = "card";
+        
+        const headlineDiv = document.createElement('div');
+        headlineDiv.className = "card-headline";
+        headlineDiv.textContent = card.headline;
+        
+        const descriptionDiv = document.createElement('div');
+        descriptionDiv.className = "card-description";
+        descriptionDiv.textContent = card.description;
+        descriptionDiv.style.display = "none";  // dold som standard
+        
+        cardDiv.appendChild(headlineDiv);
+        cardDiv.appendChild(descriptionDiv);
+        
+        cardDiv.addEventListener('click', () => {
+          // Ta bort "selected" från alla kort och dölj deras beskrivningar
+          document.querySelectorAll('.card').forEach(c => {
+            c.classList.remove('selected');
+            const desc = c.querySelector('.card-description');
+            if (desc) { desc.style.display = "none"; }
+          });
+          // Markera detta kort som valt och visa beskrivningen
+          cardDiv.classList.add('selected');
+          descriptionDiv.style.display = "block";
+          selectedCard = { card, index };
+        });
+        
+        cardsContainer.appendChild(cardDiv);
+      });
+    }
+    
+    // Rendera tidslinjen – visar varje händelse med ett framträdande år och rubrik.
+    // Klick på en händelse togglar visningen av den längre beskrivningen.
+    function renderTimeline() {
+      timelineContainer.innerHTML = "";
+      // Sortera tidslinjen efter årtal
+      timeline.sort((a, b) => a.year - b.year);
+      
+      // Skapa en drop-zone före första evenemanget
+      const dropBefore = createDropZone(null, timeline[0]);
+      timelineContainer.appendChild(dropBefore);
+      
+      timeline.forEach((event, i) => {
+        const eventDiv = document.createElement('div');
+        eventDiv.className = "timeline-event";
+        
+        const yearDiv = document.createElement('div');
+        yearDiv.className = "event-year";
+        yearDiv.textContent = event.year;
+        
+        const headlineDiv = document.createElement('div');
+        headlineDiv.className = "event-headline";
+        headlineDiv.textContent = event.headline;
+        
+        const descDiv = document.createElement('div');
+        descDiv.className = "event-description";
+        descDiv.textContent = event.description;
+        descDiv.style.display = "none";
+        
+        // Klick på tidslinjehändelsen togglar beskrivningen
+        eventDiv.addEventListener('click', () => {
+          descDiv.style.display = descDiv.style.display === "block" ? "none" : "block";
+        });
+        
+        eventDiv.appendChild(yearDiv);
+        eventDiv.appendChild(headlineDiv);
+        eventDiv.appendChild(descDiv);
+        
+        timelineContainer.appendChild(eventDiv);
+        
+        // Skapa drop zone mellan detta och nästa event (om något finns)
+        if (i < timeline.length - 1) {
+          const dropZone = createDropZone(event, timeline[i+1]);
+          timelineContainer.appendChild(dropZone);
+        }
+      });
+      
+      // Drop zone efter sista evenemanget
+      const dropAfter = createDropZone(timeline[timeline.length - 1], null);
+      timelineContainer.appendChild(dropAfter);
+    }
+    
+    // Skapa en "drop zone" med en etikett beroende på positionen
+    function createDropZone(lowerEvent, upperEvent) {
+      const dropZone = document.createElement('div');
+      dropZone.className = "drop-zone";
+      let label = "";
+      if (!lowerEvent && upperEvent) {
+        label = "Före: " + upperEvent.year;
+      } else if (lowerEvent && !upperEvent) {
+        label = "Efter: " + lowerEvent.year;
+      } else if (lowerEvent && upperEvent) {
+        label = "Mellan: " + lowerEvent.year + " och " + upperEvent.year;
+      }
+      dropZone.textContent = label;
+      dropZone.addEventListener('click', () => {
+        if (!selectedCard) {
+          alert("Välj ett kort först!");
+          return;
+        }
+        const cardYear = selectedCard.card.year;
+        let valid = false;
+        if (!lowerEvent && upperEvent) {
+          valid = cardYear < upperEvent.year;
+        } else if (lowerEvent && !upperEvent) {
+          valid = cardYear > lowerEvent.year;
+        } else if (lowerEvent && upperEvent) {
+          valid = cardYear > lowerEvent.year && cardYear < upperEvent.year;
+        }
+        
+        if (valid) {
+          score++;
+          addEventToTimeline(selectedCard.card);
+          hand.splice(selectedCard.index, 1);
+          if (deck.length > 0) {
+            hand.push(deck.shift());
+          }
+        } else {
+          lives--;
+          if (lives <= 0) {
+            alert("Spelet över! Du fick " + score + " poäng.");
+            initGame();
+            return;
+          } else {
+            alert("Fel placering! Försök igen.");
+          }
+        }
+        selectedCard = null;
+        scoreEl.textContent = score;
+        livesEl.textContent = lives;
+        renderHand();
+        renderTimeline();
+      });
+      return dropZone;
+    }
+    
+    // Lägg till ett evenemang i tidslinjen
+    function addEventToTimeline(event) {
+      timeline.push(event);
+    }
+    
+    resetBtn.addEventListener('click', initGame);
+    initGame();
+  </script>
+</body>
+</html>
