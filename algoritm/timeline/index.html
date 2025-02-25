@@ -84,6 +84,7 @@
     h1 .header-emoji {
       margin-left: auto;
     }
+  
     
     /* Informationsruta */
     .inforuta {
@@ -107,17 +108,21 @@
       flex: 0 0 calc((100% - 20px) * 0.4);
     }
     .option-group select {
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      font-size: 13px;
+      padding: 10px;
+      border-radius: 5px;
       width: 100%;
-      padding: 5px;
-      font-size: 14px;
     }
     .button-group {
       flex: 0 0 calc((100% - 20px) * 0.2);
     }
     .button-group button {
       width: 100%;
-      padding: 10px;
-      font-size: 16px;
+      padding: 11px 20px;
+      font-size: 14px;
     }
     
     .game-area {
@@ -136,7 +141,7 @@
       background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
-      height: 400px;
+      height: 550px;
       overflow-y: auto;
       scrollbar-color: var(--effect) var(--primary);
     }
@@ -170,7 +175,7 @@
       background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
-      height: 400px;
+      height: 550px;
       overflow-y: auto;
       scrollbar-color: var(--effect) var(--primary);
     }
@@ -233,6 +238,11 @@
       border-radius: 5px;
       padding: 10px;
       margin: 15px 0 0 0;
+    }
+
+    #separator {
+      border-top: 1px dashed var(--dark);
+      margin: 20px 0;
     }
     
     button {
@@ -298,6 +308,8 @@
       </div>
     </div>
     
+    <hr id="separator" />
+
     <div class="score-board">
       Poäng: <span id="score">0</span>
     </div>
