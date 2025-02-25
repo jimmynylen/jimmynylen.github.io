@@ -37,19 +37,15 @@
       --score-bg: #D98E04;
       --score-text: #ffffff;
       
-      /* Färgvariabler för de 5 korten */
+      /* Färgvariabler för spelkorten – används cykliskt */
       --card-color-1: #D4A76A;
       --card-color-1-border: #C2955C;
-      
       --card-color-2: #4682B4;
       --card-color-2-border: #2C3E50;
-      
       --card-color-3: #A7A0C9;
       --card-color-3-border: #6B5876;
-      
       --card-color-4: #8E9775;
       --card-color-4-border: #5B7052;
-      
       --card-color-5: #A0522D;
       --card-color-5-border: #8A3324;
     }
@@ -73,7 +69,7 @@
       margin: 20px auto;
     }
     
-    /* Rubrik med emoji: endast emoji högerjusteras */
+    /* Header */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -89,6 +85,7 @@
       margin-left: auto;
     }
     
+    /* Informationsruta */
     .inforuta {
       margin-top: 0;
       font-size: 15px;
@@ -99,14 +96,28 @@
       margin-bottom: 15px;
     }
     
-    .score-board {
-      background-color: var(--score-bg);
-      color: var(--score-text);
-      font-size: 24px;
-      text-align: center;
-      border-radius: 5px;
+    /* Alternativområde med dropdowns och knapp på samma rad.
+       Totalt utnyttjas 100% av bredden minus 20px gap (2 st á 10px) */
+    .options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .option-group {
+      flex: 0 0 calc((100% - 20px) * 0.4);
+    }
+    .option-group select {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .button-group {
+      flex: 0 0 calc((100% - 20px) * 0.2);
+    }
+    .button-group button {
+      width: 100%;
       padding: 10px;
-      margin: 15px 0;
+      font-size: 16px;
     }
     
     .game-area {
@@ -119,32 +130,32 @@
       border: 1px solid var(--primary);
     }
     
+    /* Kortlistan: fast höjd med scroll */
     .cards-container {
       flex: 0 0 40%;
       background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
+      height: 400px;
+      overflow-y: auto;
     }
     
     .card {
-      border: 1px solid; /* Ramfärg sätts via JavaScript */
+      border: 1px solid;
       border-radius: 4px;
       padding: 10px;
       margin-bottom: 10px;
       cursor: pointer;
     }
-    
     .card.selected {
       border-color: var(--primary);
       background-color: var(--subtle);
     }
-    
     .card-headline {
       font-size: 16px;
       font-weight: bold;
       color: var(--white);
     }
-    
     .card-description {
       font-size: 14px;
       color: var(--white);
@@ -152,27 +163,28 @@
       display: none;
     }
     
+    /* Tidslinjerutan: fast höjd med scroll */
     .timeline-container {
       flex: 1;
       background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
-      position: relative;
+      height: 400px;
+      overflow-y: auto;
     }
     
+    /* Tidslinjehändelsen: årtalet till vänster, detaljer i kolumn */
     .timeline-event {
       background-color: var(--status_graygreen);
       border: 1px solid var(--status_olivegreen);
       border-radius: 4px;
       margin: 5px 0;
       padding: 10px;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 10px;
-      position: relative;
+      cursor: pointer;
     }
-    
     .event-year {
       font-family: monospace;
       font-size: 20px;
@@ -185,22 +197,19 @@
       border: 1px solid var(--status_olivegreen);
       border-radius: 4px;
     }
-    
     .event-headline {
       font-family: monospace;
       font-size: 14px;
       font-weight: 500;
       color: var(--white);
     }
-    
     .event-description {
-      display: none;
       font-family: monospace;
       margin-top: 5px;
       font-size: 12px;
       color: var(--white);
+      display: none;
     }
-    
     .drop-zone {
       background-color: var(--primary);
       color: var(--white);
@@ -214,8 +223,19 @@
       cursor: pointer;
     }
     
+    .score-board {
+      background-color: var(--score-bg);
+      color: var(--score-text);
+      font-size: 24px;
+      text-align: center;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 15px 0 0 0;
+    }
+    
     button {
       display: block;
+      width: 100%;
       margin: 0 auto;
       padding: 10px 20px;
       font-size: 16px;
@@ -225,7 +245,6 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    
     button:hover {
       background-color: var(--effect);
     }
@@ -235,12 +254,39 @@
   <div class="container">
     <h1>
       Timeline &#8611; Artificiell Intelligens 
-      <span class="header-emoji">😵</span>
+      <span class="header-emoji">🕹️</span>
     </h1>
     <p class="inforuta">
-      Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna är i första hand hämtade från AI:ns historia, men även datorns historia då de är sammanlänkade. <strong>Spelet är över efter 5 fel.</strong>
+      Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna är i första hand hämtade från AI:ns historia, men även datorns historia då de är sammanlänkade.
     </p>
-
+    
+    <!-- Alternativområde med dropdowns och knapp på samma rad -->
+    <div class="options">
+      <div class="option-group">
+        <select id="difficulty">
+          <option value="latt">Lätt svårighetsgrad</option>
+          <option value="medel">Medel svårighetsgrad</option>
+          <option value="svar">Hög svårighetsgrad</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <select id="hand-count">
+          <option value="1">Börja med 1 kort (+4p)</option>
+          <option value="2">Börja med 2 kort (+3p)</option>
+          <option value="3">Börja med 3 kort (+2p)</option>
+          <option value="4">Börja med 4 kort (+1p)</option>
+          <option value="5" selected>Börja med 5 kort</option>
+          <option value="6">Börja med 6 kort (-1p)</option>
+          <option value="7">Börja med 7 kort (-2p)</option>
+          <option value="8">Börja med 8 kort (-3p)</option>
+          <option value="9">Börja med 9 kort (-4p)</option>
+        </select>
+      </div>
+      <div class="button-group">
+        <button id="reset-btn">Starta om</button>
+      </div>
+    </div>
+    
     <div class="game-area">
       <div class="cards-container" id="cards-container">
         <!-- Spelkorten visas här -->
@@ -249,10 +295,9 @@
         <!-- Tidslinjen med händelser visas här -->
       </div>
     </div>
-    <button id="reset-btn">Starta om</button>
-
+    
     <div class="score-board">
-      Poäng: <span id="score">0</span> | Misstag kvar: <span id="lives">5</span>
+      Poäng: <span id="score">0</span>
     </div>
   </div>
   
@@ -279,7 +324,7 @@
       - year: årtalet
       - headline: kort rubrik
       - description: längre beskrivning
-      - importance: 1, 2 eller 3 (1 används först; 0 = utesluts)
+      - importance: 1, 2 eller 3 (0 = utesluts)
     */
     const eventsData = [
       { year: 1822, headline: "Babbage konceptualiserar sin revolutionerande maskin", description: "Charles Babbage konceptualiserar Difference Engine", importance: 2 },
@@ -358,49 +403,86 @@
     // -----------------------------
     // Spelvariabler
     // -----------------------------
-    let deck = [];      // Kortleken, sorterad efter importance
-    let hand = [];      // Spelarens aktuella hand (5 kort)
+    let deck = [];      // Kortleken, filtrerad enligt vald svårighetsgrad
+    let hand = [];      // Spelarens aktuella hand ("liv")
     let timeline = [];  // Händelser placerade på tidslinjen
-    let score = 0;
-    let lives = 5;
-    const handSize = 5;
+    let score = 0;      // Antal rätt placerade händelser
+    let initialHandCount = 5; // Spara startantalet kort
     
-    // Referenser till DOM-element
+    // Global variabel för att spåra om omgången redan är igång
+    let gameOngoing = false;
+    
+    // Spara tidigare värden för dropdowns
+    const difficultySelect = document.getElementById('difficulty');
+    const handCountSelect = document.getElementById('hand-count');
+    let previousDifficulty = difficultySelect.value;
+    let previousHandCount = handCountSelect.value;
+    
+    // Referenser till övriga DOM-element
     const cardsContainer = document.getElementById('cards-container');
     const timelineContainer = document.getElementById('timeline-container');
     const scoreEl = document.getElementById('score');
-    const livesEl = document.getElementById('lives');
     const resetBtn = document.getElementById('reset-btn');
     let selectedCard = null;
     
+    // Om dropdowns ändras
+    function handleOptionChange() {
+      if (gameOngoing) {
+        if (confirm("Vill du börja om med de nya inställningarna?")) {
+          initGame();
+          gameOngoing = false;
+          previousDifficulty = difficultySelect.value;
+          previousHandCount = handCountSelect.value;
+        } else {
+          difficultySelect.value = previousDifficulty;
+          handCountSelect.value = previousHandCount;
+        }
+      } else {
+        initGame();
+        previousDifficulty = difficultySelect.value;
+        previousHandCount = handCountSelect.value;
+      }
+    }
+    
+    difficultySelect.addEventListener('change', handleOptionChange);
+    handCountSelect.addEventListener('change', handleOptionChange);
+    
     // Initiera (eller återställ) spelet
     function initGame() {
-      // Filtrera händelser med importance > 0 och gruppera (importance 1 först, sedan 2 och 3)
-      const groups = [[], [], []];
-      eventsData.forEach(event => {
-        if (event.importance > 0) {
-          groups[event.importance - 1].push(event);
-        }
-      });
-      groups.forEach(group => group.sort(() => Math.random() - 0.5));
-      deck = [...groups[0], ...groups[1], ...groups[2]];
+      gameOngoing = false;  // Återställ flaggan
+      // Läs in alternativ
+      const difficulty = difficultySelect.value;
+      const startingHandCount = parseInt(handCountSelect.value);
+      initialHandCount = startingHandCount; // Spara startvärdet
       
+      // Filtrera eventsData baserat på vald svårighetsgrad
+      let filtered = [];
+      if (difficulty === "latt") {
+        filtered = eventsData.filter(event => event.importance === 1);
+      } else if (difficulty === "medel") {
+        filtered = eventsData.filter(event => event.importance === 1 || event.importance === 2);
+      } else if (difficulty === "svar") {
+        filtered = eventsData.filter(event => event.importance >= 1);
+      }
+      // Slumpa ordningen
+      deck = filtered.sort(() => Math.random() - 0.5);
+      
+      // Återställ spelvariabler
       hand = [];
       timeline = [];
       score = 0;
-      lives = 5;
-      selectedCard = null;
       scoreEl.textContent = score;
-      livesEl.textContent = lives;
       
-      // Starta tidslinjen med ett slumpat evenemang
-      addEventToTimeline(deck.shift());
+      // Starta tidslinjen med ett slumpat evenemang (om något finns kvar i deck)
+      if (deck.length > 0) {
+        addEventToTimeline(deck.shift());
+      }
       
-      // Fyll spelarens hand med 5 kort med bakgrunds- och ramfärg.
-      while (hand.length < handSize && deck.length > 0) {
+      // Fyll spelarens hand med "liv" (antalet kort valt via dropdown)
+      while (hand.length < startingHandCount && deck.length > 0) {
         let card = deck.shift();
-        card.color = defaultCardColors[hand.length]; 
-        card.borderColor = defaultCardBorderColors[hand.length];
+        card.color = defaultCardColors[hand.length % defaultCardColors.length];
+        card.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
         hand.push(card);
       }
       
@@ -408,7 +490,7 @@
       renderTimeline();
     }
     
-    // Rendera spelarens hand – visar rubrik och, vid klick, även beskrivning.
+    // Rendera spelarens hand – visar kortens rubriker (och vid klick, även beskrivningen).
     function renderHand() {
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
@@ -438,13 +520,14 @@
           cardDiv.classList.add('selected');
           descriptionDiv.style.display = "block";
           selectedCard = { card, index };
+          gameOngoing = true;
         });
         
         cardsContainer.appendChild(cardDiv);
       });
     }
     
-    // Rendera tidslinjen – visar händelser med år och rubrik.
+    // Rendera tidslinjen – visar varje händelse med år samt en container med rubrik och beskrivning
     function renderTimeline() {
       timelineContainer.innerHTML = "";
       timeline.sort((a, b) => a.year - b.year);
@@ -460,6 +543,11 @@
         yearDiv.className = "event-year";
         yearDiv.textContent = event.year;
         
+        // Container för rubrik och beskrivning (kolumn)
+        const detailsDiv = document.createElement('div');
+        detailsDiv.style.display = "flex";
+        detailsDiv.style.flexDirection = "column";
+        
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "event-headline";
         headlineDiv.textContent = event.headline;
@@ -469,13 +557,35 @@
         descDiv.textContent = event.description;
         descDiv.style.display = "none";
         
+        detailsDiv.appendChild(headlineDiv);
+        detailsDiv.appendChild(descDiv);
+        
+        // När händelsen klickas, växla visningen av beskrivningen
         eventDiv.addEventListener('click', () => {
-          descDiv.style.display = descDiv.style.display === "block" ? "none" : "block";
+          if (descDiv.style.display === "block") {
+            descDiv.style.display = "none";
+            const lineHeight = parseFloat(window.getComputedStyle(headlineDiv).lineHeight);
+            if (headlineDiv.offsetHeight <= lineHeight * 1.1) {
+              detailsDiv.style.justifyContent = "center";
+            } else {
+              detailsDiv.style.justifyContent = "flex-start";
+            }
+          } else {
+            descDiv.style.display = "block";
+            detailsDiv.style.justifyContent = "flex-start";
+          }
         });
         
+        const computedLineHeight = window.getComputedStyle(headlineDiv).lineHeight;
+        const lineHeight = parseFloat(computedLineHeight);
+        if (headlineDiv.offsetHeight <= lineHeight * 1.1) {
+          detailsDiv.style.justifyContent = "center";
+        } else {
+          detailsDiv.style.justifyContent = "flex-start";
+        }
+        
         eventDiv.appendChild(yearDiv);
-        eventDiv.appendChild(headlineDiv);
-        eventDiv.appendChild(descDiv);
+        eventDiv.appendChild(detailsDiv);
         
         timelineContainer.appendChild(eventDiv);
         
@@ -489,7 +599,7 @@
       timelineContainer.appendChild(dropAfter);
     }
     
-    // Skapa en "drop zone" med etikett beroende på position.
+    // Skapa en "drop zone" med etikett beroende på position
     function createDropZone(lowerEvent, upperEvent) {
       const dropZone = document.createElement('div');
       dropZone.className = "drop-zone";
@@ -503,6 +613,7 @@
       }
       dropZone.textContent = label;
       dropZone.addEventListener('click', () => {
+        gameOngoing = true;
         if (!selectedCard) {
           alert("Välj ett kort först!");
           return;
@@ -520,26 +631,35 @@
         if (valid) {
           score++;
           addEventToTimeline(selectedCard.card);
+          // Vid korrekt placering: ta bort kortet och ersätt med ett nytt om möjligt
           hand.splice(selectedCard.index, 1);
           if (deck.length > 0) {
             let newCard = deck.shift();
-            newCard.color = selectedCard.card.color;
-            newCard.borderColor = selectedCard.card.borderColor;
+            newCard.color = defaultCardColors[hand.length % defaultCardColors.length];
+            newCard.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
             hand.push(newCard);
           }
         } else {
-          lives--;
-          if (lives <= 0) {
-            alert("Spelet över! Du fick " + score + " poäng.");
-            initGame();
-            return;
-          } else {
-            alert("Fel placering! Försök igen.");
-          }
+          // Vid fel placering: ta bort kortet utan ersättning
+          hand.splice(selectedCard.index, 1);
         }
         selectedCard = null;
         scoreEl.textContent = score;
-        livesEl.textContent = lives;
+        
+        // Om spelaren inte har några kort kvar ("liv") – justera slutpoängen baserat på startantalet
+        if (hand.length === 0) {
+          let adjustment = 0;
+          if (initialHandCount < 5) {
+            adjustment = 5 - initialHandCount; // +1p per kort under 5
+          } else if (initialHandCount > 5) {
+            adjustment = -(initialHandCount - 5); // -1p per extra kort
+          }
+          let finalScore = score + adjustment;
+          alert("Spelet över! Du fick " + finalScore + " poäng.");
+          initGame();
+          return;
+        }
+        
         renderHand();
         renderTimeline();
       });
