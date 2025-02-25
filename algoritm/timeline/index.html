@@ -139,9 +139,10 @@
     .cards-container {
       flex: 0 0 40%;
       background-color: var(--primary);
+      font-family: monospace;
       padding: 10px;
       border-radius: 8px;
-      height: 550px;
+      height: 500px;
       overflow-y: auto;
       scrollbar-color: var(--effect) var(--primary);
     }
@@ -158,12 +159,11 @@
       background-color: var(--subtle);
     }
     .card-headline {
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 14px;
       color: var(--white);
     }
     .card-description {
-      font-size: 14px;
+      font-size: 12px;
       color: var(--white);
       margin-top: 5px;
       display: none;
@@ -175,7 +175,7 @@
       background-color: var(--primary);
       padding: 10px;
       border-radius: 8px;
-      height: 550px;
+      height: 500px;
       overflow-y: auto;
       scrollbar-color: var(--effect) var(--primary);
     }
@@ -231,13 +231,26 @@
     }
     
     .score-board {
-      background-color: var(--score-bg);
-      color: var(--score-text);
-      font-size: 24px;
+      font-family: 'Poppins', sans-serif;
+      color: var(--white);
+      background-color: #D98E04;
+      border: 1px solid #A44434;
+      border-radius: 5px;
+      margin-top: 20px;
+      padding: 15px;
+      width: 100%;
+      font-size: 40px;
       text-align: center;
+    }
+
+    .score-inner {
+      background-color: var(--extra_primary);
+      font-weight: 500;
       border-radius: 5px;
       padding: 10px;
-      margin: 15px 0 0 0;
+      margin: 0;
+      text-shadow: 0px 0px 7px var(--extra_red);
+      text-align: center;
     }
 
     #separator {
@@ -311,7 +324,9 @@
     <hr id="separator" />
 
     <div class="score-board">
-      Poäng: <span id="score">0</span>
+      <div class="score-inner">
+        Poäng: <span id="score">0</span>
+      </div>
     </div>
   </div>
   
