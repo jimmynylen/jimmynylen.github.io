@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timeline &#11136; Artificiell Intelligens</title>
+  <title>Timeline &#8611; Artificiell Intelligens</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
   <style>
@@ -36,6 +36,22 @@
       --timeline-bg: #F9E79F;
       --score-bg: #D98E04;
       --score-text: #ffffff;
+      
+      /* Färgvariabler för de 5 korten */
+      --card-color-1: #D4A76A;
+      --card-color-1-border: #C2955C;
+      
+      --card-color-2: #4682B4;
+      --card-color-2-border: #2C3E50;
+      
+      --card-color-3: #A7A0C9;
+      --card-color-3-border: #6B5876;
+      
+      --card-color-4: #8E9775;
+      --card-color-4-border: #5B7052;
+      
+      --card-color-5: #A0522D;
+      --card-color-5-border: #8A3324;
     }
     
     * { box-sizing: border-box; }
@@ -57,6 +73,7 @@
       margin: 20px auto;
     }
     
+    /* Rubrik med emoji: endast emoji högerjusteras */
     h1 {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -66,6 +83,10 @@
       border-radius: 8px 8px 0 0;
       padding: 10px 20px;
       display: flex;
+      align-items: center;
+    }
+    h1 .header-emoji {
+      margin-left: auto;
     }
     
     .inforuta {
@@ -77,7 +98,7 @@
       padding: 10px 20px;
       margin-bottom: 15px;
     }
-
+    
     .score-board {
       background-color: var(--score-bg);
       color: var(--score-text);
@@ -106,8 +127,7 @@
     }
     
     .card {
-      background-color: var(--white);
-      border: 1px solid var(--effect);
+      border: 1px solid; /* Ramfärg sätts via JavaScript */
       border-radius: 4px;
       padding: 10px;
       margin-bottom: 10px;
@@ -122,12 +142,12 @@
     .card-headline {
       font-size: 16px;
       font-weight: bold;
-      color: var(--dark);
+      color: var(--white);
     }
     
     .card-description {
       font-size: 14px;
-      color: var(--text);
+      color: var(--white);
       margin-top: 5px;
       display: none;
     }
@@ -153,7 +173,6 @@
       position: relative;
     }
     
-    /* Året visas med större font och i en separat ruta */
     .event-year {
       font-family: monospace;
       font-size: 20px;
@@ -162,7 +181,7 @@
       min-width: 60px;
       text-align: center;
       padding: 5px;
-      background-color: rgb(91, 112, 82, 0.5);
+      background-color: rgba(91, 112, 82, 0.5);
       border: 1px solid var(--status_olivegreen);
       border-radius: 4px;
     }
@@ -187,10 +206,10 @@
       color: var(--white);
       border: 1px dashed var(--effect);
       font-family: monospace;
-      font-size: 14px;
+      font-size: 12px;
       border-radius: 4px;
       margin: 5px 0;
-      padding: 10px;
+      padding: 5px;
       text-align: center;
       cursor: pointer;
     }
@@ -214,18 +233,20 @@
 </head>
 <body>
   <div class="container">
-    <h1>Timeline &#11136; Artificiell Intelligens 😵</h1>
+    <h1>
+      Timeline &#8611; Artificiell Intelligens 
+      <span class="header-emoji">😵</span>
+    </h1>
     <p class="inforuta">
       Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna är i första hand hämtade från AI:ns historia, men även datorns historia då de är sammanlänkade. <strong>Spelet är över efter 5 fel.</strong>
     </p>
 
-
     <div class="game-area">
       <div class="cards-container" id="cards-container">
-        <!-- Spelkorten visas här (rubrik + dold beskrivning som visas vid klick) -->
+        <!-- Spelkorten visas här -->
       </div>
       <div class="timeline-container" id="timeline-container">
-        <!-- Tidslinjen med händelser visas här (år, rubrik och klickbar beskrivning) -->
+        <!-- Tidslinjen med händelser visas här -->
       </div>
     </div>
     <button id="reset-btn">Starta om</button>
@@ -233,17 +254,31 @@
     <div class="score-board">
       Poäng: <span id="score">0</span> | Misstag kvar: <span id="lives">5</span>
     </div>
-
   </div>
-
-
   
   <script>
+    // Hämta färger från CSS-variabler
+    const rootStyles = getComputedStyle(document.documentElement);
+    const defaultCardColors = [
+      rootStyles.getPropertyValue('--card-color-1').trim(),
+      rootStyles.getPropertyValue('--card-color-2').trim(),
+      rootStyles.getPropertyValue('--card-color-3').trim(),
+      rootStyles.getPropertyValue('--card-color-4').trim(),
+      rootStyles.getPropertyValue('--card-color-5').trim()
+    ];
+    const defaultCardBorderColors = [
+      rootStyles.getPropertyValue('--card-color-1-border').trim(),
+      rootStyles.getPropertyValue('--card-color-2-border').trim(),
+      rootStyles.getPropertyValue('--card-color-3-border').trim(),
+      rootStyles.getPropertyValue('--card-color-4-border').trim(),
+      rootStyles.getPropertyValue('--card-color-5-border').trim()
+    ];
+    
     /* 
       Händelsedata: Varje objekt innehåller:
       - year: årtalet
-      - headline: en kort, slagkraftig rubrik
-      - description: längre beskrivning som visas vid klick
+      - headline: kort rubrik
+      - description: längre beskrivning
       - importance: 1, 2 eller 3 (1 används först; 0 = utesluts)
     */
     const eventsData = [
@@ -320,7 +355,9 @@
       { year: 2023, headline: "Multimodala AI-system expanderar", description: "Fortsatta framsteg inom storskaliga och multimodala AI-system expanderar möjligheterna inom både forskning och kommersiella applikationer", importance: 3 }
     ];
     
+    // -----------------------------
     // Spelvariabler
+    // -----------------------------
     let deck = [];      // Kortleken, sorterad efter importance
     let hand = [];      // Spelarens aktuella hand (5 kort)
     let timeline = [];  // Händelser placerade på tidslinjen
@@ -338,15 +375,13 @@
     
     // Initiera (eller återställ) spelet
     function initGame() {
-      // Endast händelser med importance > 0 används.
-      // Gruppindelning: importance 1 först, därefter 2, sedan 3.
+      // Filtrera händelser med importance > 0 och gruppera (importance 1 först, sedan 2 och 3)
       const groups = [[], [], []];
       eventsData.forEach(event => {
         if (event.importance > 0) {
           groups[event.importance - 1].push(event);
         }
       });
-      // Blanda inom varje grupp och slå sedan ihop
       groups.forEach(group => group.sort(() => Math.random() - 0.5));
       deck = [...groups[0], ...groups[1], ...groups[2]];
       
@@ -361,21 +396,26 @@
       // Starta tidslinjen med ett slumpat evenemang
       addEventToTimeline(deck.shift());
       
-      // Fyll spelarens hand med 5 kort (om det finns)
+      // Fyll spelarens hand med 5 kort med bakgrunds- och ramfärg.
       while (hand.length < handSize && deck.length > 0) {
-        hand.push(deck.shift());
+        let card = deck.shift();
+        card.color = defaultCardColors[hand.length]; 
+        card.borderColor = defaultCardBorderColors[hand.length];
+        hand.push(card);
       }
       
       renderHand();
       renderTimeline();
     }
     
-    // Rendera spelarens hand – visar rubriken och, vid klick, även beskrivningen.
+    // Rendera spelarens hand – visar rubrik och, vid klick, även beskrivning.
     function renderHand() {
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = "card";
+        cardDiv.style.backgroundColor = card.color || 'var(--white)';
+        cardDiv.style.borderColor = card.borderColor || 'var(--primary)';
         
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "card-headline";
@@ -384,19 +424,17 @@
         const descriptionDiv = document.createElement('div');
         descriptionDiv.className = "card-description";
         descriptionDiv.textContent = card.description;
-        descriptionDiv.style.display = "none";  // dold som standard
+        descriptionDiv.style.display = "none";
         
         cardDiv.appendChild(headlineDiv);
         cardDiv.appendChild(descriptionDiv);
         
         cardDiv.addEventListener('click', () => {
-          // Ta bort "selected" från alla kort och dölj deras beskrivningar
           document.querySelectorAll('.card').forEach(c => {
             c.classList.remove('selected');
             const desc = c.querySelector('.card-description');
             if (desc) { desc.style.display = "none"; }
           });
-          // Markera detta kort som valt och visa beskrivningen
           cardDiv.classList.add('selected');
           descriptionDiv.style.display = "block";
           selectedCard = { card, index };
@@ -406,14 +444,11 @@
       });
     }
     
-    // Rendera tidslinjen – visar varje händelse med ett framträdande år och rubrik.
-    // Klick på en händelse togglar visningen av den längre beskrivningen.
+    // Rendera tidslinjen – visar händelser med år och rubrik.
     function renderTimeline() {
       timelineContainer.innerHTML = "";
-      // Sortera tidslinjen efter årtal
       timeline.sort((a, b) => a.year - b.year);
       
-      // Skapa en drop-zone före första evenemanget
       const dropBefore = createDropZone(null, timeline[0]);
       timelineContainer.appendChild(dropBefore);
       
@@ -434,7 +469,6 @@
         descDiv.textContent = event.description;
         descDiv.style.display = "none";
         
-        // Klick på tidslinjehändelsen togglar beskrivningen
         eventDiv.addEventListener('click', () => {
           descDiv.style.display = descDiv.style.display === "block" ? "none" : "block";
         });
@@ -445,19 +479,17 @@
         
         timelineContainer.appendChild(eventDiv);
         
-        // Skapa drop zone mellan detta och nästa event (om något finns)
         if (i < timeline.length - 1) {
           const dropZone = createDropZone(event, timeline[i+1]);
           timelineContainer.appendChild(dropZone);
         }
       });
       
-      // Drop zone efter sista evenemanget
       const dropAfter = createDropZone(timeline[timeline.length - 1], null);
       timelineContainer.appendChild(dropAfter);
     }
     
-    // Skapa en "drop zone" med en etikett beroende på positionen
+    // Skapa en "drop zone" med etikett beroende på position.
     function createDropZone(lowerEvent, upperEvent) {
       const dropZone = document.createElement('div');
       dropZone.className = "drop-zone";
@@ -490,7 +522,10 @@
           addEventToTimeline(selectedCard.card);
           hand.splice(selectedCard.index, 1);
           if (deck.length > 0) {
-            hand.push(deck.shift());
+            let newCard = deck.shift();
+            newCard.color = selectedCard.card.color;
+            newCard.borderColor = selectedCard.card.borderColor;
+            hand.push(newCard);
           }
         } else {
           lives--;
