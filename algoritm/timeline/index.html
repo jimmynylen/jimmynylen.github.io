@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timeline &#8611; Artificiell Intelligens</title>
+  <title>Timeline – Artificiell Intelligens</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
   <style>
@@ -192,7 +192,7 @@
       to { opacity: 0; transform: translateY(10px); }
     }
     
-    /* Animation för nya tidslinjehändelser */
+    /* Animation för tidslinjehändelser */
     .timeline-animate {
       animation: slideIn 0.5s ease-out;
     }
@@ -330,14 +330,14 @@
 <body>
   <div class="container">
     <h1>
-      <span class="header-title">Timeline &#8611; Artificiell Intelligens</span>
+      <span class="header-title">Timeline – Artificiell Intelligens</span>
       <span class="header-controls">
         <span id="current-score" class="header-score">0</span>
         <span class="header-emoji">🕹️</span>
       </span>
     </h1>
     <p class="inforuta">
-      Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna är i första hand hämtade från AI:ns historia, men även datorns historia då de är sammanlänkade.
+      Vad kan du egentligen om den Artificiella Intelligensens historia? Testa dina kunskaper genom att placera in historiska händelser på en tidslinje. Händelserna här fokuserar på de genombrott och idéer som direkt påverkat AI:s utveckling – från tidiga koncept till moderna system.
     </p>
     
     <!-- Alternativområde med dropdowns och knapp -->
@@ -408,91 +408,69 @@
       rootStyles.getPropertyValue('--card-color-5-border').trim()
     ];
     
-    /* Händelsedata med alla historiska händelser */
+    /* Uppdaterad händelsedata – AI-centrerad historik med nya tillägg */
     const eventsData = [
-      { year: 1822, headline: "Babbage konceptualiserar sin revolutionerande maskin", description: "Charles Babbage konceptualiserar Difference Engine", importance: 2 },
-      { year: 1837, headline: "Ada Lovelace skriver första algoritmen", description: "Ada Lovelace skriver det första algoritmiska konceptet för Babbages maskin", importance: 1 },
-      { year: 1936, headline: "Turing definierar Turingmaskinen", description: "Alan Turing publicerar 'On Computable Numbers' och introducerar Turingmaskinen", importance: 1 },
-      { year: 1943, headline: "Neurala nätverk tar sin början", description: "McCulloch och Pitts presenterar den första matematiska modellen av neurala nätverk", importance: 2 },
-      { year: 1943, headline: "Colossus knäcker koder", description: "Colossus – världens första programmerbara digitala dator – används för att knäcka tyska koder under andra världskriget", importance: 2 },
-      { year: 1946, headline: "ENIAC revolutionen startar", description: "ENIAC, den första elektroniska allmänna datorn, tas i bruk", importance: 1 },
-      { year: 1947, headline: "Transistorn förändrar allt", description: "Transistorn uppfinns vid Bell Labs, vilket revolutionerar elektronikindustrin", importance: 1 },
-      { year: 1950, headline: "Turing introducerar Turingtestet", description: "Alan Turing introducerar Turingtestet i 'Computing Machinery and Intelligence'", importance: 1 },
-      { year: 1951, headline: "Ferranti Mark 1 lanseras", description: "Ferranti Mark 1 blir den första kommersiellt tillgängliga datorn", importance: 2 },
-      { year: 1952, headline: "Samuel skapar AI-schackprogram", description: "Arthur Samuel utvecklar ett schackprogram med maskininlärning – ett tidigt exempel på AI", importance: 2 },
-      { year: 1956, headline: "Begreppet Artificiell Intelligens myntas", description: "Dartmouth-konferensen hålls och myntar begreppet 'artificiell intelligens'", importance: 1 },
-      { year: 1958, headline: "Integrerade kretsar sätter ny standard", description: "Inventionen av integrerade kretsar (av Jack Kilby och Robert Noyce) sätter en ny teknisk era", importance: 1 },
-      { year: 1962, headline: "ELIZA simulerar mänskligt samtal", description: "Joseph Weizenbaum skapar ELIZA, ett tidigt program som simulerar naturligt samtal", importance: 2 },
-      { year: 1964, headline: "IBM revolutionerar med System/360", description: "IBM lanserar System/360, en serie datorer som sätter standarden för arkitektur", importance: 2 },
-      { year: 1965, headline: "Moores lag förutspår datorkraftens ökning", description: "Gordon Moore formulerar Moores lag, som förutspår den exponentiella ökningen av datorkraft", importance: 2 },
-      { year: 1966, headline: "Shakey roboten rör sig för första gången", description: "Shakey the Robot, den första mobila roboten med perceptuella och beslutsfattande förmågor, utvecklas", importance: 2 },
-      { year: 1969, headline: "ARPANET banar väg för internet", description: "ARPANET lanseras – en föregångare till dagens Internet", importance: 1 },
-      { year: 1970, headline: "Relationsdatabasen tar form", description: "Edgar F. Codd introducerar den relationsdatabasmodell som revolutionerar datalagring", importance: 2 },
-      { year: 1971, headline: "Mikroprocessorn 4004 lanseras", description: "Intel släpper mikroprocessorn 4004, som markerar början på modern datorteknik", importance: 1 },
-      { year: 1972, headline: "Pong underhåller världen", description: "Videospelsfenomenet 'Pong' lanseras och visar på digital underhållnings potential", importance: 3 },
-      { year: 1973, headline: "GUI introduceras med Xerox Alto", description: "Xerox Alto introduceras med grafiskt användargränssnitt (GUI) och musen – förebådar dagens datorer", importance: 2 },
-      { year: 1974, headline: "MYCIN diagnostiserar med AI", description: "MYCIN, ett tidigt expertssystem för medicinsk diagnostik, utvecklas", importance: 2 },
-      { year: 1975, headline: "Altair kickstartar PC-eran", description: "Altair 8800 släpps och sätter igång persondatorrevolutionen", importance: 2 },
-      { year: 1976, headline: "Apple grundas – en ny era inleds", description: "Apple Computer grundas av Steve Jobs, Steve Wozniak och Ronald Wayne", importance: 1 },
-      { year: 1977, headline: "Apple II populariserar persondatorn", description: "Apple II lanseras och bidrar till att popularisera persondatorer", importance: 2 },
-      { year: 1978, headline: "Intresse för neurala nätverk återupplivas", description: "Forskningsinsatser återupplivar intresset för artificiella neurala nätverk", importance: 3 },
-      { year: 1979, headline: "Expertssystem börjar användas brett", description: "De första expert systemen börjar få genomslag inom olika tillämpningsområden", importance: 3 },
-      { year: 1980, headline: "Industriell AI expanderar", description: "Expertssystem expanderar inom industri och medicin", importance: 3 },
-      { year: 1981, headline: "IBM PC definierar persondatorn", description: "IBM introducerar den första IBM PC:n, vilket standardiserar persondatorer", importance: 1 },
-      { year: 1982, headline: "Portabla datorer visar framtiden", description: "De första portabla datorerna och mobiltelefonerna börjar visa datorns framtid i rörelse", importance: 3 },
-      { year: 1983, headline: "Backpropagation återupptäcks", description: "Backpropagation-algoritmen återupptäcks och banar väg för modern träning av neurala nätverk", importance: 2 },
-      { year: 1984, headline: "Macintosh med grafiskt gränssnitt lanseras", description: "Apple lanserar Macintosh med sitt banbrytande grafiska gränssnitt", importance: 1 },
-      { year: 1985, headline: "TCP/IP standardiseras", description: "TCP/IP blir standardprotokoll, vilket möjliggör global datakommunikation", importance: 2 },
-      { year: 1986, headline: "Genombrott inom neurala nätverk", description: "Geoffrey Hinton och kollegor publicerar banbrytande arbeten om neurala nätverk", importance: 2 },
-      { year: 1987, headline: "Fuzzy logic tar plats i industrin", description: "Fuzzy logic introduceras i industriella styrsystem för att hantera osäker information", importance: 3 },
-      { year: 1988, headline: "Förberedelser för World Wide Web", description: "Tidiga koncept och tekniska förberedelser för det som snart blir World Wide Web", importance: 3 },
-      { year: 1989, headline: "WWW-förslaget", description: "Tim Berners-Lee föreslår World Wide Web, en idé som revolutionerar informationsspridning", importance: 1 },
-      { year: 1990, headline: "Internet expanderar med WWW", description: "World Wide Web blir allmänt tillgängligt och transformerar global kommunikation", importance: 2 },
-      { year: 1991, headline: "Linux och öppen källkod tar fart", description: "Linux-kärnan lanseras av Linus Torvalds, vilket sätter igång öppen källkodsrörelsen", importance: 2 },
-      { year: 1992, headline: "Statistiska metoder vinner mark", description: "Statistiska maskininlärningsmetoder, såsom support vector machines, börjar få genomslag", importance: 3 },
-      { year: 1993, headline: "Deep Blue förbereds", description: "IBM inleder projektet Deep Blue med målet att utmana schackens mästare", importance: 3 },
-      { year: 1994, headline: "DVD-teknologin förändrar multimedia", description: "DVD-teknologin introduceras och möjliggör lagring av högkvalitativ multimedia", importance: 3 },
-      { year: 1995, headline: "Java förenklar utveckling", description: "Java programmeringsspråk lanseras, vilket underlättar plattformsoberoende utveckling", importance: 3 },
-      { year: 1996, headline: "Deep Blue möter Kasparov", description: "IBM:s Deep Blue möter Garry Kasparov i schack, en signal om AI:s framsteg", importance: 3 },
-      { year: 1997, headline: "Deep Blue besegrar Kasparov", description: "IBM:s Deep Blue besegrar Garry Kasparov – en historisk milstolpe för AI", importance: 1 },
-      { year: 1998, headline: "Google startar sökrevolutionen", description: "Google grundas och förändrar hur vi söker och hanterar information", importance: 1 },
-      { year: 1999, headline: "Robotik visar praktisk AI", description: "Framsteg inom robotik, med humanoida prototyper och autonoma system, visar AI:s praktiska tillämpningar", importance: 3 },
-      { year: 2000, headline: "Smartphones och kameror tar över", description: "Konsumentelektroniken tar ett stort kliv med digitala kameror och de första smartphones", importance: 3 },
-      { year: 2001, headline: "E-handel omformar global handel", description: "E-handeln växer, trots dot-com-krisen, och omformar global handel", importance: 3 },
-      { year: 2002, headline: "Roomba introduceras i hushållet", description: "iRobot lanserar Roomba – ett tidigt exempel på AI i hushållsprodukter", importance: 3 },
-      { year: 2003, headline: "Genomprojektet avslutas", description: "Det mänskliga genomprojektet avslutas, ett bevis på avancerad datorkraft inom biovetenskap", importance: 3 },
-      { year: 2004, headline: "Facebook förändrar kommunikationen", description: "Facebook lanseras och omdefinierar sättet vi kommunicerar på nätet", importance: 3 },
-      { year: 2005, headline: "YouTube banar videodelning", description: "YouTube startar, vilket banar väg för digitalt videoinnehåll och global delning", importance: 3 },
-      { year: 2006, headline: "Djupinlärning återupplivas", description: "Geoffrey Hinton och forskargruppen återupplivar djupinlärning, vilket utlöser en AI-revolution", importance: 1 },
-      { year: 2007, headline: "iPhone revolutionerar mobilteknik", description: "Apple introducerar iPhone, vilket revolutionerar mobil datorteknik och app-ekonomi", importance: 1 },
-      { year: 2008, headline: "Molntjänster omdefinierar IT", description: "Amazon lanserar AWS, och molntjänster blir en ny global IT-infrastruktur", importance: 1 },
-      { year: 2009, headline: "Bitcoin sätter blockchain-grunden", description: "Bitcoin-whitepaper publiceras av Satoshi Nakamoto, vilket lägger grunden för blockchain och kryptovalutor", importance: 1 },
-      { year: 2010, headline: "iPad introducerar en ny plattform", description: "Apple lanserar iPad, vilket populariserar surfplattor som en ny datorplattform", importance: 3 },
-      { year: 2011, headline: "Watson visar AI:s språkförmåga", description: "IBM:s Watson vinner Jeopardy! och demonstrerar AI:s förmåga att hantera naturligt språk", importance: 1 },
-      { year: 2012, headline: "AlexNet visar djupinlärningens potential", description: "AlexNet vinner ImageNet-tävlingen och visar den enorma potentialen hos djupinlärning", importance: 1 },
-      { year: 2013, headline: "Självkörande bilar visar framtidens transport", description: "Google presenterar sina självstyrande bilprojekt, vilket visar AI:s roll i transportens framtid", importance: 3 },
-      { year: 2014, headline: "AlphaGo tar sig an spelet Go", description: "AlphaGo-projektet inleds med ambitionen att bemästra det komplexa spelet Go", importance: 3 },
-      { year: 2015, headline: "OpenAI startar säker AI-forskning", description: "OpenAI grundas med målet att utveckla säker och fördelaktig AI", importance: 3 },
-      { year: 2016, headline: "AlphaGo besegrar Lee Sedol", description: "AlphaGo besegrar den koreanska Go-mästaren Lee Sedol – en milstolpe för maskininlärning", importance: 1 },
-      { year: 2017, headline: "AI utmanar eSport", description: "AI-system som OpenAI Five visar upp avancerade tekniker inom förstärkt lärande genom att tävla i spel (t.ex. Dota 2)", importance: 3 },
-      { year: 2018, headline: "Google Duplex visar naturliga samtal", description: "Google Duplex imponerar med förmågan att föra naturliga samtal och boka tider via AI", importance: 3 },
-      { year: 2019, headline: "GPT-2 driver språkmodellrevolutionen", description: "OpenAI släpper GPT-2, vilket driver fram utvecklingen inom generativ språkmodellering", importance: 3 },
-      { year: 2020, headline: "GPT-3 imponerar med sin kraft", description: "OpenAI lanserar GPT-3, en av de mest kraftfulla språkmodellerna hittills", importance: 1 },
-      { year: 2021, headline: "Transformer-modeller omformar AI-forskningen", description: "Transformerbaserade modeller dominerar AI-forskningen och banar väg för nya applikationer", importance: 3 },
-      { year: 2022, headline: "ChatGPT förändrar AI-interaktionen", description: "ChatGPT och liknande konversationsmodeller introduceras och förändrar interaktionen med AI", importance: 1 },
-      { year: 2023, headline: "Multimodala AI-system expanderar", description: "Fortsatta framsteg inom storskaliga och multimodala AI-system expanderar möjligheterna inom både forskning och kommersiella applikationer", importance: 3 }
+      { year: 1818, headline: "Frankenstein publiceras", description: "Mary Shelley's Frankenstein; or, The Modern Prometheus lägger fram en tidig vision om att skapa liv genom teknik.", importance: 2 },
+      { year: 1822, headline: "Babbage konceptualiserar sin revolutionerande maskin", description: "Charles Babbage konceptualiserar Difference Engine – en tidig vision om mekanisk beräkning.", importance: 2 },
+      { year: 1837, headline: "Ada Lovelace skriver första algoritmen", description: "Ada Lovelace skapar det första algoritmiska konceptet för Babbages maskin.", importance: 1 },
+      { year: 1927, headline: "Metropolis släpps", description: "Filmen Metropolis introducerar en robotkaraktär och formar en tidig bild av teknikens framtid.", importance: 2 },
+      { year: 1936, headline: "Turing definierar Turingmaskinen", description: "Alan Turing publicerar 'On Computable Numbers' och introducerar den teoretiska modellen för maskinberäkning.", importance: 1 },
+      { year: 1940, headline: "Enigma-maskinen knäcks", description: "Alan Turing och kollegor knäcker Enigma-koden – en händelse som både påverkar krigsutfall och inspirerar datoridéer.", importance: 2 },
+      { year: 1943, headline: "Neurala nätverk tar sin början", description: "McCulloch och Pitts presenterar den första matematiska modellen för neurala nätverk.", importance: 2 },
+      { year: 1943, headline: "Colossus knäcker koder", description: "Colossus – världens första programmerbara digitala dator – används för att knäcka tyska koder under andra världskriget.", importance: 2 },
+      { year: 1946, headline: "ENIAC revolutionen startar", description: "ENIAC, den första elektroniska allmänna datorn, tas i bruk och banar väg för digital beräkning.", importance: 1 },
+      { year: 1947, headline: "Transistorn uppfinns", description: "Transistorn, uppfunnen vid Bell Labs, revolutionerar elektronikindustrin och möjliggör avancerad datorteknik.", importance: 1 },
+      { year: 1950, headline: "Turing introducerar Turingtestet", description: "Alan Turing formulerar Turingtestet för att mäta maskinintelligens.", importance: 1 },
+      { year: 1950, headline: "Asimov publicerar 'I, Robot'", description: "Isaac Asimovs noveller sätter igång diskussioner kring robotar och artificiell intelligens.", importance: 2 },
+      { year: 1951, headline: "Ferranti Mark 1 lanseras", description: "Ferranti Mark 1 blir den första kommersiellt tillgängliga datorn.", importance: 2 },
+      { year: 1952, headline: "Samuel skapar AI‑schackprogram", description: "Arthur Samuel utvecklar ett schackprogram med maskininlärning – ett tidigt praktiskt exempel på AI.", importance: 2 },
+      { year: 1956, headline: "Begreppet Artificiell Intelligens myntas", description: "Dartmouth‑konferensen hålls och myntar begreppet 'artificiell intelligens', startpunkten för AI‑forskning.", importance: 1 },
+      { year: 1957, headline: "Perceptron introduceras", description: "Frank Rosenblatt utvecklar perceptron – en tidig modell för neurala nätverk och maskininlärning.", importance: 2 },
+      { year: 1958, headline: "Integrerade kretsar möjliggör digital revolution", description: "Inventionen av integrerade kretsar (av Jack Kilby och Robert Noyce) blir en kritisk teknisk milstolpe.", importance: 1 },
+      { year: 1959, headline: "Begreppet maskininlärning myntas", description: "Termen 'maskininlärning' börjar användas för att beskriva algoritmiska metoder för att förbättra datorprestanda baserat på data.", importance: 2 },
+      { year: 1961, headline: "Unimate lanseras", description: "Unimate, den första industriella roboten, introduceras och markerar början på robotik i produktionen.", importance: 3 },
+      { year: 1962, headline: "ELIZA simulerar mänskligt samtal", description: "Joseph Weizenbaum skapar ELIZA – ett tidigt program som demonstrerar bearbetning av naturligt språk.", importance: 2 },
+      { year: 1966, headline: "Shakey roboten tar sina första steg", description: "Shakey the Robot, den första mobila roboten med perceptuella och beslutsfattande förmågor, utvecklas.", importance: 2 },
+      { year: 1968, headline: "2001: A Space Odyssey lanseras", description: "Filmen introducerar HAL 9000, en ikonisk AI‑karaktär som formar popkulturens syn på intelligenta maskiner.", importance: 3 },
+      { year: 1974, headline: "MYCIN diagnostiserar med AI", description: "MYCIN, ett tidigt expertssystem för medicinsk diagnostik, visar AI:s praktiska potential.", importance: 2 },
+      { year: 1978, headline: "Neurala nätverk återupplivas vid MIT", description: "Forskare vid MIT återupplivar neurala nätverk med nya metoder – en vändpunkt för modern AI.", importance: 3 },
+      { year: 1979, headline: "DENDRAL demonstrerar expertssystem", description: "DENDRAL, ett av de första expertssystemen, används för kemisk analys och visar praktiska AI‑tillämpningar.", importance: 3 },
+      { year: 1980, headline: "XCON optimerar industriell produktion", description: "Digital Equipment Corporation implementerar XCON, ett expertssystem som automatiserar datorkonfigurationer.", importance: 3 },
+      { year: 1980, headline: "Erik Sandewall blir professor i AI", description: "Erik Sandewall tilldelas en professur i AI – en viktig milstolpe i svensk AI‑historia.", importance: 2 },
+      { year: 1982, headline: "Osborne 1 lanseras – den första portabla datorn", description: "Osborne 1 introduceras och banar väg för mobil datorteknik.", importance: 3 },
+      { year: 1982, headline: "Blade Runner släpps", description: "Filmen Blade Runner utforskar teman om mänsklighet och artificiell intelligens.", importance: 2 },
+      { year: 1984, headline: "The Terminator släpps", description: "Filmen The Terminator skildrar en dystopisk framtid med autonoma, intelligenta maskiner.", importance: 2 },
+      { year: 1986, headline: "Backpropagation revolutionerar neurala nätverk", description: "Geoffrey Hinton och kollegor visar hur backpropagation effektivt kan träna neurala nätverk.", importance: 2 },
+      { year: 1987, headline: "Fuzzy logic i japansk tågkontroll", description: "Japanska tågoperatörer implementerar fuzzy logic i sina kontrollsystem för att optimera driften.", importance: 3 },
+      { year: 1992, headline: "Support Vector Machines introduceras", description: "Support Vector Machines, en banbrytande metod för klassificering, börjar användas inom maskininlärning.", importance: 3 },
+      { year: 1997, headline: "Deep Blue besegrar Kasparov", description: "IBM:s Deep Blue besegrar schackmästaren Garry Kasparov – en milstolpe i AI:s problemlösningsförmåga.", importance: 1 },
+      { year: 1998, headline: "Google lanserar sin sökmotor", description: "Google lanserar en sökmotor som revolutionerar informationssökning med avancerade algoritmer.", importance: 1 },
+      { year: 1999, headline: "Sony lanserar AIBO", description: "Sony introducerar AIBO, en robot-hund med autonoma funktioner som visar praktiska AI‑tillämpningar inom robotik.", importance: 3 },
+      { year: 2002, headline: "Roomba introduceras i hushållet", description: "iRobot lanserar Roomba – en robotdammsugare som demonstrerar AI i konsumentprodukter.", importance: 3 },
+      { year: 2006, headline: "Djupinlärning återupplivas", description: "Geoffrey Hinton och hans team återupplivar djupinlärning, vilket utlöser en revolution inom AI.", importance: 1 },
+      { year: 2011, headline: "Watson visar AI‑s språkförmåga", description: "IBM:s Watson vinner Jeopardy! och demonstrerar sin förmåga att bearbeta naturligt språk.", importance: 1 },
+      { year: 2011, headline: "Apple lanserar Siri", description: "Apple introducerar Siri – en röststyrd assistent som sätter AI i praktiska konsumentprodukter.", importance: 1 },
+      { year: 2012, headline: "AlexNet visar djupinlärningens potential", description: "AlexNet vinner ImageNet‑tävlingen och visar den enorma potentialen hos djupinlärning.", importance: 1 },
+      { year: 2013, headline: "Google lanserar sina självkörande bilar", description: "Google presenterar sina autonoma fordon – en milstolpe inom AI‑driven transportteknik.", importance: 3 },
+      { year: 2014, headline: "AlphaGo tar sig an spelet Go", description: "AlphaGo-projektet startas med ambitionen att bemästra det komplexa spelet Go.", importance: 3 },
+      { year: 2014, headline: "Eugene klarar Turingtestet", description: "AI‑programmet Eugene, inspirerat av Eugene Goostman, anses ha klarat Turingtestet.", importance: 2 },
+      { year: 2015, headline: "OpenAI startar säker AI‑forskning", description: "OpenAI grundas med målet att utveckla AI på ett säkert och etiskt sätt.", importance: 3 },
+      { year: 2016, headline: "AlphaGo besegrar Lee Sedol", description: "AlphaGo besegrar den koreanska Go‑mästaren Lee Sedol – en milstolpe för AI:s strategiska förmåga.", importance: 1 },
+      { year: 2017, headline: "OpenAI Five tävlar i Dota 2", description: "OpenAI Five, en AI‑agent, tävlar i Dota 2 och demonstrerar avancerade metoder inom förstärkt lärande.", importance: 3 },
+      { year: 2018, headline: "Google Duplex visar naturliga samtal", description: "Google Duplex imponerar med sin förmåga att föra konversationer och boka tider med en mänsklig röst.", importance: 3 },
+      { year: 2021, headline: "Transformer-modeller omformar AI‑forskningen", description: "Transformermodeller blir grunden för många moderna AI‑system.", importance: 3 },
+      { year: 2022, headline: "ChatGPT förändrar AI‑interaktionen", description: "ChatGPT och liknande modeller revolutionerar hur vi interagerar med AI i vardagen.", importance: 1 },
+      { year: 2023, headline: "Multimodala AI‑system expanderar", description: "System som kan hantera flera datatyper (text, bild, ljud) öppnar nya möjligheter för AI.", importance: 3 },
+      { year: 2025, headline: "DeepSeek lanseras", description: "DeepSeek lanseras med funktionen DeepThink som låter AI:n resonera och djupgående analysera de uppmaningar den får, vilket ger mer utarbetade och motiverade svar.", importance: 2 }
     ];
     
-    // -----------------------------
     // Spelvariabler
-    // -----------------------------
     let deck = [];      // Filtrerad kortlek (unika händelser per år)
     let hand = [];      // Spelarens aktuella hand ("liv")
     let timeline = [];  // Händelser på tidslinjen
     let score = 0;      // Aktuell poäng
     let initialHandCount = 5; // Startantal kort
-    // Highscores lagras som objekt {score, date}
-    let topScores = [];
+    let topScores = []; // Highscores lagrade som objekt { score, date }
     
     // Spelarstatus
     let gameOngoing = false;
@@ -524,50 +502,41 @@
       }
     }
     
-    // Uppdatera highscore-listan med topp 3, där varje highscore visar datum och tid (via title-attribut)
+    // Uppdatera highscore-listan med topp 3, där varje highscore visar datum/tid via title
     function updateHighscoreDisplay() {
       const medals = ["🥇", "🥈", "🥉"];
       let html = "";
       for (let i = 0; i < medals.length; i++) {
-        let scoreObj = (topScores[i] !== undefined ? topScores[i] : { score: 0, date: "" });
+        let scoreObj = topScores[i] !== undefined ? topScores[i] : { score: 0, date: "" };
         let displayScore = scoreObj.score || 0;
-        let displayDate = scoreObj.date ? new Date(scoreObj.date) : null;
-        let dateStr = displayDate ? displayDate.toLocaleString() : "";
-        html += `<span class="highscore-item" title="${dateStr}">${medals[i]} ${displayScore}</span>`;
+        let displayDate = scoreObj.date ? new Date(scoreObj.date).toLocaleString() : "";
+        html += `<span class="highscore-item" title="${displayDate}">${medals[i]} ${displayScore}</span>`;
       }
       highScoreEl.innerHTML = html;
     }
     
-    // Visa ett game-over-kort – rensa kortlistan så att endast game-over-kortet visas
+    // Visa game-over-kortet
     function displayGameOverCard(finalScore, adjustment) {
       gameOver = true;
-      // Rensa kortlistan så att inga andra kort visas
       cardsContainer.innerHTML = "";
       const gameOverCard = document.createElement('div');
       gameOverCard.className = "card game-over-card";
-      
       const headline = document.createElement('div');
       headline.className = "card-headline";
       headline.textContent = "Spelet är över, tack för att du spelade!";
-      
       const description = document.createElement('div');
       description.className = "card-description";
       let bonusText = "";
-      if (adjustment > 0) {
-        bonusText = "Bonus: +" + adjustment;
-      } else if (adjustment < 0) {
-        bonusText = "Avdrag: " + adjustment;
-      }
+      if (adjustment > 0) bonusText = "Bonus: +" + adjustment;
+      else if (adjustment < 0) bonusText = "Avdrag: " + adjustment;
       description.textContent = "Poäng: " + finalScore + (bonusText ? " (" + bonusText + ")" : "");
       description.style.display = "block";
-      
       gameOverCard.appendChild(headline);
       gameOverCard.appendChild(description);
-      
       cardsContainer.appendChild(gameOverCard);
     }
     
-    // Hantera ändringar i dropdowns – om ett spel är pågående (och inte över) visas en dialog, annars startas ett nytt spel direkt.
+    // Hantera ändringar i dropdowns – om spelet är pågående och inte över visas en dialog
     function handleOptionChange() {
       if (gameOngoing && !gameOver) {
         if (confirm("Vill du börja om med de nya inställningarna?")) {
@@ -592,49 +561,32 @@
     function initGame() {
       gameOngoing = false;
       gameOver = false;
-      
       const difficulty = difficultySelect.value;
       const startingHandCount = parseInt(handCountSelect.value);
       initialHandCount = startingHandCount;
-      
       let filtered = [];
-      if (difficulty === "latt") {
-        filtered = eventsData.filter(event => event.importance === 1);
-      } else if (difficulty === "medel") {
-        filtered = eventsData.filter(event => event.importance === 1 || event.importance === 2);
-      } else if (difficulty === "svar") {
-        filtered = eventsData.filter(event => event.importance >= 1);
-      }
-      
-      // Ta bort dubbletter per år – endast behåll det första eventet per år.
+      if (difficulty === "latt") filtered = eventsData.filter(event => event.importance === 1);
+      else if (difficulty === "medel") filtered = eventsData.filter(event => event.importance === 1 || event.importance === 2);
+      else if (difficulty === "svar") filtered = eventsData.filter(event => event.importance >= 1);
+      // Ta bort dubbletter per år (behåll det första eventet per år)
       let uniqueEventsMap = new Map();
       filtered.forEach(event => {
-        if (!uniqueEventsMap.has(event.year)) {
-          uniqueEventsMap.set(event.year, event);
-        }
+        if (!uniqueEventsMap.has(event.year)) uniqueEventsMap.set(event.year, event);
       });
       let uniqueEvents = Array.from(uniqueEventsMap.values());
       deck = uniqueEvents.sort(() => Math.random() - 0.5);
-      
       hand = [];
       timeline = [];
       score = 0;
       currentScoreEl.textContent = score;
-      
-      // Töm kortlistan (inklusive tidigare game-over-kort)
       cardsContainer.innerHTML = "";
-      
-      if (deck.length > 0) {
-        addEventToTimeline(deck.shift());
-      }
-      
+      if (deck.length > 0) addEventToTimeline(deck.shift());
       while (hand.length < startingHandCount && deck.length > 0) {
         let card = deck.shift();
         card.color = defaultCardColors[hand.length % defaultCardColors.length];
         card.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
         hand.push(card);
       }
-      
       renderHand();
       renderTimeline();
       updateHighscoreDisplay();
@@ -643,60 +595,50 @@
     // Rendera spelarens hand – använder .card-animate-in för in-animation
     function renderHand() {
       if (gameOver) return;
-      
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = "card";
         cardDiv.style.backgroundColor = card.color || 'var(--white)';
         cardDiv.style.borderColor = card.borderColor || 'var(--primary)';
-        
-        // Använd den nya in-animationen
         if (animateNewCard && index === hand.length - 1) {
           cardDiv.classList.add("card-animate-in");
           cardDiv.addEventListener('animationend', () => {
             cardDiv.classList.remove("card-animate-in");
           });
         }
-        
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "card-headline";
         headlineDiv.textContent = card.headline;
-        
         const descriptionDiv = document.createElement('div');
         descriptionDiv.className = "card-description";
         descriptionDiv.textContent = card.description;
         descriptionDiv.style.display = "none";
-        
         cardDiv.appendChild(headlineDiv);
         cardDiv.appendChild(descriptionDiv);
-        
         cardDiv.addEventListener('click', () => {
           if (gameOver) return;
           document.querySelectorAll('.card').forEach(c => {
             c.classList.remove('selected');
             const desc = c.querySelector('.card-description');
-            if (desc) { desc.style.display = "none"; }
+            if (desc) desc.style.display = "none";
           });
           cardDiv.classList.add('selected');
           descriptionDiv.style.display = "block";
           selectedCard = { card, index };
           gameOngoing = true;
         });
-        
         cardsContainer.appendChild(cardDiv);
       });
       animateNewCard = false;
     }
     
-    // Rendera tidslinjen (oförändrat)
+    // Rendera tidslinjen
     function renderTimeline() {
       timelineContainer.innerHTML = "";
       timeline.sort((a, b) => a.year - b.year);
-      
       const dropBefore = createDropZone(null, timeline[0]);
       timelineContainer.appendChild(dropBefore);
-      
       timeline.forEach((event, i) => {
         const eventDiv = document.createElement('div');
         eventDiv.className = "timeline-event";
@@ -704,27 +646,21 @@
           eventDiv.classList.add("timeline-animate");
           event.rendered = true;
         }
-        
         const yearDiv = document.createElement('div');
         yearDiv.className = "event-year";
         yearDiv.textContent = event.year;
-        
         const detailsDiv = document.createElement('div');
         detailsDiv.style.display = "flex";
         detailsDiv.style.flexDirection = "column";
-        
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "event-headline";
         headlineDiv.textContent = event.headline;
-        
         const descDiv = document.createElement('div');
         descDiv.className = "event-description";
         descDiv.textContent = event.description;
         descDiv.style.display = "none";
-        
         detailsDiv.appendChild(headlineDiv);
         detailsDiv.appendChild(descDiv);
-        
         eventDiv.addEventListener('click', () => {
           if (descDiv.style.display === "block") {
             descDiv.style.display = "none";
@@ -735,23 +671,19 @@
             detailsDiv.style.justifyContent = "flex-start";
           }
         });
-        
         eventDiv.appendChild(yearDiv);
         eventDiv.appendChild(detailsDiv);
-        
         timelineContainer.appendChild(eventDiv);
-        
         if (i < timeline.length - 1) {
           const dropZone = createDropZone(timeline[i], timeline[i+1]);
           timelineContainer.appendChild(dropZone);
         }
       });
-      
       const dropAfter = createDropZone(timeline[timeline.length - 1], null);
       timelineContainer.appendChild(dropAfter);
     }
     
-    // Skapa dropzon. Om båda händelser finns och de skiljer sig med exakt 1 år returneras ett tomt fragment.
+    // Skapa dropzon – om skillnaden mellan två händelser är exakt 1 år, returnera ett tomt fragment
     function createDropZone(lowerEvent, upperEvent) {
       if (lowerEvent && upperEvent && (upperEvent.year - lowerEvent.year === 1)) {
         return document.createDocumentFragment();
@@ -759,35 +691,22 @@
       const dropZone = document.createElement('div');
       dropZone.className = "drop-zone";
       let label = "";
-      if (!lowerEvent && upperEvent) {
-        label = "Före: " + upperEvent.year;
-      } else if (lowerEvent && !upperEvent) {
-        label = "Efter: " + lowerEvent.year;
-      } else if (lowerEvent && upperEvent) {
-        label = "Mellan: " + lowerEvent.year + " och " + upperEvent.year;
-      }
+      if (!lowerEvent && upperEvent) label = "Före: " + upperEvent.year;
+      else if (lowerEvent && !upperEvent) label = "Efter: " + lowerEvent.year;
+      else if (lowerEvent && upperEvent) label = "Mellan: " + lowerEvent.year + " och " + upperEvent.year;
       dropZone.textContent = label;
-      
       dropZone.addEventListener('click', () => {
         if (gameOver) return;
         if (!selectedCard) return;
         const cardYear = selectedCard.card.year;
         let valid = false;
-        if (!lowerEvent && upperEvent) {
-          valid = cardYear < upperEvent.year;
-        } else if (lowerEvent && !upperEvent) {
-          valid = cardYear > lowerEvent.year;
-        } else if (lowerEvent && upperEvent) {
-          valid = cardYear > lowerEvent.year && cardYear < upperEvent.year;
-        }
-        
+        if (!lowerEvent && upperEvent) valid = cardYear < upperEvent.year;
+        else if (lowerEvent && !upperEvent) valid = cardYear > lowerEvent.year;
+        else if (lowerEvent && upperEvent) valid = cardYear > lowerEvent.year && cardYear < upperEvent.year;
         if (valid) {
-          // Vid korrekt placering: använd ut-animationen
           const cardElements = cardsContainer.querySelectorAll('.card');
           const cardElement = cardElements[selectedCard.index];
-          if (cardElement) {
-            cardElement.classList.add("card-animate-out");
-          }
+          if (cardElement) cardElement.classList.add("card-animate-out");
           score++;
           addEventToTimeline(selectedCard.card);
           renderTimeline();
@@ -807,9 +726,7 @@
               let finalScore = score + adjustment;
               topScores.push({ score: finalScore, date: new Date() });
               topScores.sort((a, b) => b.score - a.score);
-              if (topScores.length > 3) {
-                topScores = topScores.slice(0, 3);
-              }
+              if (topScores.length > 3) topScores = topScores.slice(0, 3);
               saveHighScores();
               updateHighscoreDisplay();
               displayGameOverCard(finalScore, adjustment);
@@ -818,7 +735,6 @@
             renderHand();
           }, 500);
         } else {
-          // Vid fel placering: använd ut-animationen
           const originalLabel = dropZone.textContent;
           dropZone.textContent = "Rätt svar: " + selectedCard.card.year;
           dropZone.classList.add("error");
@@ -828,9 +744,7 @@
           }, 3000);
           const cardElements = cardsContainer.querySelectorAll('.card');
           const cardElement = cardElements[selectedCard.index];
-          if (cardElement) {
-            cardElement.classList.add("card-animate-out");
-          }
+          if (cardElement) cardElement.classList.add("card-animate-out");
           setTimeout(() => {
             hand.splice(selectedCard.index, 1);
             selectedCard = null;
@@ -840,9 +754,7 @@
               let finalScore = score + adjustment;
               topScores.push({ score: finalScore, date: new Date() });
               topScores.sort((a, b) => b.score - a.score);
-              if (topScores.length > 3) {
-                topScores = topScores.slice(0, 3);
-              }
+              if (topScores.length > 3) topScores = topScores.slice(0, 3);
               saveHighScores();
               updateHighscoreDisplay();
               displayGameOverCard(finalScore, adjustment);
@@ -862,8 +774,6 @@
     }
     
     resetBtn.addEventListener('click', initGame);
-    
-    // Ladda highScores från localStorage vid sidladdning
     loadHighScores();
     initGame();
   </script>
