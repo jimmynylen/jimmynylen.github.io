@@ -32,22 +32,9 @@
       --status_mjuklavendel: #A7A0C9;
       --status_mutedpurple:  #6B5876;
       
-      --card-bg: #E0F2E9;
-      --timeline-bg: #F9E79F;
-      --score-bg: #D98E04;
-      --score-text: #ffffff;
-      
-      /* Färgvariabler för spelkorten – används cykliskt */
-      --card-color-1: #D4A76A;
-      --card-color-1-border: #C2955C;
-      --card-color-2: #4682B4;
-      --card-color-2-border: #2C3E50;
-      --card-color-3: #A7A0C9;
-      --card-color-3-border: #6B5876;
-      --card-color-4: #8E9775;
-      --card-color-4-border: #5B7052;
-      --card-color-5: #A0522D;
-      --card-color-5-border: #8A3324;
+      /* Dessa variabler styr gradientens start- och slutfärg – ändra dem vid behov */
+      --card-gradient-start: #C2955C;  
+      --card-gradient-end:   #D4A76A;  
     }
     
     * { box-sizing: border-box; }
@@ -82,7 +69,6 @@
       justify-content: space-between;
       align-items: center;
     }
-    /*.header-title { }*/
     .header-controls {
       display: flex;
       align-items: center;
@@ -92,7 +78,6 @@
       font-size: 14px;
       color: var(--white);
     }
-    /*.header-emoji { }*/
     
     /* Informationsruta */
     .inforuta {
@@ -154,17 +139,17 @@
       scrollbar-color: var(--effect) var(--primary);
     }
     
+    /* Ändrad .card – alla kort får nu samma gradientbakgrund */
     .card {
-      border: 1px solid;
+      border: 1px solid var(--dark);
       border-radius: 4px;
-      padding: 10px;
+      padding: 15px;
       margin-bottom: 10px;
       cursor: pointer;
+      background: linear-gradient(to bottom, var(--card-gradient-start), var(--card-gradient-end));
     }
-    .card.selected {
-      border-color: var(--primary);
-      background-color: var(--subtle);
-    }
+    
+    /* Rubrik och kortbeskrivning (oförändrat) */
     .card-headline {
       font-size: 14px;
       color: var(--white);
@@ -175,6 +160,12 @@
       margin-top: 5px;
       display: none;
     }
+    
+    /* Vid klick (behåller ursprunglig effekt) */
+    .card.selected {
+      background: linear-gradient(to bottom, var(--status_olivegreen), var(--status_graygreen));
+      border: 1px solid var(--dark);
+}
     
     /* Nya animationsklasser för korten */
     .card-animate-in {
@@ -284,7 +275,7 @@
     .highscore-board {
       font-family: 'Poppins', sans-serif;
       color: var(--white);
-      background-color: var(--score-bg);
+      background-color: var(--extra_effect);
       border: 1px solid #A44434;
       border-radius: 5px;
       margin-top: 20px;
@@ -391,22 +382,8 @@
     let gameOver = false;
     let animateNewCard = false; // Flagga för att animera nya kort
     
-    // Hämta färger från CSS-variabler
-    const rootStyles = getComputedStyle(document.documentElement);
-    const defaultCardColors = [
-      rootStyles.getPropertyValue('--card-color-1').trim(),
-      rootStyles.getPropertyValue('--card-color-2').trim(),
-      rootStyles.getPropertyValue('--card-color-3').trim(),
-      rootStyles.getPropertyValue('--card-color-4').trim(),
-      rootStyles.getPropertyValue('--card-color-5').trim()
-    ];
-    const defaultCardBorderColors = [
-      rootStyles.getPropertyValue('--card-color-1-border').trim(),
-      rootStyles.getPropertyValue('--card-color-2-border').trim(),
-      rootStyles.getPropertyValue('--card-color-3-border').trim(),
-      rootStyles.getPropertyValue('--card-color-4-border').trim(),
-      rootStyles.getPropertyValue('--card-color-5-border').trim()
-    ];
+    // Eftersom vi nu använder en fast gradient bakgrund tar vi bort de tidigare färginställningarna.
+    // Därför kommenterar vi ut eller ignorerar defaultCardColors och defaultCardBorderColors.
     
     /* Uppdaterad händelsedata – AI-centrerad historik med nya tillägg */
     const eventsData = [
@@ -582,8 +559,7 @@
       if (deck.length > 0) addEventToTimeline(deck.shift());
       while (hand.length < startingHandCount && deck.length > 0) {
         let card = deck.shift();
-        card.color = defaultCardColors[hand.length % defaultCardColors.length];
-        card.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
+        // Tidigare sattes card.color och card.borderColor – nu lämnar vi dessa
         hand.push(card);
       }
       renderHand();
@@ -591,15 +567,14 @@
       updateHighscoreDisplay();
     }
     
-    // Rendera spelarens hand – använder .card-animate-in för in-animation
+    // Rendera spelarens hand – tar bort inline-färgning så att CSS-gradienten alltid syns
     function renderHand() {
       if (gameOver) return;
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = "card";
-        cardDiv.style.backgroundColor = card.color || 'var(--white)';
-        cardDiv.style.borderColor = card.borderColor || 'var(--primary)';
+        // Vi tar bort: cardDiv.style.backgroundColor = ... och cardDiv.style.borderColor = ...
         if (animateNewCard && index === hand.length - 1) {
           cardDiv.classList.add("card-animate-in");
           cardDiv.addEventListener('animationend', () => {
@@ -713,8 +688,6 @@
             hand.splice(selectedCard.index, 1);
             if (deck.length > 0) {
               let newCard = deck.shift();
-              newCard.color = defaultCardColors[hand.length % defaultCardColors.length];
-              newCard.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
               hand.push(newCard);
               animateNewCard = true;
             }
