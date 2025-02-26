@@ -82,22 +82,17 @@
       justify-content: space-between;
       align-items: center;
     }
-    .header-title {
-      /* Huvudrubriken – behåll standardstorlek */
-    }
+    .header-title { }
     .header-controls {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    /* Den aktuella poängen visas bara som siffra, till vänster om emojin */
     .header-score {
       font-size: 14px;
       color: var(--white);
     }
-    .header-emoji {
-      /* Emoji kan få lite marginal om så önskas */
-    }
+    .header-emoji { }
     
     /* Informationsruta */
     .inforuta {
@@ -165,6 +160,7 @@
       padding: 10px;
       margin-bottom: 10px;
       cursor: pointer;
+      transition: opacity 1s ease-out;
     }
     .card.selected {
       border-color: var(--primary);
@@ -179,6 +175,42 @@
       color: var(--white);
       margin-top: 5px;
       display: none;
+    }
+    
+    /* Animation för att kortet ska blekna ut (används vid fel placering) */
+    .fade-out {
+      opacity: 0;
+    }
+    
+    /* Snabb fade-out för rätt placering */
+    .fade-out-fast {
+      transition: opacity 0.5s ease-out;
+      opacity: 0;
+    }
+    
+    /* Fade-in-animation för nya kort */
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* Animation för nya tidslinjehändelser */
+    .timeline-animate {
+      animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Styling för game-over-kortet */
+    .game-over-card {
+      background-color: var(--primary);
+      border: 1px dashed var(--effect);
+      color: var(--white);
     }
     
     /* Tidslinjerutan */
@@ -239,9 +271,25 @@
       padding: 5px;
       text-align: center;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    /* Ta bort övre marginal från första dropzonen och nedre från sista dropzonen inom tidslinjen */
+    .timeline-container > .drop-zone:first-child {
+      margin-top: 0;
+    }
+    .timeline-container > .drop-zone:last-child {
+      margin-bottom: 0;
+    }
+    .error {
+      animation: blinkRed 0.5s linear infinite;
+    }
+    @keyframes blinkRed {
+      0% { background-color: var(--primary); }
+      50% { background-color: red; }
+      100% { background-color: var(--primary); }
     }
     
-    /* Highscore-rutan längst ner – visar topp 3 med medalj-emojis på samma rad */
+    /* Highscore-rutan längst ner */
     .highscore-board {
       font-family: 'Poppins', sans-serif;
       color: var(--white);
@@ -339,7 +387,7 @@
     
     <hr id="separator" />
     
-    <!-- Highscore-ruta längst ner: topp 3 visas med medalj-emojis och standardvärde 0 -->
+    <!-- Highscore-ruta längst ner -->
     <div class="highscore-board">
       <div class="highscore-inner" id="highscore">
         <!-- Topp 3-highscores uppdateras här -->
@@ -348,6 +396,10 @@
   </div>
   
   <script>
+    // Globala variabler
+    let gameOver = false;
+    let animateNewCard = false; // Flagga för att animera nya kort
+    
     // Hämta färger från CSS-variabler
     const rootStyles = getComputedStyle(document.documentElement);
     const defaultCardColors = [
@@ -365,7 +417,7 @@
       rootStyles.getPropertyValue('--card-color-5-border').trim()
     ];
     
-    /* Händelsedata med alla händelser */
+    /* Händelsedata med alla historiska händelser */
     const eventsData = [
       { year: 1822, headline: "Babbage konceptualiserar sin revolutionerande maskin", description: "Charles Babbage konceptualiserar Difference Engine", importance: 2 },
       { year: 1837, headline: "Ada Lovelace skriver första algoritmen", description: "Ada Lovelace skriver det första algoritmiska konceptet för Babbages maskin", importance: 1 },
@@ -448,7 +500,8 @@
     let timeline = [];  // Händelser på tidslinjen
     let score = 0;      // Aktuell poäng
     let initialHandCount = 5; // Startantal kort
-    let topScores = []; // Array för topp 3-highscores
+    // Ändrad: highScores lagras som objekt med score och date
+    let topScores = []; // Array för topp 3-highscores, ex: {score: 123, date: "2025-02-26T12:34:56.789Z"}
     
     // Spelarstatus
     let gameOngoing = false;
@@ -480,16 +533,46 @@
       }
     }
     
-    // Uppdatera highscore-listan med topp 3 och medalj-emojis på samma rad
-    // Om inget highscore finns för en position, visas 0
+    // Uppdatera highscore-listan med topp 3 och medalj-emojis samt visa datum/tid i tooltip
     function updateHighscoreDisplay() {
       const medals = ["🥇", "🥈", "🥉"];
       let html = "";
       for (let i = 0; i < medals.length; i++) {
-        let scoreValue = (topScores[i] !== undefined ? topScores[i] : 0);
-        html += `<span class="highscore-item">${medals[i]} ${scoreValue}</span>`;
+        let scoreObj = (topScores[i] !== undefined ? topScores[i] : { score: 0, date: "" });
+        let displayScore = scoreObj.score || 0;
+        let displayDate = scoreObj.date ? new Date(scoreObj.date) : null;
+        let dateStr = displayDate ? displayDate.toLocaleString() : "";
+        html += `<span class="highscore-item" title="${dateStr}">${medals[i]} ${displayScore}</span>`;
       }
       highScoreEl.innerHTML = html;
+    }
+    
+    // Visa ett game-over-kort i kortrutan med anpassningsbar styling
+    function displayGameOverCard(finalScore, adjustment) {
+      gameOver = true;
+      const gameOverCard = document.createElement('div');
+      gameOverCard.className = "card game-over-card";
+      
+      const headline = document.createElement('div');
+      headline.className = "card-headline";
+      headline.textContent = "Spelet är över, tack för att du spelade!";
+      
+      const description = document.createElement('div');
+      description.className = "card-description";
+      let bonusText = "";
+      if (adjustment > 0) {
+        bonusText = "Bonus: +" + adjustment;
+      } else if (adjustment < 0) {
+        bonusText = "Avdrag: " + adjustment;
+      }
+      description.textContent = "Poäng: " + finalScore + (bonusText ? " (" + bonusText + ")" : "");
+      description.style.display = "block";
+      
+      gameOverCard.appendChild(headline);
+      gameOverCard.appendChild(description);
+      
+      // Placera game-over-kortet längst upp
+      cardsContainer.insertBefore(gameOverCard, cardsContainer.firstChild);
     }
     
     // Hantera ändringar i dropdowns
@@ -497,7 +580,7 @@
       if (gameOngoing) {
         if (confirm("Vill du börja om med de nya inställningarna?")) {
           initGame();
-          gameOngoing = false;
+          gameOver = false;
           previousDifficulty = difficultySelect.value;
           previousHandCount = handCountSelect.value;
         } else {
@@ -506,6 +589,7 @@
         }
       } else {
         initGame();
+        gameOver = false;
         previousDifficulty = difficultySelect.value;
         previousHandCount = handCountSelect.value;
       }
@@ -516,7 +600,7 @@
     
     // Initiera/återställ spelet
     function initGame() {
-      gameOngoing = false;
+      gameOver = false;
       const difficulty = difficultySelect.value;
       const startingHandCount = parseInt(handCountSelect.value);
       initialHandCount = startingHandCount;
@@ -536,6 +620,9 @@
       score = 0;
       currentScoreEl.textContent = score;
       
+      // Töm kortrutan (inklusive tidigare game-over-kort)
+      cardsContainer.innerHTML = "";
+      
       if (deck.length > 0) {
         addEventToTimeline(deck.shift());
       }
@@ -554,12 +641,22 @@
     
     // Rendera spelarens hand
     function renderHand() {
+      if (gameOver) return;
+      
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = "card";
         cardDiv.style.backgroundColor = card.color || 'var(--white)';
         cardDiv.style.borderColor = card.borderColor || 'var(--primary)';
+        
+        // Lägg till fade-in på det nyinförda kortet
+        if (animateNewCard && index === hand.length - 1) {
+          cardDiv.classList.add("fade-in");
+          cardDiv.addEventListener('animationend', () => {
+            cardDiv.classList.remove("fade-in");
+          });
+        }
         
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "card-headline";
@@ -574,6 +671,7 @@
         cardDiv.appendChild(descriptionDiv);
         
         cardDiv.addEventListener('click', () => {
+          if (gameOver) return;
           document.querySelectorAll('.card').forEach(c => {
             c.classList.remove('selected');
             const desc = c.querySelector('.card-description');
@@ -587,6 +685,8 @@
         
         cardsContainer.appendChild(cardDiv);
       });
+      // Återställ flaggan
+      animateNewCard = false;
     }
     
     // Rendera tidslinjen
@@ -600,6 +700,11 @@
       timeline.forEach((event, i) => {
         const eventDiv = document.createElement('div');
         eventDiv.className = "timeline-event";
+        // Lägg till animation om eventet inte redan renderats
+        if (!event.rendered) {
+          eventDiv.classList.add("timeline-animate");
+          event.rendered = true;
+        }
         
         const yearDiv = document.createElement('div');
         yearDiv.className = "event-year";
@@ -660,10 +765,10 @@
         label = "Mellan: " + lowerEvent.year + " och " + upperEvent.year;
       }
       dropZone.textContent = label;
+      
       dropZone.addEventListener('click', () => {
-        gameOngoing = true;
+        if (gameOver) return;
         if (!selectedCard) {
-          alert("Välj ett kort först!");
           return;
         }
         const cardYear = selectedCard.card.year;
@@ -677,39 +782,78 @@
         }
         
         if (valid) {
+          // Vid korrekt placering: applicera snabb fade-out och rendera tidslinjen direkt
+          const cardElements = cardsContainer.querySelectorAll('.card');
+          const cardElement = cardElements[selectedCard.index];
+          if (cardElement) {
+            cardElement.classList.add("fade-out-fast");
+          }
           score++;
           addEventToTimeline(selectedCard.card);
-          hand.splice(selectedCard.index, 1);
-          if (deck.length > 0) {
-            let newCard = deck.shift();
-            newCard.color = defaultCardColors[hand.length % defaultCardColors.length];
-            newCard.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
-            hand.push(newCard);
-          }
+          renderTimeline();
+          // Vänta 0.5s innan handens innehåll uppdateras
+          setTimeout(() => {
+            hand.splice(selectedCard.index, 1);
+            if (deck.length > 0) {
+              let newCard = deck.shift();
+              newCard.color = defaultCardColors[hand.length % defaultCardColors.length];
+              newCard.borderColor = defaultCardBorderColors[hand.length % defaultCardBorderColors.length];
+              hand.push(newCard);
+              animateNewCard = true;
+            }
+            selectedCard = null;
+            currentScoreEl.textContent = score;
+            if (hand.length === 0) {
+              let adjustment = (initialHandCount < 5) ? (5 - initialHandCount) : -(initialHandCount - 5);
+              let finalScore = score + adjustment;
+              // Lagra highscore som objekt med score och datum
+              topScores.push({ score: finalScore, date: new Date() });
+              topScores.sort((a, b) => b.score - a.score);
+              if (topScores.length > 3) {
+                topScores = topScores.slice(0, 3);
+              }
+              saveHighScores();
+              updateHighscoreDisplay();
+              displayGameOverCard(finalScore, adjustment);
+              return;
+            }
+            renderHand();
+          }, 500);
         } else {
-          hand.splice(selectedCard.index, 1);
-        }
-        selectedCard = null;
-        currentScoreEl.textContent = score;
-        
-        if (hand.length === 0) {
-          let adjustment = (initialHandCount < 5) ? (5 - initialHandCount) : -(initialHandCount - 5);
-          let finalScore = score + adjustment;
-          alert("Spelet över! Du fick " + finalScore + " poäng.");
-          // Uppdatera topp 3-highscores
-          topScores.push(finalScore);
-          topScores.sort((a, b) => b - a);
-          if (topScores.length > 3) {
-            topScores = topScores.slice(0, 3);
+          // Vid fel placering: visa felmeddelande och använd långsammare fade-out
+          const originalLabel = dropZone.textContent;
+          dropZone.textContent = "Rätt svar: " + selectedCard.card.year;
+          dropZone.classList.add("error");
+          setTimeout(() => {
+            dropZone.textContent = originalLabel;
+            dropZone.classList.remove("error");
+          }, 3000);
+          const cardElements = cardsContainer.querySelectorAll('.card');
+          const cardElement = cardElements[selectedCard.index];
+          if (cardElement) {
+            cardElement.classList.add("fade-out");
           }
-          saveHighScores();
-          updateHighscoreDisplay();
-          initGame();
-          return;
+          setTimeout(() => {
+            hand.splice(selectedCard.index, 1);
+            selectedCard = null;
+            currentScoreEl.textContent = score;
+            if (hand.length === 0) {
+              let adjustment = (initialHandCount < 5) ? (5 - initialHandCount) : -(initialHandCount - 5);
+              let finalScore = score + adjustment;
+              topScores.push({ score: finalScore, date: new Date() });
+              topScores.sort((a, b) => b.score - a.score);
+              if (topScores.length > 3) {
+                topScores = topScores.slice(0, 3);
+              }
+              saveHighScores();
+              updateHighscoreDisplay();
+              displayGameOverCard(finalScore, adjustment);
+              return;
+            }
+            renderHand();
+            renderTimeline();
+          }, 1000);
         }
-        
-        renderHand();
-        renderTimeline();
       });
       return dropZone;
     }
