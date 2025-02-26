@@ -192,7 +192,9 @@
     .game-over-card {
       background-color: var(--primary);
       border: 1px dashed var(--effect);
+      border-radius: 4px;
       color: var(--white);
+      padding: 10px;
     }
     
     /* Tidslinjerutan */
@@ -496,7 +498,7 @@
       gameOver = true;
       cardsContainer.innerHTML = "";
       const gameOverCard = document.createElement('div');
-      gameOverCard.className = "card game-over-card";
+      gameOverCard.className = "game-over-card";
       const headline = document.createElement('div');
       headline.className = "card-headline";
       headline.textContent = "Spelet är över, tack för att du spelade!";
