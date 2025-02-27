@@ -32,9 +32,15 @@
       --status_mjuklavendel: #A7A0C9;
       --status_mutedpurple:  #6B5876;
       
-      /* Dessa variabler styr gradientens start- och slutfärg – ändra dem vid behov */
+      /* Gradient för kortbakgrund */
       --card-gradient-start: #C2955C;  
       --card-gradient-end:   #D4A76A;  
+
+      /* Nya variabler för scrollande textens utseende */
+      --scroll-bg: rgba(0, 0, 0, 0.1);      /* Bakgrundsfärg */
+      --scroll-border: #ffffff;              /* Ramfärg */
+      --scroll-border-width: 0px;            /* Ramtjocklek */
+      --scroll-padding: 5px;                 /* Padding */
     }
     
     * { box-sizing: border-box; }
@@ -139,35 +145,54 @@
       scrollbar-color: var(--effect) var(--primary);
     }
     
-    /* Ändrad .card – alla kort får nu samma gradientbakgrund */
     .card {
-      border: 1px solid var(--dark);
+      border-left: 5px solid var(--status_goldenbrown);
+      background-color: var(--status_ochreyellow);
       border-radius: 4px;
-      padding: 15px;
+      padding: 10px;
       margin-bottom: 10px;
       cursor: pointer;
-      background: linear-gradient(to bottom, var(--card-gradient-start), var(--card-gradient-end));
     }
     
-    /* Rubrik och kortbeskrivning (oförändrat) */
     .card-headline {
       font-size: 14px;
       color: var(--white);
     }
+    /* Container för den scrollande texten med bakgrund, ram och padding */
     .card-description {
-      font-size: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
       color: var(--white);
+      font-size: 12px;
       margin-top: 5px;
-      display: none;
+      border-radius: 4px;
+      background-color: var(--scroll-bg);
+      border: var(--scroll-border-width) solid var(--scroll-border);
+      padding: var(--scroll-padding);
+    }
+    .scrolling-text {
+      display: inline-block;
+      white-space: nowrap;
+      /* Animationen flyttar hela blocket med dubbelt innehåll så att den andra kopian börjar direkt */
+      animation: scroll 30s linear infinite;
+    }
+    /* Separator för att markera att texten börjar om */
+    .separator {
+      margin: 0 0.5em;
+    }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
     
     /* Vid klick (behåller ursprunglig effekt) */
     .card.selected {
-      background: linear-gradient(to bottom, var(--status_olivegreen), var(--status_graygreen));
-      border: 1px solid var(--dark);
-}
+      border-left: 5px solid var(--status_olivegreen);
+      background-color: var(--status_graygreen);
+    }
     
-    /* Nya animationsklasser för korten */
+    /* Animationsklasser */
     .card-animate-in {
       animation: slideIn 0.5s ease-out;
     }
@@ -210,7 +235,7 @@
     
     .timeline-event {
       background-color: var(--status_graygreen);
-      border: 1px solid var(--status_olivegreen);
+      border-left: 5px solid var(--status_olivegreen);
       border-radius: 4px;
       margin: 5px 0;
       padding: 10px;
@@ -257,7 +282,6 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    /* Ta bort övre marginal från första dropzonen och nedre från sista dropzonen inom tidslinjen */
     .timeline-container > .drop-zone:first-child {
       margin-top: 0;
     }
@@ -383,9 +407,6 @@
     // Globala variabler
     let gameOver = false;
     let animateNewCard = false; // Flagga för att animera nya kort
-    
-    // Eftersom vi nu använder en fast gradient bakgrund tar vi bort de tidigare färginställningarna.
-    // Därför kommenterar vi ut eller ignorerar defaultCardColors och defaultCardBorderColors.
     
     /* Uppdaterad händelsedata – AI-centrerad historik med nya tillägg */
     const eventsData = [
@@ -517,7 +538,6 @@
       if (adjustment > 0) bonusText = "Bonus: +" + adjustment;
       else if (adjustment < 0) bonusText = "Avdrag: " + adjustment;
       description.textContent = "Poäng: " + finalScore + (bonusText ? " (" + bonusText + ")" : "");
-      description.style.display = "block";
       gameOverCard.appendChild(headline);
       gameOverCard.appendChild(description);
       cardsContainer.appendChild(gameOverCard);
@@ -570,7 +590,6 @@
       if (deck.length > 0) addEventToTimeline(deck.shift());
       while (hand.length < startingHandCount && deck.length > 0) {
         let card = deck.shift();
-        // Tidigare sattes card.color och card.borderColor – nu lämnar vi dessa
         hand.push(card);
       }
       renderHand();
@@ -578,41 +597,59 @@
       updateHighscoreDisplay();
     }
     
-    // Rendera spelarens hand – tar bort inline-färgning så att CSS-gradienten alltid syns
+    // Rendera spelarens hand – den scrollande beskrivningen visas med bakgrund, ram och padding
     function renderHand() {
       if (gameOver) return;
       cardsContainer.innerHTML = "";
       hand.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.className = "card";
-        // Vi tar bort: cardDiv.style.backgroundColor = ... och cardDiv.style.borderColor = ...
         if (animateNewCard && index === hand.length - 1) {
           cardDiv.classList.add("card-animate-in");
           cardDiv.addEventListener('animationend', () => {
             cardDiv.classList.remove("card-animate-in");
           });
         }
+        // Skapa rubriken
         const headlineDiv = document.createElement('div');
         headlineDiv.className = "card-headline";
         headlineDiv.textContent = card.headline;
+        
+        // Skapa den scrollande beskrivningen med duplicerad text och separator
         const descriptionDiv = document.createElement('div');
         descriptionDiv.className = "card-description";
-        descriptionDiv.textContent = card.description;
-        descriptionDiv.style.display = "none";
+        const scrollingDiv = document.createElement('div');
+        scrollingDiv.className = "scrolling-text";
+        
+        const textSpan1 = document.createElement('span');
+        textSpan1.className = "text-content";
+        textSpan1.textContent = card.description;
+        
+        const separatorSpan = document.createElement('span');
+        separatorSpan.className = "separator";
+        separatorSpan.textContent = "/";
+        
+        const textSpan2 = document.createElement('span');
+        textSpan2.className = "text-content";
+        textSpan2.textContent = card.description;
+        
+        scrollingDiv.appendChild(textSpan1);
+        scrollingDiv.appendChild(separatorSpan);
+        scrollingDiv.appendChild(textSpan2);
+        descriptionDiv.appendChild(scrollingDiv);
+        
         cardDiv.appendChild(headlineDiv);
         cardDiv.appendChild(descriptionDiv);
+        
+        // Klickhändelse för att markera valt kort (påverkar ej den scrollande texten)
         cardDiv.addEventListener('click', () => {
           if (gameOver) return;
-          document.querySelectorAll('.card').forEach(c => {
-            c.classList.remove('selected');
-            const desc = c.querySelector('.card-description');
-            if (desc) desc.style.display = "none";
-          });
+          document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
           cardDiv.classList.add('selected');
-          descriptionDiv.style.display = "block";
           selectedCard = { card, index };
           gameOngoing = true;
         });
+        
         cardsContainer.appendChild(cardDiv);
       });
       animateNewCard = false;
