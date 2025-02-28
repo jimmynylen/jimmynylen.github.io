@@ -178,7 +178,7 @@
     .scrolling-text {
       display: inline-block;
       white-space: nowrap;
-      /* Animationen flyttar hela blocket med dubbelt innehåll så att den andra kopian börjar direkt */
+      will-change: transform;
       animation: scroll 30s linear infinite;
     }
     /* Separator för att markera att texten börjar om */
@@ -187,7 +187,7 @@
     }
     @keyframes scroll {
       0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      100% { transform: translateX(-100%); }
     }
     
     /* Vid klick (behåller ursprunglig effekt) */
@@ -443,7 +443,7 @@
       { year: 1971, headline: "Intel 4004, den första mikroprocessorn", description: "Den första mikroprocessorn möjliggjorde en ökad beräkningskraft och lade grunden för den moderna datorrevolutionen, vilket senare blev avgörande för AI-utvecklingen.", importance: 2 },
       { year: 1972, headline: "Programmeringsspråket C utvecklas", description: "Dennis Ritchie utvecklar C-språket, som blir ett centralt programmeringsspråk inom systemutveckling och AI.", importance: 3 },
       { year: 1973, headline: "Bob Metcalfe utvecklar Ethernet", description: "Bob Metcalfe och kollegor utvecklar Ethernet, vilket revolutionerar datakommunikationen och nätverksinfrastrukturen.", importance: 2 },
-      { year: 1974, headline: "MYCIN, expertsystem för medicinsk diagnostisk", description: "MYCIN, ett tidigt expertssystem för medicinsk diagnostik, visar AI:s praktiska potential.", importance: 2 },
+      { year: 1974, headline: "MYCIN, expertsystem för medicinsk diagnostik", description: "MYCIN, ett tidigt expertssystem för medicinsk diagnostik, visar AI:s praktiska potential.", importance: 2 },
       { year: 1975, headline: "Erik Sandewall blir professor i AI", description: "Erik Sandewall tilldelas en professur i AI – en viktig milstolpe i svensk AI‑historia.", importance: 2 },
       { year: 1978, headline: "Neurala nätverk återupplivas vid MIT", description: "Forskare vid MIT återupplivar neurala nätverk med nya metoder – en vändpunkt för modern AI.", importance: 3 },
       { year: 1979, headline: "DENDRAL, expertsystem för kemisk analys", description: "DENDRAL, ett av de första expertssystemen, används för kemisk analys och visar praktiska AI‑tillämpningar.", importance: 3 },
