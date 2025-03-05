@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klassrumstimer</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap" />
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --white: #ffffff;
+      --primary: #40534C;
+      --cell_mediumgreen: #3CB371;
+      --dark: #1A3636;
+      --text: #644117;
+      --subtle: #D6BD98;
+      --effect: #677D6A;
+      --extra_red: #A44434;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Source Serif Pro', serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+    }
+    
+    .container {
+      width: 740px;
+      min-width: 740px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px auto;
+    }
+    
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      color: var(--white);
+      background-color: var(--primary);
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    
+    /* Område med timer och klocka */
+    .game-area {
+      display: flex;
+      gap: 15px;
+      background-color: var(--effect);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--primary);
+    }
+    
+    /* Rutorna för timer och klocka – tar 50% vardera */
+    .box {
+      flex: 1 1 50%;
+      background-color: var(--subtle);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    
+    /* Timerområdet (inuti cirkeln) */
+    #timer-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto;
+    }
+    
+    /* Canvas för timer-cirkeln */
+    #timer-canvas {
+      display: block;
+      margin: 0 auto;
+    }
+    
+    /* Container med redigerbar tid och knappar, centrerad i cirkeln */
+    #timer-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    /* Redigerbart tidfält med fast bredd så att alla siffror syns */
+    #timer-display {
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-size: 32px;
+      color: var(--dark);
+      width: 100px;
+      outline: none;
+    }
+    
+    /* Timerknappar, placerade under tidfältet */
+    #timer-buttons {
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+    #timer-buttons button {
+      padding: 4px 8px;
+      font-size: 16px;
+      line-height: 1;
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #timer-buttons button:hover {
+      background-color: var(--effect);
+    }
+    
+    /* Analog klocka */
+    #clock-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #clock-box canvas {
+      display: block;
+      width: 250px;
+      height: 250px;
+    }
+    
+    /* Knapp för att lägga till ny informationsruta */
+    #add-info-btn {
+      display: block;
+      width: 200px;
+      margin: 0 auto 15px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #add-info-btn:hover {
+      background-color: var(--effect);
+    }
+    
+    /* Informationsruta-stil */
+    .inforuta {
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 8px;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Klassrumstimer</h1>
+    <div class="game-area">
+      <!-- Timer-rutan med cirkulärt diagram, redigerbart tidfält centrerat och knappar med symboler under -->
+      <div id="timer-box" class="box">
+        <div id="timer-container">
+          <canvas id="timer-canvas" width="250" height="250"></canvas>
+          <div id="timer-content">
+            <input id="timer-display" type="text" value="30:00" />
+            <div id="timer-buttons">
+              <button id="timer-start-pause">►</button>
+              <button id="timer-stop">■</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Analog klocka -->
+      <div id="clock-box" class="box">
+        <canvas id="clock-canvas" width="250" height="250"></canvas>
+      </div>
+    </div>
+    <!-- Knapp för att lägga till ny informationsruta -->
+    <button id="add-info-btn">Lägg till ny ruta</button>
+    <div id="info-container">
+      <!-- Ytterligare informationsrutor läggs till här -->
+    </div>
+  </div>
+  
+  <script>
+    /* --- TIMER-FUNKTIONALITET --- */
+    let timerDuration = 30 * 60; // 30 minuter i sekunder
+    let timeLeft = timerDuration;
+    let timerInterval = null;
+    let isTimerRunning = false;
+    
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return (minutes < 10 ? "0" + minutes : minutes) + ":" +
+             (seconds < 10 ? "0" + seconds : seconds);
+    }
+    
+    function updateTimerDisplay() {
+      document.getElementById("timer-display").value = formatTime(timeLeft);
+      updateTimerCanvas();
+    }
+    
+    document.getElementById("timer-start-pause").addEventListener("click", function() {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        this.textContent = "►";
+      } else {
+        timerInterval = setInterval(function() {
+          if (timeLeft > 0) {
+            timeLeft--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+          }
+        }, 1000);
+        isTimerRunning = true;
+        this.textContent = "❚❚";
+      }
+    });
+    
+    document.getElementById("timer-stop").addEventListener("click", function() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timeLeft = timerDuration;
+      updateTimerDisplay();
+      document.getElementById("timer-start-pause").textContent = "►";
+    });
+    
+    // Låt användaren ändra timerns tid via inputfältet
+    document.getElementById("timer-display").addEventListener("blur", function() {
+      const value = this.value.trim();
+      const parts = value.split(":");
+      if (parts.length === 2) {
+        const minutes = parseInt(parts[0], 10);
+        const seconds = parseInt(parts[1], 10);
+        if (!isNaN(minutes) && !isNaN(seconds) && seconds < 60 && minutes >= 0 && seconds >= 0) {
+          timerDuration = minutes * 60 + seconds;
+          timeLeft = timerDuration;
+          updateTimerDisplay();
+          return;
+        }
+      }
+      // Om inmatningen är felaktig återställs fältet
+      updateTimerDisplay();
+    });
+    
+    updateTimerDisplay();
+    
+    function updateTimerCanvas() {
+      const canvas = document.getElementById("timer-canvas");
+      const ctx = canvas.getContext("2d");
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 5;
+      
+      // Rensa canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Rita bakgrundscirkel (full cirkel)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#ddd";
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      
+      // Beräkna progress (0 till 1)
+      let progress = (timerDuration - timeLeft) / timerDuration;
+      let startAngle = -Math.PI / 2;
+      let endAngle = startAngle + progress * 2 * Math.PI;
+      
+      // Rita progress-ark
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle, false);
+      ctx.strokeStyle = "#3CB371";
+      ctx.lineWidth = 10;
+      ctx.stroke();
+    }
+    
+    /* --- ANALOG KLOCKA --- */
+    function drawClock() {
+      const canvas = document.getElementById("clock-canvas");
+      const ctx = canvas.getContext("2d");
+      const x = canvas.width / 2;
+      const y = canvas.height / 2;
+      const radius = Math.min(x, y) * 0.90;
+      
+      // Rensa canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Rita klockans ansikte
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+      
+      ctx.strokeStyle = "#40534C";
+      ctx.lineWidth = radius * 0.05;
+      ctx.stroke();
+      
+      // Rita siffror
+      ctx.fillStyle = "#40534C";
+      ctx.font = (radius * 0.15) + "px Poppins, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      for (let num = 1; num <= 12; num++) {
+        let ang = num * Math.PI / 6;
+        let numX = x + radius * 0.75 * Math.cos(ang - Math.PI/2);
+        let numY = y + radius * 0.75 * Math.sin(ang - Math.PI/2);
+        ctx.fillText(num.toString(), numX, numY);
+      }
+      
+      // Hämta aktuell tid
+      let now = new Date();
+      let hour = now.getHours();
+      let minute = now.getMinutes();
+      let second = now.getSeconds();
+      
+      // Rita timvisare
+      hour = hour % 12;
+      let hourAngle = (hour * Math.PI / 6) + (minute * Math.PI / 360) + (second * Math.PI / 21600);
+      drawHand(ctx, x, y, hourAngle, radius * 0.5, radius * 0.07);
+      
+      // Rita minutvisare
+      let minuteAngle = (minute * Math.PI / 30) + (second * Math.PI / 1800);
+      drawHand(ctx, x, y, minuteAngle, radius * 0.7, radius * 0.05);
+      
+      // Rita sekundvisare
+      let secondAngle = second * Math.PI / 30;
+      drawHand(ctx, x, y, secondAngle, radius * 0.8, radius * 0.02, "#A44434");
+    }
+    
+    function drawHand(ctx, x, y, pos, length, width, color) {
+      ctx.beginPath();
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = color ? color : "#40534C";
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + length * Math.cos(pos - Math.PI/2), y + length * Math.sin(pos - Math.PI/2));
+      ctx.stroke();
+    }
+    
+    setInterval(drawClock, 1000);
+    drawClock();
+    
+    /* --- NYA INFORMATIONSRUTOR --- */
+    document.getElementById("add-info-btn").addEventListener("click", function() {
+      const infoContainer = document.getElementById("info-container");
+      const newInfo = document.createElement("div");
+      newInfo.className = "inforuta";
+      newInfo.contentEditable = "true";
+      newInfo.textContent = "Skriv här...";
+      infoContainer.appendChild(newInfo);
+    });
+  </script>
+</body>
+</html>
