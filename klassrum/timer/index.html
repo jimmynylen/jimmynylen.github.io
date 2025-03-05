@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Klassrumstimer</title>
-  <!-- Om du vill använda fallback-typsnitt för klockan kan du även ta bort Poppins-länken nedan -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <!-- Vi laddar Poppins för rubriken -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" />
+  <!-- Laddar även en annan webfont för övrig text om du önskar, eller låt webbläsaren använda sina fallbacks -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap" />
   <style>
     :root {
@@ -23,24 +25,15 @@
     * { box-sizing: border-box; }
     
     body {
+      /* Du kan ändra body-font om du vill, här används Source Serif Pro */
       font-family: 'Source Serif Pro', serif;
       margin: 0;
       padding: 0;
       background-color: var(--bg);
     }
     
-    .container {
-      width: 740px;
-      min-width: 740px;
-      background-color: var(--white);
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin: 20px auto;
-    }
-    
     h1 {
-      font-family: 'Source Serif Pro', serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0 0 20px 0;
       font-size: 24px;
       color: var(--white);
@@ -176,7 +169,7 @@
   <div class="container">
     <h1>Klassrumstimer</h1>
     <div class="game-area">
-      <!-- Timer-rutan med cirkulärt diagram, redigerbart tidfält och knappar med symboler -->
+      <!-- Timer-rutan med cirkulärt diagram, redigerbart tidfält och knappar -->
       <div id="timer-box" class="box">
         <div id="timer-container">
           <canvas id="timer-canvas" width="250" height="250"></canvas>
