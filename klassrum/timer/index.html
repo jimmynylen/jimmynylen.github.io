@@ -19,7 +19,21 @@
       --text: #644117;
       --subtle: #D6BD98;
       --effect: #677D6A;
+      --placeholder: #B9AFA1;
+      --textarea: #FCF8F4;
+      --extra_effect: #D98E04;
+      --extra_primary: #E0A030;
       --extra_red: #A44434;
+      --status_graygreen: #8E9775;
+      --status_olivegreen: #5B7052;
+      --status_ochreyellow: #D4A76A;
+      --status_goldenbrown: #C2955C;
+      --status_sienna: #A0522D;
+      --status_burntumber: #8A3324;
+      --status_steelblue: #4682B4;
+      --status_darkblue:  #2C3E50;
+      --status_softlavendel: #A7A0C9;
+      --status_mutedpurple:  #6B5876;
     }
     
     * { box-sizing: border-box; }
@@ -42,13 +56,25 @@
     
     h1 {
       font-family: 'Poppins', sans-serif;
-      margin: 0 0 20px 0;
+      margin: 0;
       font-size: 24px;
       color: var(--white);
       background-color: var(--primary);
-      border-radius: 8px;
+      border-radius: 8px 8px 0 0;
       padding: 10px 20px;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .inforuta {
+      margin-top: 0;
+      font-size: 15px;
+      color: var(--text);
+      background-color: var(--subtle);
+      border-radius: 0 0 8px 8px;
+      padding: 10px 20px;
+      margin-bottom: 15px;
     }
     
     .game-area {
@@ -63,7 +89,7 @@
     
     .box {
       flex: 1 1 50%;
-      background-color: var(--subtle);
+      background-color: var(--primary);
       border-radius: 8px;
       padding: 20px;
       text-align: center;
@@ -119,7 +145,7 @@
       padding: 4px 8px;
       font-size: 16px;
       line-height: 1;
-      background-color: var(--primary);
+      background-color: var(--effect);
       color: var(--white);
       border: none;
       border-radius: 3px;
@@ -157,20 +183,15 @@
       background-color: var(--effect);
     }
     
-    .inforuta {
-      font-size: 15px;
-      color: var(--text);
-      background-color: var(--subtle);
-      border-radius: 8px;
-      padding: 10px 20px;
-      margin-bottom: 15px;
-      outline: none;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Klassrumstimer</h1>
+    <p class="inforuta">
+      En enkel timer och klocka för visning på projektor under lektioner. Det är också möjligt att visa annan information som kan vara viktig för lektionen eller provet, såsom provkoder till digitala plattformar eller instruktioner för den pågående uppgiften. 
+    </p>
+
     <div class="game-area">
       <div id="timer-box" class="box">
         <div id="timer-container">
@@ -291,13 +312,13 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "#8E9775";
       ctx.fill();
-      ctx.strokeStyle = "#40534C";
+      ctx.strokeStyle = "#5B7052";
       ctx.lineWidth = radius * 0.05;
       ctx.stroke();
       // Använd systemets fallback (sans-serif) för klockans siffror
-      ctx.fillStyle = "#40534C";
+      ctx.fillStyle = "#fff";
       ctx.font = (radius * 0.15) + "px sans-serif";
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
