@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Klassrumstimer</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <!-- Ladda in Google Fonts: Doto -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap" />
   <style>
@@ -39,16 +41,17 @@
       --clock-digit: #1A3636;
       --clock-hand: #2C3E50;
       --clock-second-hand: #A44434;
-      --clock-border-width: 0.05; /* Tjocklek som en andel av radien */
+      --clock-border-width: 0.05;
 
       /* Timer-specifika variabler */
-      --timer-font-family: sans-serif;
-      --timer-font-size: 52px;
+      --timer-font-family: 'Doto', sans-serif;
+      --timer-font-size: 32px;
+      --timer-font-weight: 400;
       --timer-font-color: var(--dark);
       --timer-bg: #FCF8F4;
       --timer-border: #1A3636;
-      --timer-progress-color: #F1E9D2;
-      --timer-text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.3); /* Skugga under timern */
+      --timer-progress-color: #3CB371;
+      --timer-text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     }
     
     * { box-sizing: border-box; }
@@ -82,6 +85,22 @@
       align-items: center;
     }
     
+    textarea,
+    input[type="number"] {
+      background-color: var(--textarea);
+      border: 1px solid var(--effect);
+      color: var(--dark);
+      font-size: 13px;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
     .inforuta {
       margin-top: 0;
       font-size: 15px;
@@ -91,8 +110,8 @@
       padding: 10px 20px;
       margin-bottom: 15px;
     }
-
-    /* Timerinställningsruta – placeras under inforutan */
+    
+    /* Timerinställningsruta */
     #timer-settings {
       display: flex;
       align-items: center;
@@ -100,12 +119,35 @@
       gap: 10px;
       margin-bottom: 15px;
     }
-    #timer-duration {
-      width: 80px;
-      padding: 5px;
-      font-size: 16px;
-      text-align: center;
+    /* Omslagsbehållare för inmatningsrutan med suffix */
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
     }
+    .input-wrapper::after {
+      content: " minuter";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--timer-font-color);
+    }
+    .input-wrapper:focus-within::after {
+      content: "";
+    }
+    
+    #timer-duration {
+      width: 120px;
+      padding: 5px 60px 5px 5px;
+      font-size: 16px;
+    }
+    /* Flytta spinnerpilarna åt vänster */
+    #timer-duration::-webkit-inner-spin-button,
+    #timer-duration::-webkit-outer-spin-button {
+      transform: translateX(-15px);
+    }
+    
     #timer-buttons button {
       padding: 6px 12px;
       font-size: 16px;
@@ -143,19 +185,17 @@
       position: relative;
     }
     
-    /* Timercirkeldiagram med centrerat (read-only) tidvärde */
+    /* Timercirkeldiagram och centrerat innehåll */
     #timer-container {
       position: relative;
       width: 250px;
       height: 250px;
       margin: 0 auto;
     }
-    
     #timer-canvas {
       display: block;
       margin: 0 auto;
     }
-    
     #timer-content {
       position: absolute;
       top: 50%;
@@ -166,8 +206,9 @@
     #timer-display {
       font-size: var(--timer-font-size);
       font-family: var(--timer-font-family);
+      font-weight: var(--timer-font-weight);
       color: var(--timer-font-color);
-      text-shadow: var(--timer-text-shadow); /* Använder variabeln för skugga */
+      text-shadow: var(--timer-text-shadow);
     }
     
     /* Analog klocka */
@@ -202,18 +243,18 @@
 <body>
   <div class="container">
     <h1>Klassrumstimer</h1>
-    <!-- Inforutan återställd till originaltexten -->
     <p class="inforuta">
-      En enkel timer och klocka för visning på projektor under lektioner. Det är också möjligt att visa annan information som kan vara viktig för lektionen eller provet, såsom provkoder till digitala plattformar eller instruktioner för den pågående uppgiften. 
+      En enkel timer och klocka för visning på projektor under lektioner. Det är också möjligt att visa annan information som kan vara viktig för lektionen eller provet, såsom provkoder till digitala plattformar eller instruktioner för den pågående uppgiften.
     </p>
   
-    <!-- Timerinställningsruta: vanligt nummerfält med knappar på samma rad -->
+    <!-- Timerinställningsruta med input wrapper -->
     <div id="timer-settings">
-      <label for="timer-duration">Minuter:</label>
-      <input id="timer-duration" type="number" value="30" min="1" />
+      <div class="input-wrapper">
+        <input id="timer-duration" type="number" value="60" min="1" />
+      </div>
       <div id="timer-buttons">
-        <button id="timer-start-pause">Start/Pausa</button>
-        <button id="timer-stop">Stopp</button>
+        <button id="timer-start-pause">Starta timern</button>
+        <button id="timer-stop">Stoppa timern</button>
       </div>
     </div>
     
@@ -222,7 +263,7 @@
         <div id="timer-container">
           <canvas id="timer-canvas" width="250" height="250"></canvas>
           <div id="timer-content">
-            <span id="timer-display">30:00</span>
+            <span id="timer-display">60:00</span>
           </div>
         </div>
       </div>
@@ -258,7 +299,7 @@
       if (isTimerRunning) {
         clearInterval(timerInterval);
         isTimerRunning = false;
-        this.textContent = "Start/Pausa";
+        this.textContent = "Starta timern";
       } else {
         timerInterval = setInterval(function() {
           if (timeLeft > 0) {
@@ -267,10 +308,11 @@
           } else {
             clearInterval(timerInterval);
             isTimerRunning = false;
+            document.getElementById("timer-start-pause").textContent = "Starta timern";
           }
         }, 1000);
         isTimerRunning = true;
-        this.textContent = "Start/Pausa";
+        this.textContent = "Pausa timern";
       }
     });
     
@@ -279,10 +321,12 @@
       isTimerRunning = false;
       timeLeft = timerDuration;
       updateTimerDisplay();
+      document.getElementById("timer-start-pause").textContent = "Starta timern";
     });
     
+    // Vid blur uppdateras värdet (suffix hanteras via CSS)
     document.getElementById("timer-duration").addEventListener("blur", function() {
-      const value = parseInt(this.value, 10);
+      let value = parseInt(this.value, 10);
       if (!isNaN(value) && value > 0) {
         timerDuration = value * 60;
         timeLeft = timerDuration;
@@ -294,7 +338,6 @@
     
     updateTimerDisplay();
     
-    // Rita timerns cirkeldiagram med timer-specifika variabler
     function updateTimerCanvas() {
       const canvas = document.getElementById("timer-canvas");
       const ctx = canvas.getContext("2d");
@@ -310,13 +353,11 @@
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Bakgrundscirkel
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.fillStyle = timerBg;
       ctx.fill();
       
-      // Framstegs-paj: ifyllt cirkeldiagram
       let progress = (timerDuration - timeLeft) / timerDuration;
       let startAngle = -Math.PI / 2;
       let endAngle = startAngle + progress * 2 * Math.PI;
@@ -327,7 +368,6 @@
       ctx.fillStyle = rootStyles.getPropertyValue('--timer-progress-color').trim();
       ctx.fill();
       
-      // Rita ramen med samma tjocklek som klockan
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.strokeStyle = timerBorder;
@@ -335,7 +375,6 @@
       ctx.stroke();
     }
     
-    /* --- ANALOG KLOCKA --- */
     function drawClock() {
       const canvas = document.getElementById("clock-canvas");
       const ctx = canvas.getContext("2d");
