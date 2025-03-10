@@ -40,6 +40,15 @@
       --clock-hand: #2C3E50;
       --clock-second-hand: #A44434;
       --clock-border-width: 0.05; /* Tjocklek som en andel av radien */
+
+      /* Timer-specifika variabler */
+      --timer-font-family: sans-serif;
+      --timer-font-size: 52px;
+      --timer-font-color: var(--dark);
+      --timer-bg: #FCF8F4;
+      --timer-border: #1A3636;
+      --timer-progress-color: #F1E9D2;
+      --timer-text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.3); /* Skugga under timern */
     }
     
     * { box-sizing: border-box; }
@@ -155,8 +164,10 @@
       text-align: center;
     }
     #timer-display {
-      font-size: 32px;
-      color: var(--dark);
+      font-size: var(--timer-font-size);
+      font-family: var(--timer-font-family);
+      color: var(--timer-font-color);
+      text-shadow: var(--timer-text-shadow); /* Använder variabeln för skugga */
     }
     
     /* Analog klocka */
@@ -283,19 +294,17 @@
     
     updateTimerDisplay();
     
-    // Rita timerns cirkeldiagram med samma dimensioner och ram tjocklek som klockan
+    // Rita timerns cirkeldiagram med timer-specifika variabler
     function updateTimerCanvas() {
       const canvas = document.getElementById("timer-canvas");
       const ctx = canvas.getContext("2d");
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const x = centerX;
-      const y = centerY;
-      const radius = Math.min(x, y) * 0.90;
+      const radius = Math.min(centerX, centerY) * 0.90;
       
       const rootStyles = getComputedStyle(document.documentElement);
-      const timerBg = rootStyles.getPropertyValue('--clock-bg').trim();
-      const timerBorder = rootStyles.getPropertyValue('--clock-border').trim();
+      const timerBg = rootStyles.getPropertyValue('--timer-bg').trim();
+      const timerBorder = rootStyles.getPropertyValue('--timer-border').trim();
       const borderRatio = parseFloat(rootStyles.getPropertyValue('--clock-border-width')) || 0.05;
       const borderThickness = radius * borderRatio;
       
@@ -303,7 +312,7 @@
       
       // Bakgrundscirkel
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.fillStyle = timerBg;
       ctx.fill();
       
@@ -312,15 +321,15 @@
       let startAngle = -Math.PI / 2;
       let endAngle = startAngle + progress * 2 * Math.PI;
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.arc(x, y, radius, startAngle, endAngle, false);
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle, false);
       ctx.closePath();
-      ctx.fillStyle = "#3CB371";
+      ctx.fillStyle = rootStyles.getPropertyValue('--timer-progress-color').trim();
       ctx.fill();
       
       // Rita ramen med samma tjocklek som klockan
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.strokeStyle = timerBorder;
       ctx.lineWidth = borderThickness;
       ctx.stroke();
@@ -330,9 +339,9 @@
     function drawClock() {
       const canvas = document.getElementById("clock-canvas");
       const ctx = canvas.getContext("2d");
-      const x = canvas.width / 2;
-      const y = canvas.height / 2;
-      const radius = Math.min(x, y) * 0.90;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) * 0.90;
       
       const rootStyles = getComputedStyle(document.documentElement);
       const clockBg = rootStyles.getPropertyValue('--clock-bg').trim();
@@ -345,7 +354,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.fillStyle = clockBg;
       ctx.fill();
       ctx.strokeStyle = clockBorder;
@@ -358,8 +367,8 @@
       ctx.textAlign = "center";
       for (let num = 1; num <= 12; num++) {
         let ang = num * Math.PI / 6;
-        let numX = x + radius * 0.75 * Math.cos(ang - Math.PI/2);
-        let numY = y + radius * 0.75 * Math.sin(ang - Math.PI/2);
+        let numX = centerX + radius * 0.75 * Math.cos(ang - Math.PI/2);
+        let numY = centerY + radius * 0.75 * Math.sin(ang - Math.PI/2);
         ctx.fillText(num.toString(), numX, numY);
       }
       
@@ -369,11 +378,11 @@
       let second = now.getSeconds();
       hour = hour % 12;
       let hourAngle = (hour * Math.PI / 6) + (minute * Math.PI / 360) + (second * Math.PI / 21600);
-      drawHand(ctx, x, y, hourAngle, radius * 0.5, radius * 0.07, clockHand);
+      drawHand(ctx, centerX, centerY, hourAngle, radius * 0.5, radius * 0.07, clockHand);
       let minuteAngle = (minute * Math.PI / 30) + (second * Math.PI / 1800);
-      drawHand(ctx, x, y, minuteAngle, radius * 0.7, radius * 0.05, clockHand);
+      drawHand(ctx, centerX, centerY, minuteAngle, radius * 0.7, radius * 0.05, clockHand);
       let secondAngle = second * Math.PI / 30;
-      drawHand(ctx, x, y, secondAngle, radius * 0.8, radius * 0.02, clockSecondHand);
+      drawHand(ctx, centerX, centerY, secondAngle, radius * 0.8, radius * 0.02, clockSecondHand);
     }
     
     function drawHand(ctx, x, y, pos, length, width, color) {
