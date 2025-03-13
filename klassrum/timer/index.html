@@ -13,12 +13,12 @@
     :root {
       --bg: #f4f4f4;
       --white: #ffffff;
-      --primary: #40534C; /* Primärfärg */
-      --effect: #677D6A;  /* Effektfärg */
+      --primary: #40534C;
+      --effect: #677D6A;
       --dark: #1A3636;
       --text: #644117;
       --subtle: #D6BD98;
-      --placeholder: #677D6A; /* Standard placeholder-färg */
+      --placeholder: #677D6A;
       --textarea: #FCF8F4;
       
       /* Klockans färger */
@@ -29,7 +29,7 @@
       --clock-second-hand: #A44434;
       --clock-border-width: 0.05;
       
-      /* Timer-specifika variabler */
+      /* Timer */
       --timer-font-family: sans-serif;
       --timer-font-size: 52px;
       --timer-font-weight: 400;
@@ -38,6 +38,11 @@
       --timer-border: #1A3636;
       --timer-progress-color: #F7E7CE;
       --timer-text-shadow: 0px 0px 2px rgba(250, 250, 250, 0.9);
+
+      /* Meddelande-textstorlekar */
+      --msg-text-size-small: 16px;
+      --msg-text-size-medium: 20px;
+      --msg-text-size-large: 24px;
     }
     
     * { box-sizing: border-box; }
@@ -109,10 +114,7 @@
       margin: 0 auto;
     }
     
-    #timer-canvas {
-      display: block;
-      margin: 0 auto;
-    }
+    #timer-canvas { display: block; margin: 0 auto; }
     
     #timer-info {
       position: absolute;
@@ -139,7 +141,7 @@
     #timer-controls {
       display: flex;
       flex-direction: column;
-      gap: 0px;
+      gap: 0;
       height: 52px;
       margin-top: 9px;
     }
@@ -153,9 +155,7 @@
       height: calc((52px - 10px) / 2);
     }
     
-    .material-icons {
-      color: #40534C;
-    }
+    .material-icons { color: #40534C; }
     
     #clock-box {
       display: flex;
@@ -173,37 +173,32 @@
     #message-rows {
       flex: 1 1 100%;
       margin-top: 0;
-      position: relative;
     }
     
-    /* Rader utan extra sidomarginaler */
     .message-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 10px;
       margin: 0 0 10px 0;
-      position: relative;
-      padding: 0;
     }
+    /* Sista (nya) raden ska inte ha extra marginal nedanför */
+    .message-row:last-child { margin-bottom: 0; }
     
     .message-box {
       flex: 1;
       background-color: var(--primary);
       border-radius: 5px;
-      padding: 10px 40px 10px 10px;
-      position: relative;
-      text-align: left;
+      padding: 10px;
+      text-align: center;
       min-height: 40px;
       color: #ffffff;
     }
     
-    /* Styling för ny rad */
     .message-box.new-box {
       border: 2px dashed var(--primary);
       background-color: var(--effect);
     }
     
-    /* Placeholder-styling */
     .message-cell:empty:not(:focus):before {
       content: attr(data-placeholder);
       color: var(--placeholder);
@@ -213,51 +208,39 @@
       color: #ffffff;
     }
     
-    .message-cell {
-      outline: none;
-    }
+    .message-cell { outline: none; }
     
-    /* Textstorlekskontroller */
-    .text-size-controls {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 5px;
+    /* Dolda kontroller visas som sista flexbarnet i raden */
+    .row-controls {
+      margin-left: auto;
+      display: none;
+      gap: 10px;
+      align-items: center;
     }
-    .text-size-controls .material-icons {
+    .message-row:hover .row-controls { display: flex; }
+    
+    .text-size-controls { display: flex; gap: 5px; }
+    
+    .text-size-btn {
       cursor: pointer;
       user-select: none;
-      font-size: 16px;
       color: #ffffff;
     }
     
-    /* Kolumnkontroller – dolda som standard, visas vid hover */
     .message-controls {
-      display: none;
+      display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 5px;
       cursor: pointer;
       align-self: center;
     }
-    .message-row:hover .message-controls {
-      display: flex;
-    }
     
-    /* Vänsterpil för att ta bort rad – dolda som standard */
     .row-btn {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
       cursor: pointer;
       display: none;
     }
-    .message-row:hover .row-btn {
-      display: block;
-    }
+    .message-row:hover .row-btn { display: block; }
   </style>
 </head>
 <body>
@@ -467,13 +450,34 @@
     /* ---------------- Meddelanderader med dynamiska kontroller ---------------- */
     const messageRowsContainer = document.getElementById('message-rows');
     
-    // Skapa en ny meddelanderad.
-    // isNew === true markerar "ny rad" med specialstil (där placeholdertexten har en annan färg).
+    // Initiera eventlyssnare för en cell i en rad
+    function initCell(cell, row) {
+      cell.addEventListener('input', function() {
+        if (row === messageRowsContainer.lastElementChild &&
+            cell.parentElement.classList.contains('new-box') &&
+            cell.textContent.trim() !== "") {
+          cell.parentElement.classList.remove('new-box');
+          cell.setAttribute("data-placeholder", "Skriv meddelande här...");
+          messageRowsContainer.appendChild(createMessageRow(true));
+        }
+        if (cell.textContent.trim() === "") {
+          cell.innerHTML = "";
+        }
+      });
+      cell.addEventListener('blur', function() {
+        if (row !== messageRowsContainer.lastElementChild &&
+            row.querySelectorAll('.message-box').length === 1 &&
+            cell.textContent.trim() === "") {
+          messageRowsContainer.removeChild(row);
+        }
+      });
+    }
+    
     function createMessageRow(isNew = false) {
       const row = document.createElement('div');
       row.classList.add('message-row');
       
-      // Om raden inte är ny, lägg till en vänsterpil för att ta bort hela raden.
+      // Lägg till en vänsterpil för att ta bort raden (om den inte är ny)
       if (!isNew) {
         const rowBtn = document.createElement('span');
         rowBtn.classList.add('material-icons', 'row-btn');
@@ -486,136 +490,99 @@
         row.appendChild(rowBtn);
       }
       
-      // Skapa meddelanderutan
+      // Skapa meddelanderuta/-rutor (första kolumnen)
       const box = document.createElement('div');
       box.classList.add('message-box');
-      if (isNew) {
-        box.classList.add('new-box');
-      }
+      if (isNew) { box.classList.add('new-box'); }
       
       const cell = document.createElement('div');
       cell.classList.add('message-cell');
       cell.setAttribute("contenteditable", "true");
       cell.setAttribute("data-placeholder", isNew ? "Skriv här för att skapa en ny rad." : "Skriv meddelande här...");
       cell.innerHTML = "";
+      box.appendChild(cell);
+      row.appendChild(box);
       
+      initCell(cell, row);
+      
+      // Skapa de dolda kontrollerna som ett flexbarn (placerade längst till höger)
+      const rowControls = document.createElement('div');
+      rowControls.classList.add('row-controls');
+      
+      // Textstorlekskontroller
       const textSizeControls = document.createElement('div');
       textSizeControls.classList.add('text-size-controls');
+      ['small', 'medium', 'large'].forEach(size => {
+        const btn = document.createElement('span');
+        btn.classList.add('text-size-btn');
+        btn.setAttribute("contenteditable", "false");
+        btn.setAttribute("data-size", size);
+        btn.textContent = "A";
+        btn.style.fontSize = `var(--msg-text-size-${size})`;
+        textSizeControls.appendChild(btn);
+      });
       
-      const decreaseBtn = document.createElement('span');
-      decreaseBtn.classList.add('material-icons', 'decrease-text');
-      decreaseBtn.setAttribute("contenteditable", "false");
-      decreaseBtn.textContent = "remove";
-      
-      const increaseBtn = document.createElement('span');
-      increaseBtn.classList.add('material-icons', 'increase-text');
-      increaseBtn.setAttribute("contenteditable", "false");
-      increaseBtn.textContent = "add";
-      
-      textSizeControls.appendChild(decreaseBtn);
-      textSizeControls.appendChild(increaseBtn);
-      
-      box.appendChild(cell);
-      box.appendChild(textSizeControls);
-      
-      // Skapa kontroll för kolumn (högerpil)
-      const controls = document.createElement('div');
-      controls.classList.add('message-controls');
-      
+      // Kolumnkontroller
+      const columnControls = document.createElement('div');
+      columnControls.classList.add('message-controls');
       const columnBtn = document.createElement('span');
       columnBtn.classList.add('material-icons', 'column-btn');
       columnBtn.setAttribute("title", "Lägg till kolumn");
       columnBtn.textContent = "arrow_right";
+      columnControls.appendChild(columnBtn);
       
-      controls.appendChild(columnBtn);
+      rowControls.appendChild(textSizeControls);
+      rowControls.appendChild(columnControls);
       
-      row.appendChild(box);
-      row.appendChild(controls);
+      row.appendChild(rowControls);
       
-      initMessageBox(box);
-      
-      // När man börjar skriva i den sista (nya) raden tas "new"-stilen bort och en ny rad läggs till.
-      cell.addEventListener('input', function() {
-        if (row === messageRowsContainer.lastElementChild && box.classList.contains('new-box') && cell.textContent.trim() !== "") {
-          box.classList.remove('new-box');
-          cell.setAttribute("data-placeholder", "Skriv meddelande här...");
-          messageRowsContainer.appendChild(createMessageRow(true));
-        }
+      // Händelsehantering för textstorlekskontroller – ändrar fontstorlek på alla celler i raden
+      textSizeControls.querySelectorAll('.text-size-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const size = this.getAttribute('data-size');
+          const newSize = getComputedStyle(document.documentElement)
+                            .getPropertyValue(`--msg-text-size-${size}`).trim();
+          row.querySelectorAll('.message-cell').forEach(cell => {
+            cell.style.fontSize = newSize;
+            cell.dataset.fontSize = newSize;
+          });
+        });
       });
       
-      // Om raden bara har en ruta, tas den bort (om rutan är tom) vid blur (förutom den sista, nya raden)
-      cell.addEventListener('blur', function() {
-        if (row !== messageRowsContainer.lastElementChild &&
-            row.querySelectorAll('.message-box').length === 1 &&
-            cell.textContent.trim() === "") {
-          messageRowsContainer.removeChild(row);
-        }
-      });
+      // Sätt standardfontstorlek (medium)
+      const defaultSize = getComputedStyle(document.documentElement)
+                          .getPropertyValue('--msg-text-size-medium').trim();
+      cell.style.fontSize = defaultSize;
+      cell.dataset.fontSize = defaultSize;
       
       return row;
     }
     
-    // Initiera med en första rad (ny rad)
+    // Lägg till den första (nya) raden
     messageRowsContainer.appendChild(createMessageRow(true));
     
-    // Initiera textstorlekskontroller
-    function initMessageBox(messageBox) {
-      const messageCell = messageBox.querySelector('.message-cell');
-      messageCell.dataset.fontSize = "16";
-      messageCell.addEventListener('input', function() {
-        if (messageCell.textContent.trim() === "") {
-          messageCell.innerHTML = "";
-        }
-      });
-      const increaseBtn = messageBox.querySelector('.increase-text');
-      const decreaseBtn = messageBox.querySelector('.decrease-text');
-      
-      increaseBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        let fontSize = parseInt(messageCell.dataset.fontSize, 10);
-        fontSize += 2;
-        messageCell.dataset.fontSize = fontSize;
-        messageCell.style.fontSize = fontSize + "px";
-      });
-      
-      decreaseBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        let fontSize = parseInt(messageCell.dataset.fontSize, 10);
-        if (fontSize > 6) {
-          fontSize -= 2;
-          messageCell.dataset.fontSize = fontSize;
-          messageCell.style.fontSize = fontSize + "px";
-        }
-      });
-    }
-    
-    // Eventdelegation för kolumnknappen:
+    // Eventdelegation för kolumnknappen: lägger till eller tar bort en kolumn i raden
     messageRowsContainer.addEventListener('click', function(e) {
       if (e.target.classList.contains('column-btn')) {
         const row = e.target.closest('.message-row');
         const boxes = row.querySelectorAll('.message-box');
         if (boxes.length === 1) {
-          // Kontrollera att cellen inte är tom innan vi lägger till en kolumn
           const cell = boxes[0].querySelector('.message-cell');
-          if (cell.textContent.trim() === "") {
-            return;
-          }
-          // Lägg till en extra kolumn
+          if (cell.textContent.trim() === "") { return; }
           const newBox = boxes[0].cloneNode(true);
           const newCell = newBox.querySelector('.message-cell');
           newCell.innerHTML = "";
-          newCell.dataset.fontSize = "16";
+          newCell.dataset.fontSize = getComputedStyle(document.documentElement)
+                                      .getPropertyValue('--msg-text-size-medium').trim();
           newBox.classList.remove('new-box');
           newCell.setAttribute("data-placeholder", "Skriv meddelande här...");
-          initMessageBox(newBox);
-          row.insertBefore(newBox, row.querySelector('.message-controls'));
-          // Ändra ikonen till en vänsterpekande pil
+          initCell(newCell, row);
+          row.insertBefore(newBox, row.querySelector('.row-controls'));
           e.target.textContent = "arrow_left";
           e.target.setAttribute("title", "Ta bort kolumn");
         } else if (boxes.length === 2) {
-          // Ta bort den extra kolumnen
           row.removeChild(row.querySelectorAll('.message-box')[1]);
-          // Återställ ikonen till högerpil
           e.target.textContent = "arrow_right";
           e.target.setAttribute("title", "Lägg till kolumn");
         }
