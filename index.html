@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="sv">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jimmy Nylén [.se]</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Source+Serif+Pro&display=swap">
   <style>
     :root {
       --bg: #f4f4f4;       /* ljusgrå (#f4f4f4) */
@@ -39,6 +37,9 @@
     }
 
     h1 {
+      display: flex;
+      justify-content: space-between; /* Placerar barnen längst ut till vänster och höger */
+      align-items: center;            /* Centrerar innehållet i höjdled */
       font-family: 'Poppins', sans-serif;
       margin-top: 0;
       font-size: 24px;
@@ -62,9 +63,8 @@
       background-color: #fff;
       color: var(--primary);
       border-radius: 5px;
-      padding-left: 5px;
-      padding-right: 5px;
-      text-align:right;
+      padding: 0 5px;
+      font-size: 14px;
     }
 
     .button-container {
@@ -108,8 +108,8 @@
 
     /* Rubrikstil som efterliknar pre-taggens utseende */
     h2.dashed-header {
-      font-family: monospace; /* Monospace (standard för pre-taggar) */
-      font-size: 14px;        /* Anpassad storlek för att matcha pre-taggen */
+      font-family: monospace;
+      font-size: 14px;
       color: var(--dark);
       display: flex;
       align-items: center;
@@ -117,7 +117,7 @@
       margin: 20px 0;
       margin-bottom: 5px;
       margin-top: 15px;
-      white-space: nowrap;    /* Behåller whitespace så att innehållet inte bryts */
+      white-space: nowrap;
     }
 
     h2.dashed-header .title {
@@ -132,13 +132,13 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
-    <h1>Skolverktyg skapade med AI</h1>
-
-    <p>Dessa verktyg är skapade som ett experiment för att se hur väl Artificiell Intelligens fungerar som ett stöd
-      vid programmering. Alla verktyg är skapade med ChatGPT (som inte alltid gör saker så enkla som man hade hoppats) och endast visuella justeringar är gjorda för hand.</p>
+    <h1>
+      Skolverktyg skapade med AI 
+      <span class="jn">Jimmy Nylén</span>
+    </h1>
+    <p>Dessa verktyg är skapade som ett experiment för att se hur väl Artificiell Intelligens fungerar som ett stöd vid programmering. Alla verktyg är skapade med ChatGPT (som inte alltid gör saker så enkla som man hade hoppats) och endast visuella justeringar är gjorda för hand.</p>
 
     <!-- Rubrik som efterliknar pre -->
     <h2 class="dashed-header"><span class="title">Klassrumsverktyg</span></h2>
@@ -168,5 +168,4 @@
     </div>
   </div>
 </body>
-
 </html>
