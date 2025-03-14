@@ -59,12 +59,25 @@
       border-radius: 0 0 8px 8px;
     }
 
+    /* Ändrad .jn-klass som nu gäller för länken */
     .jn {
       background-color: #fff;
       color: var(--primary);
       border-radius: 5px;
       padding: 0 5px;
       font-size: 14px;
+      text-decoration: none;
+    }
+
+    /* Besökta länkar behåller samma färg */
+    a.jn:visited {
+      color: var(--primary);
+    }
+
+    /* När muspekaren är över länken ändras bakgrundsfärgen till gul */
+    a.jn:hover {
+      background-color: #ffffd4;
+      text-decoration: none;
     }
 
     .button-container {
@@ -136,7 +149,7 @@
   <div class="container">
     <h1>
       Skolverktyg skapade med AI 
-      <span class="jn">Jimmy Nylén</span>
+      <a class="jn" href="https://www.geogebra.org/u/jimmynylen" target="_blank">Jimmy Nylén</a>
     </h1>
     <p>Dessa verktyg är skapade som ett experiment för att se hur väl Artificiell Intelligens fungerar som ett stöd vid programmering. Alla verktyg är skapade med ChatGPT (som inte alltid gör saker så enkla som man hade hoppats) och endast visuella justeringar är gjorda för hand.</p>
 
@@ -154,7 +167,6 @@
       <button onclick="window.location.href='https://jimmynylen.github.io/matematik/statistik'">Beräkna lägesmått och spridningsmått</button>
       <button onclick="window.location.href='https://jimmynylen.github.io/matematik/sannolikhet'">Tärningskast och sannolikhet</button>
       <button onclick="window.location.href='https://jimmynylen.github.io/matematik/enhetsomvandlare'">Enhetsomvandlaren (ma/fy/ke/IT)</button>
-      <button onclick="window.location.href='https://www.geogebra.org/u/jimmynylen'">Mina Geogebra-projekt</button>
       <button onclick="window.location.href='https://jimmynylen.github.io/matematik/countdown'">Sifferspelet från Countdown</button>
     </div>
 
