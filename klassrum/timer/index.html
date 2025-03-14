@@ -6,7 +6,7 @@
   <title>Klassrumstimer</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <!-- Ladda in Google Fonts -->
+  <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap" />
   <style>
@@ -14,26 +14,12 @@
       --bg: #f4f4f4;
       --white: #ffffff;
       --primary: #40534C;
-      --cell_mediumgreen: #3CB371;
+      --effect: #677D6A;
       --dark: #1A3636;
       --text: #644117;
       --subtle: #D6BD98;
-      --effect: #677D6A;
-      --placeholder: #B9AFA1;
+      --placeholder: #677D6A;
       --textarea: #FCF8F4;
-      --extra_effect: #D98E04;
-      --extra_primary: #E0A030;
-      --extra_red: #A44434;
-      --status_graygreen: #8E9775;
-      --status_olivegreen: #5B7052;
-      --status_ochreyellow: #D4A76A;
-      --status_goldenbrown: #C2955C;
-      --status_sienna: #A0522D;
-      --status_burntumber: #8A3324;
-      --status_steelblue: #4682B4;
-      --status_darkblue:  #2C3E50;
-      --status_softlavendel: #A7A0C9;
-      --status_mutedpurple:  #6B5876;
       
       /* Klockans färger */
       --clock-border: #1A3636;
@@ -42,8 +28,8 @@
       --clock-hand: #2C3E50;
       --clock-second-hand: #A44434;
       --clock-border-width: 0.05;
-
-      /* Timer-specifika variabler */
+      
+      /* Timer */
       --timer-font-family: sans-serif;
       --timer-font-size: 52px;
       --timer-font-weight: 400;
@@ -52,6 +38,11 @@
       --timer-border: #1A3636;
       --timer-progress-color: #F7E7CE;
       --timer-text-shadow: 0px 0px 2px rgba(250, 250, 250, 0.9);
+
+      /* Meddelande-textstorlekar */
+      --msg-text-size-small: 16px;
+      --msg-text-size-medium: 20px;
+      --msg-text-size-large: 24px;
     }
     
     * { box-sizing: border-box; }
@@ -85,21 +76,6 @@
       align-items: center;
     }
     
-    textarea {
-      background-color: var(--textarea);
-      border: 1px solid var(--effect);
-      color: var(--dark);
-      font-size: 13px;
-      width: 100%;
-      max-width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-    
     .inforuta {
       margin-top: 0;
       font-size: 15px;
@@ -112,16 +88,16 @@
     
     .game-area {
       display: flex;
+      flex-wrap: wrap;
       gap: 15px;
       background-color: var(--effect);
       padding: 15px;
       border-radius: 8px;
-      margin-bottom: 15px;
       border: 1px solid var(--primary);
     }
     
     .box {
-      flex: 1 1 50%;
+      flex: 1 1 45%;
       background-color: var(--primary);
       border-radius: 8px;
       padding: 20px;
@@ -130,7 +106,7 @@
       position: relative;
     }
     
-    /* Timercirkeldiagram och centrerat innehåll */
+    /* Timer och klockelement */
     #timer-container {
       position: relative;
       width: 250px;
@@ -138,12 +114,8 @@
       margin: 0 auto;
     }
     
-    #timer-canvas {
-      display: block;
-      margin: 0 auto;
-    }
+    #timer-canvas { display: block; margin: 0 auto; }
     
-    /* Container för timervisning och knappar */
     #timer-info {
       position: absolute;
       top: 50%;
@@ -154,7 +126,6 @@
       gap: 5px;
     }
     
-    /* Numerisk timer – tar sin naturliga plats i flexboxen */
     #timer-display {
       font-size: var(--timer-font-size);
       font-family: var(--timer-font-family);
@@ -167,13 +138,12 @@
       line-height: 52px;
     }
     
-    /* Knapparna, staplade vertikalt med 5px gap */
     #timer-controls {
       display: flex;
       flex-direction: column;
-      gap: 0px;
+      gap: 0;
       height: 52px;
-      margin-top:10px;
+      margin-top: 9px;
     }
     
     #timer-controls button {
@@ -182,16 +152,11 @@
       background: none;
       border: none;
       cursor: pointer;
-      /* Varje knapp får höjden: (52px - 5px) / 2 */
       height: calc((52px - 10px) / 2);
     }
     
-    /* Ändra Material Icons färg till grön */
-    .material-icons {
-      color: #40534C;
-    }
+    .material-icons { color: #40534C; }
     
-    /* Analog klocka */
     #clock-box {
       display: flex;
       justify-content: center;
@@ -204,33 +169,89 @@
       height: 250px;
     }
     
-    #add-info-btn {
-      display: block;
-      width: 200px;
-      margin: 0 auto 15px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: var(--primary);
-      color: var(--white);
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    /* Meddelanderader */
+    #message-rows {
+      flex: 1 1 100%;
+      margin-top: 0;
     }
     
-    #add-info-btn:hover {
+    .message-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 10px 0;
+    }
+    /* Sista (nya) raden ska inte ha extra marginal nedanför */
+    .message-row:last-child { margin-bottom: 0; }
+    
+    .message-box {
+      flex: 1;
+      background-color: var(--primary);
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      min-height: 40px;
+      color: #ffffff;
+      font-family: sans-serif;
+    }
+    
+    .message-box.new-box {
+      border: 1px dashed var(--primary);
       background-color: var(--effect);
     }
-
+    
+    .message-cell:empty:not(:focus):before {
+      content: attr(data-placeholder);
+      color: var(--placeholder);
+      display: block;
+    }
+    .message-box.new-box .message-cell:empty:not(:focus):before {
+      color: var(--primary);
+    }
+    
+    .message-cell { outline: none; }
+    
+    /* Dolda kontroller visas som sista flexbarnet i raden */
+    .row-controls {
+      margin-left: auto;
+      display: none;
+      gap: 10px;
+      align-items: center;
+    }
+    .message-row:hover .row-controls { display: flex; }
+    
+    .text-size-controls { display: flex; gap: 5px; }
+    
+    .text-size-btn {
+      cursor: pointer;
+      user-select: none;
+      color: #ffffff;
+    }
+    
+    .message-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      align-self: center;
+    }
+    
+    .row-btn {
+      cursor: pointer;
+      display: none;
+    }
+    .message-row:hover .row-btn { display: block; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Klassrumstimer</h1>
+    <h1>Klassrumstimer för projektor</h1>
     <p class="inforuta">
-      En enkel timer och klocka för visning på projektor under lektioner. Det är också möjligt att visa annan information som kan vara viktig för lektionen eller provet, såsom provkoder till digitala plattformar eller instruktioner för den pågående uppgiften.
+      En enkel timer och klocka för visning på projektor under lektioner eller prov. Ändra timern genom att skriva rätt i rutan när timern är avstängd. Utöver den funktionaliteten går det även att visa annan information såsom provkoder eller instruktioner för den uppgift som de ska arbeta med.
     </p>
-    
     <div class="game-area">
+      <!-- Timer och klocka -->
       <div id="timer-box" class="box">
         <div id="timer-container">
           <canvas id="timer-canvas" width="250" height="250"></canvas>
@@ -246,14 +267,12 @@
       <div id="clock-box" class="box">
         <canvas id="clock-canvas" width="250" height="250"></canvas>
       </div>
+      <!-- Meddelanderader -->
+      <div id="message-rows"></div>
     </div>
-    
-    <button id="add-info-btn">Lägg till ny ruta</button>
-    <div id="info-container"></div>
   </div>
-  
   <script>
-    // Hjälpfunktion för att parsa en tidsträng (mm:ss) till sekunder
+    /* ---------------- Timer och klocka ---------------- */
     function parseTimeString(timeStr) {
       const parts = timeStr.split(':');
       if (parts.length === 2) {
@@ -266,7 +285,6 @@
       return null;
     }
     
-    // Formatera sekunder till mm:ss
     function formatTime(totalSeconds) {
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
@@ -280,13 +298,11 @@
     let timerInterval = null;
     let isTimerRunning = false;
     
-    // Uppdatera visningen och cirkeldiagrammet
     function updateTimerDisplay() {
       timerDisplayElem.textContent = formatTime(timeLeft);
       updateTimerCanvas();
     }
     
-    // När användaren redigerar timervisningen uppdateras värdet vid blur
     timerDisplayElem.addEventListener("blur", function() {
       const newTime = parseTimeString(timerDisplayElem.textContent);
       if (newTime !== null && newTime > 0) {
@@ -298,7 +314,6 @@
       }
     });
     
-    // Toggle-knapp för att starta/pausa timern
     document.getElementById("toggle-btn").addEventListener("click", function() {
       const toggleBtnIcon = this.querySelector("i");
       if (!isTimerRunning) {
@@ -324,7 +339,6 @@
       }
     });
     
-    // Stop-knappen återställer timern
     document.getElementById("stop-btn").addEventListener("click", function() {
       clearInterval(timerInterval);
       isTimerRunning = false;
@@ -336,7 +350,6 @@
     
     updateTimerDisplay();
     
-    // Uppdatera cirkeldiagrammet för timern
     function updateTimerCanvas() {
       const canvas = document.getElementById("timer-canvas");
       const ctx = canvas.getContext("2d");
@@ -352,13 +365,11 @@
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Rita bakgrunden
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.fillStyle = timerBg;
       ctx.fill();
       
-      // Rita framsteg (fyllning)
       let progress = (timerDuration - timeLeft) / timerDuration;
       let startAngle = -Math.PI / 2;
       let endAngle = startAngle + progress * 2 * Math.PI;
@@ -369,7 +380,6 @@
       ctx.fillStyle = rootStyles.getPropertyValue('--timer-progress-color').trim();
       ctx.fill();
       
-      // Rita cirkelns kant
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.strokeStyle = timerBorder;
@@ -377,7 +387,6 @@
       ctx.stroke();
     }
     
-    // Analog klocka
     function drawClock() {
       const canvas = document.getElementById("clock-canvas");
       const ctx = canvas.getContext("2d");
@@ -395,7 +404,6 @@
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Rita klockans bakgrund och kant
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
       ctx.fillStyle = clockBg;
@@ -404,7 +412,6 @@
       ctx.lineWidth = radius * clockBorderWidth;
       ctx.stroke();
       
-      // Rita siffror
       ctx.fillStyle = clockDigit;
       ctx.font = (radius * 0.15) + "px sans-serif";
       ctx.textBaseline = "middle";
@@ -416,7 +423,6 @@
         ctx.fillText(num.toString(), numX, numY);
       }
       
-      // Rita klockans visare
       let now = new Date();
       let hour = now.getHours() % 12;
       let minute = now.getMinutes();
@@ -442,13 +448,146 @@
     setInterval(drawClock, 1000);
     drawClock();
     
-    document.getElementById("add-info-btn").addEventListener("click", function() {
-      const infoContainer = document.getElementById("info-container");
-      const newInfo = document.createElement("div");
-      newInfo.className = "inforuta";
-      newInfo.contentEditable = "true";
-      newInfo.textContent = "Skriv här...";
-      infoContainer.appendChild(newInfo);
+    /* ---------------- Meddelanderader med dynamiska kontroller ---------------- */
+    const messageRowsContainer = document.getElementById('message-rows');
+    
+    // Initiera eventlyssnare för en cell i en rad
+    function initCell(cell, row) {
+      cell.addEventListener('input', function() {
+        if (row === messageRowsContainer.lastElementChild &&
+            cell.parentElement.classList.contains('new-box') &&
+            cell.textContent.trim() !== "") {
+          cell.parentElement.classList.remove('new-box');
+          cell.setAttribute("data-placeholder", "Skriv meddelande här...");
+          messageRowsContainer.appendChild(createMessageRow(true));
+        }
+        if (cell.textContent.trim() === "") {
+          cell.innerHTML = "";
+        }
+      });
+      cell.addEventListener('blur', function() {
+        if (row !== messageRowsContainer.lastElementChild &&
+            row.querySelectorAll('.message-box').length === 1 &&
+            cell.textContent.trim() === "") {
+          messageRowsContainer.removeChild(row);
+        }
+      });
+    }
+    
+    function createMessageRow(isNew = false) {
+      const row = document.createElement('div');
+      row.classList.add('message-row');
+      
+      // Lägg till en vänsterpil för att ta bort raden (om den inte är ny)
+      if (!isNew) {
+        const rowBtn = document.createElement('span');
+        rowBtn.classList.add('material-icons', 'row-btn');
+        rowBtn.textContent = "arrow_left";
+        rowBtn.setAttribute("title", "Ta bort rad");
+        rowBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          messageRowsContainer.removeChild(row);
+        });
+        row.appendChild(rowBtn);
+      }
+      
+      // Skapa meddelanderuta/-rutor (första kolumnen)
+      const box = document.createElement('div');
+      box.classList.add('message-box');
+      if (isNew) { box.classList.add('new-box'); }
+      
+      const cell = document.createElement('div');
+      cell.classList.add('message-cell');
+      cell.setAttribute("contenteditable", "true");
+      cell.setAttribute("data-placeholder", isNew ? "Skriv här för att skapa en ny rad." : "Skriv meddelande här...");
+      cell.innerHTML = "";
+      box.appendChild(cell);
+      row.appendChild(box);
+      
+      initCell(cell, row);
+      
+      // Skapa de dolda kontrollerna som ett flexbarn (placerade längst till höger)
+      const rowControls = document.createElement('div');
+      rowControls.classList.add('row-controls');
+      
+      // Textstorlekskontroller
+      const textSizeControls = document.createElement('div');
+      textSizeControls.classList.add('text-size-controls');
+      ['small', 'medium', 'large'].forEach(size => {
+        const btn = document.createElement('span');
+        btn.classList.add('text-size-btn');
+        btn.setAttribute("contenteditable", "false");
+        btn.setAttribute("data-size", size);
+        btn.textContent = "A";
+        btn.style.fontSize = `var(--msg-text-size-${size})`;
+        textSizeControls.appendChild(btn);
+      });
+      
+      // Kolumnkontroller
+      const columnControls = document.createElement('div');
+      columnControls.classList.add('message-controls');
+      const columnBtn = document.createElement('span');
+      columnBtn.classList.add('material-icons', 'column-btn');
+      columnBtn.setAttribute("title", "Lägg till kolumn");
+      columnBtn.textContent = "arrow_right";
+      columnControls.appendChild(columnBtn);
+      
+      rowControls.appendChild(textSizeControls);
+      rowControls.appendChild(columnControls);
+      
+      row.appendChild(rowControls);
+      
+      // Händelsehantering för textstorlekskontroller – ändrar fontstorlek på alla celler i raden
+      textSizeControls.querySelectorAll('.text-size-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const size = this.getAttribute('data-size');
+          const newSize = getComputedStyle(document.documentElement)
+                            .getPropertyValue(`--msg-text-size-${size}`).trim();
+          row.querySelectorAll('.message-cell').forEach(cell => {
+            cell.style.fontSize = newSize;
+            cell.dataset.fontSize = newSize;
+          });
+        });
+      });
+      
+      // Sätt standardfontstorlek (medium)
+      const defaultSize = getComputedStyle(document.documentElement)
+                          .getPropertyValue('--msg-text-size-medium').trim();
+      cell.style.fontSize = defaultSize;
+      cell.dataset.fontSize = defaultSize;
+      
+      return row;
+    }
+    
+    // Lägg till den första (nya) raden
+    messageRowsContainer.appendChild(createMessageRow(true));
+    
+    // Eventdelegation för kolumnknappen: lägger till eller tar bort en kolumn i raden
+    messageRowsContainer.addEventListener('click', function(e) {
+      if (e.target.classList.contains('column-btn')) {
+        const row = e.target.closest('.message-row');
+        const boxes = row.querySelectorAll('.message-box');
+        if (boxes.length === 1) {
+          const cell = boxes[0].querySelector('.message-cell');
+          if (cell.textContent.trim() === "") { return; }
+          const newBox = boxes[0].cloneNode(true);
+          const newCell = newBox.querySelector('.message-cell');
+          newCell.innerHTML = "";
+          newCell.dataset.fontSize = getComputedStyle(document.documentElement)
+                                      .getPropertyValue('--msg-text-size-medium').trim();
+          newBox.classList.remove('new-box');
+          newCell.setAttribute("data-placeholder", "Skriv meddelande här...");
+          initCell(newCell, row);
+          row.insertBefore(newBox, row.querySelector('.row-controls'));
+          e.target.textContent = "arrow_left";
+          e.target.setAttribute("title", "Ta bort kolumn");
+        } else if (boxes.length === 2) {
+          row.removeChild(row.querySelectorAll('.message-box')[1]);
+          e.target.textContent = "arrow_right";
+          e.target.setAttribute("title", "Lägg till kolumn");
+        }
+      }
     });
   </script>
 </body>
